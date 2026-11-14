@@ -1,0 +1,537 @@
+/* Team page (side panel): head, facts, the tabs Matches, Titles, News, Transfers, Squad */
+.tp {
+  display: grid;
+  gap: 12px;
+}
+
+.tp-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.tp-head h3 {
+  margin: 0;
+  color: var(--text-strong);
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.tp-head p {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 3px 0 0;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.tp-head .tp-crest {
+  width: 52px;
+  height: 52px;
+}
+
+.tp-crest {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.tp-crest.is-empty {
+  border-radius: 50%;
+  background: var(--track);
+}
+
+.tp-facts {
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+}
+
+.tp-section h4 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0 6px;
+  color: var(--text-muted);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.tp-more {
+  margin-top: 6px;
+}
+
+/* Matches: date, home/away and opponent, score (colour of the result), status */
+.tp-fixtures {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tp-fixture {
+  display: grid;
+  grid-template-columns: 70px minmax(0, 1fr) 64px;
+  align-items: center;
+  gap: 2px 8px;
+  padding: 7px 2px;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+  font-size: 13px;
+}
+
+.tp-date {
+  display: grid;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.tp-date small {
+  font-size: 11px;
+}
+
+.tp-opponent {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  align-items: center;
+  column-gap: 6px;
+  min-width: 0;
+}
+
+.tp-opponent abbr {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.tp-opponent small {
+  grid-column: 2;
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tp-team-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  max-width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+  color: var(--text-strong);
+  font: inherit;
+  text-align: left;
+}
+
+button.tp-team-link {
+  cursor: pointer;
+}
+
+.tp-team-link strong {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+button.tp-team-link:hover {
+  background: none;
+  transform: none;
+}
+
+button.tp-team-link:hover strong,
+.tp-player-link:hover {
+  color: var(--accent-strong);
+  text-decoration: underline;
+}
+
+.tp-score {
+  justify-self: center;
+}
+
+/* a match of the team: the row opens the match info, the opponent its team page */
+.tp-fixture.is-link {
+  cursor: pointer;
+}
+
+.tp-fixture.is-link:hover {
+  background: var(--panel-highlight);
+}
+
+.tp-fixture > .tp-match-link {
+  justify-self: center;
+}
+
+.tp-vs {
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.tp-state {
+  color: #b7791f;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.tp-state.is-live {
+  color: #dc2626;
+}
+
+/* Titles: competition with the count, the seasons as chips */
+.tp-titles {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tp-titles li {
+  display: grid;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.tp-title-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.tp-title-head strong {
+  color: var(--text-strong);
+  font-size: 14px;
+}
+
+.tp-count {
+  flex: none;
+  min-width: 34px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #d99106;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.tp-seasons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.tp-season {
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: var(--accent-soft);
+  color: var(--text-strong);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.tp-runner-up {
+  color: var(--text-muted);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+/* News: picture, headline, source and time */
+.tp-news {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tp-news a {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 6px;
+  border-radius: 10px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.tp-news a:hover {
+  background: var(--panel-highlight);
+}
+
+.tp-news img,
+.tp-news-image {
+  width: 96px;
+  height: 58px;
+  border-radius: 8px;
+  background: var(--track);
+  object-fit: cover;
+}
+
+.tp-news-text {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.tp-news-text strong {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--text-strong);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.3;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.tp-news-text small {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+/* Transfers and squad: players open their profile */
+.tp-player-link {
+  min-width: 0;
+  padding: 0;
+  overflow: hidden;
+  border: none;
+  background: none;
+  box-shadow: none;
+  color: var(--text-strong);
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.tp-player-link:hover {
+  background: none;
+  transform: none;
+}
+
+.pp-fee.is-undisclosed,
+.pp-fee.is-extension {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.tp-squad {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.tp-squad th,
+.tp-squad td {
+  padding: 6px 4px;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.tp-squad thead th {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.tp-squad thead th:nth-child(2),
+.tp-squad tbody th {
+  text-align: left;
+}
+
+.tp-squad tbody th {
+  font-weight: 600;
+}
+
+.tp-squad td:last-child {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.tp-shirt {
+  width: 32px;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.tp-member {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.tp-member strong {
+  color: var(--text-strong);
+  font-weight: 600;
+}
+
+.tp-injured {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  background: #dc2626;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+/* Squad: one table, the groups as its sections, so every column stays in line */
+.tp-squad {
+  table-layout: fixed;
+}
+
+.tp-squad col.is-shirt { width: 40px; }
+.tp-squad col.is-age { width: 50px; }
+.tp-squad col.is-rating { width: 54px; }
+.tp-squad col.is-value { width: 86px; }
+
+.tp-squad .is-left {
+  text-align: left;
+}
+
+.tp-squad .is-right {
+  text-align: right;
+}
+
+.tp-squad .tp-group th {
+  padding: 14px 4px 6px;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.tp-squad .tp-group .sp-count {
+  margin-left: 6px;
+}
+
+.tp-squad thead + tbody .tp-group th {
+  padding-top: 8px;
+}
+
+.tp-member .tp-player-link {
+  flex: 0 1 auto;
+}
+
+.tp-member > :first-child {
+  flex: none;
+}
+
+/* Transfers of a team: player, position and the other club (with crest, opens its page), fee */
+.tp-transfers {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tp-transfers li {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 2px;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+  font-size: 13px;
+}
+
+.tp-move {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.tp-move > strong {
+  color: var(--text-strong);
+  font-weight: 600;
+}
+
+.tp-move small {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.tp-position {
+  font-weight: 700;
+}
+
+.tp-move-club {
+  gap: 4px;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.tp-move-club strong {
+  color: var(--text-strong);
+}
+
+.tp-move-club .tp-crest {
+  width: 16px;
+  height: 16px;
+}
+
+@media (max-width: 480px) {
+  .tp-fixture {
+    grid-template-columns: 64px minmax(0, 1fr) 56px;
+    gap: 2px 6px;
+  }
+
+  .tp-news a {
+    grid-template-columns: 72px minmax(0, 1fr);
+  }
+
+  .tp-news img,
+  .tp-news-image {
+    width: 72px;
+    height: 46px;
+  }
+
+  /* on a phone the rating column gives way to the name */
+  .tp-squad col.is-rating {
+    width: 0;
+  }
+
+  .tp-squad thead th:nth-child(4),
+  .tp-squad tbody td:nth-child(4) {
+    display: none;
+  }
+
+  .tp-transfers li {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 4px 10px;
+  }
+
+  .tp-transfers .pp-date {
+    grid-column: 1 / -1;
+  }
+}

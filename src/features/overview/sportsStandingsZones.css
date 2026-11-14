@@ -1,0 +1,98 @@
+/* Compact single-line rows retain clear zone colours and named rank tooltips. */
+.st-tables {
+  gap: 9px;
+}
+
+.st-tables tr.has-zone,
+.st-tables .st-zone-legend li {
+  --st-zone-ink: var(--st-zone-light);
+  --st-zone-edge: var(--st-zone-edge-light);
+  --st-zone-badge-text: var(--st-zone-text-light);
+}
+
+.st-tables .st-table .st-rank {
+  width: 30px;
+  white-space: nowrap;
+}
+
+.st-tables .st-table th {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.st-tables .st-table td {
+  padding-top: 3px;
+  padding-bottom: 3px;
+  line-height: 1.3;
+}
+
+.st-tables .st-table td.st-rank.has-zone {
+  box-shadow: inset 3px 0 0 var(--st-zone-edge);
+}
+
+.st-tables .st-table tr.has-zone td {
+  background: color-mix(in srgb, var(--st-zone-ink) 7%, transparent);
+}
+
+.st-tables .st-table tr.is-highlight td {
+  background: var(--accent-soft);
+}
+
+.st-tables .st-table tr.st-zone-start td {
+  border-top: 2px solid color-mix(in srgb, var(--st-zone-edge) 65%, transparent);
+}
+
+.st-rank-number {
+  display: inline-grid;
+  place-items: center;
+  min-width: 19px;
+  height: 19px;
+  padding: 0 2px;
+  border-radius: 4px;
+  font-size: 11px;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+.has-zone .st-rank-number {
+  background: var(--st-zone-ink);
+  color: var(--st-zone-badge-text);
+  box-shadow: inset 0 0 0 1px var(--st-zone-edge);
+}
+
+.st-tables .st-zone-legend {
+  gap: 4px 12px;
+  color: var(--text-strong);
+}
+
+.st-tables .st-zone-legend li {
+  gap: 5px;
+  padding: 0;
+  font-size: 10px;
+  line-height: 1.3;
+}
+
+.st-zone-legend-swatch {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--st-zone-ink);
+  box-shadow: inset 0 0 0 1px var(--st-zone-edge);
+}
+
+:root[data-theme='dark'] .st-tables tr.has-zone,
+:root[data-theme='dark'] .st-tables .st-zone-legend li {
+  --st-zone-ink: var(--st-zone-dark);
+  --st-zone-edge: var(--st-zone-edge-dark);
+  --st-zone-badge-text: var(--st-zone-text-dark);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .st-tables tr.has-zone,
+  :root:not([data-theme='light']) .st-tables .st-zone-legend li {
+    --st-zone-ink: var(--st-zone-dark);
+    --st-zone-edge: var(--st-zone-edge-dark);
+    --st-zone-badge-text: var(--st-zone-text-dark);
+  }
+}

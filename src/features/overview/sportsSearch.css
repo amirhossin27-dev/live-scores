@@ -1,0 +1,32 @@
+.sp-search { position: relative; width: 160px; max-width: 100%; margin: 0; min-width: 0; }
+.start-sports .sp-toolbar { position: relative; align-items: center; }
+.sp-toolbar > .sp-search { position: static; flex: 1 1 110px; min-width: 96px; max-width: 180px; margin-inline: auto; }
+.sp-toolbar > .sp-days, .sp-toolbar > .sp-filter { flex: none; }
+.sp-search-field { display: flex; align-items: center; gap: 6px; padding: 0 9px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); transition: border-color 150ms, box-shadow 150ms; }
+.sp-search-field:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.sp-search-field > svg { width: 14px; height: 14px; flex: none; fill: none; stroke: var(--text-muted); stroke-width: 1.8; stroke-linecap: round; }
+.sp-search-field input { width: 100%; min-width: 0; height: 28px; padding: 0; border: 0; border-radius: 0; outline: 0; box-shadow: none; background: transparent; color: var(--text-strong); font: inherit; font-size: 11px; }
+.sp-search-field input:focus { outline: 0; box-shadow: none; }
+.sp-search-field input::-webkit-search-cancel-button { display: none; }
+.sp-search-clear { flex: none; padding: 0 2px; border: 0; box-shadow: none; background: transparent; color: var(--text-muted); font-size: 16px; line-height: 1; }
+.sp-search-hint { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.sp-search-popover { position: absolute; z-index: 5; top: calc(100% + 6px); left: 0; width: min(380px, calc(100vw - 48px)); padding: 8px; border: 1px solid var(--border); border-radius: 12px; background: var(--bg); box-shadow: 0 16px 45px rgb(0 0 0 / 22%); }
+.sp-toolbar .sp-search-popover { left: 50%; width: min(100%, 400px); transform: translateX(-50%); }
+.sp-search-filters { display: flex; gap: 4px; overflow-x: auto; padding-bottom: 5px; }
+.sp-search-filters button { display: inline-flex; align-items: center; justify-content: center; gap: 5px; flex: none; min-height: 30px; padding: 4px 8px; border: 1px solid transparent; border-radius: 7px; box-shadow: none; color: var(--text-muted); background: transparent; font-size: 11px; }
+.sp-search-filters button.is-active { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 35%, transparent); color: var(--accent-strong); }
+.sp-search-filters small { font-size: 9px; font-variant-numeric: tabular-nums; opacity: .8; }
+.sp-search-status { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 5px 6px; color: var(--text-muted); font-size: 11px; }
+.sp-search-results { max-height: 330px; overflow-y: auto; margin: 0; padding: 0; list-style: none; }
+.sp-search-result { display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 8px; border: 0; border-radius: 9px; box-shadow: none; background: transparent; color: var(--text); text-align: left; }
+.sp-search-result:hover, .sp-search-result.is-active { background: var(--accent-soft); transform: none; }
+.sp-search-avatar { display: grid; place-items: center; flex: none; width: 34px; height: 34px; overflow: hidden; border-radius: 9px; background: color-mix(in srgb, var(--text-muted) 10%, transparent); color: var(--accent-strong); font-size: 15px; font-weight: 700; }
+.sp-search-avatar.is-player, .sp-search-avatar.is-coach { border-radius: 50%; }
+.sp-search-avatar img { width: 100%; height: 100%; object-fit: contain; }
+.sp-search-name { display: grid; gap: 2px; flex: 1; min-width: 0; }
+.sp-search-name strong, .sp-search-name small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sp-search-name strong { color: var(--text-strong); font-size: 12px; }
+.sp-search-name small { color: var(--text-muted); font-size: 10px; font-weight: 400; }
+.sp-search-kind { flex: none; padding: 3px 6px; border: 1px solid var(--border); border-radius: 5px; color: var(--text-muted); font-size: 9px; font-weight: 500; }
+.sp-search-arrow { flex: none; color: var(--accent-strong); }
+@media (max-width: 480px) { .sp-search-kind { display: none; } }

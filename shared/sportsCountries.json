@@ -1,0 +1,1197 @@
+[
+  {
+    "name": "Afghanistan",
+    "fifa": "AFG",
+    "iso": "af"
+  },
+  {
+    "name": "Anguilla",
+    "fifa": "AIA",
+    "iso": "ai"
+  },
+  {
+    "name": "Albania",
+    "fifa": "ALB",
+    "iso": "al"
+  },
+  {
+    "name": "Algeria",
+    "fifa": "ALG",
+    "iso": "dz"
+  },
+  {
+    "name": "Andorra",
+    "fifa": "AND",
+    "iso": "ad"
+  },
+  {
+    "name": "Angola",
+    "fifa": "ANG",
+    "iso": "ao"
+  },
+  {
+    "name": "Argentina",
+    "fifa": "ARG",
+    "iso": "ar"
+  },
+  {
+    "name": "Armenia",
+    "fifa": "ARM",
+    "iso": "am"
+  },
+  {
+    "name": "Aruba",
+    "fifa": "ARU",
+    "iso": "aw"
+  },
+  {
+    "name": "American Samoa",
+    "fifa": "ASA",
+    "iso": "as"
+  },
+  {
+    "name": "Antigua and Barbuda",
+    "fifa": "ATG",
+    "iso": "ag",
+    "aliases": [
+      "Antigua & Barbuda"
+    ]
+  },
+  {
+    "name": "Australia",
+    "fifa": "AUS",
+    "iso": "au"
+  },
+  {
+    "name": "Austria",
+    "fifa": "AUT",
+    "iso": "at"
+  },
+  {
+    "name": "Azerbaijan",
+    "fifa": "AZE",
+    "iso": "az"
+  },
+  {
+    "name": "Bahamas",
+    "fifa": "BAH",
+    "iso": "bs"
+  },
+  {
+    "name": "Bangladesh",
+    "fifa": "BAN",
+    "iso": "bd"
+  },
+  {
+    "name": "Burundi",
+    "fifa": "BDI",
+    "iso": "bi"
+  },
+  {
+    "name": "Belgium",
+    "fifa": "BEL",
+    "iso": "be"
+  },
+  {
+    "name": "Benin",
+    "fifa": "BEN",
+    "iso": "bj"
+  },
+  {
+    "name": "Bermuda",
+    "fifa": "BER",
+    "iso": "bm"
+  },
+  {
+    "name": "Burkina Faso",
+    "fifa": "BFA",
+    "iso": "bf"
+  },
+  {
+    "name": "Bahrain",
+    "fifa": "BHR",
+    "iso": "bh"
+  },
+  {
+    "name": "Bhutan",
+    "fifa": "BHU",
+    "iso": "bt"
+  },
+  {
+    "name": "Bosnia and Herzegovina",
+    "fifa": "BIH",
+    "iso": "ba",
+    "aliases": [
+      "Bosnia & Herzegovina",
+      "Bosnia-Herzegovina"
+    ]
+  },
+  {
+    "name": "Belarus",
+    "fifa": "BLR",
+    "iso": "by"
+  },
+  {
+    "name": "Belize",
+    "fifa": "BLZ",
+    "iso": "bz"
+  },
+  {
+    "name": "Bolivia",
+    "fifa": "BOL",
+    "iso": "bo",
+    "aliases": [
+      "Bolivia (Plurinational State of)"
+    ]
+  },
+  {
+    "name": "Botswana",
+    "fifa": "BOT",
+    "iso": "bw"
+  },
+  {
+    "name": "Brazil",
+    "fifa": "BRA",
+    "iso": "br"
+  },
+  {
+    "name": "Barbados",
+    "fifa": "BRB",
+    "iso": "bb"
+  },
+  {
+    "name": "Brunei Darussalam",
+    "fifa": "BRU",
+    "iso": "bn",
+    "aliases": [
+      "Brunei"
+    ]
+  },
+  {
+    "name": "Bulgaria",
+    "fifa": "BUL",
+    "iso": "bg"
+  },
+  {
+    "name": "Cambodia",
+    "fifa": "CAM",
+    "iso": "kh"
+  },
+  {
+    "name": "Canada",
+    "fifa": "CAN",
+    "iso": "ca"
+  },
+  {
+    "name": "Cayman Islands",
+    "fifa": "CAY",
+    "iso": "ky"
+  },
+  {
+    "name": "Congo",
+    "fifa": "CGO",
+    "iso": "cg",
+    "aliases": [
+      "Republic of the Congo"
+    ]
+  },
+  {
+    "name": "Chad",
+    "fifa": "CHA",
+    "iso": "td"
+  },
+  {
+    "name": "Chile",
+    "fifa": "CHI",
+    "iso": "cl"
+  },
+  {
+    "name": "China",
+    "fifa": "CHN",
+    "iso": "cn",
+    "aliases": [
+      "China PR"
+    ]
+  },
+  {
+    "name": "Ivory Coast",
+    "fifa": "CIV",
+    "iso": "ci",
+    "aliases": [
+      "Côte d'Ivoire",
+      "Côte d’Ivoire"
+    ]
+  },
+  {
+    "name": "Cameroon",
+    "fifa": "CMR",
+    "iso": "cm"
+  },
+  {
+    "name": "DR Congo",
+    "fifa": "COD",
+    "iso": "cd",
+    "aliases": [
+      "Congo DR",
+      "Democratic Republic of the Congo",
+      "Congo (DRC)"
+    ]
+  },
+  {
+    "name": "Cook Islands",
+    "fifa": "COK",
+    "iso": "ck"
+  },
+  {
+    "name": "Colombia",
+    "fifa": "COL",
+    "iso": "co"
+  },
+  {
+    "name": "Comoros",
+    "fifa": "COM",
+    "iso": "km"
+  },
+  {
+    "name": "Cape Verde",
+    "fifa": "CPV",
+    "iso": "cv",
+    "aliases": [
+      "Cabo Verde"
+    ]
+  },
+  {
+    "name": "Costa Rica",
+    "fifa": "CRC",
+    "iso": "cr"
+  },
+  {
+    "name": "Croatia",
+    "fifa": "CRO",
+    "iso": "hr"
+  },
+  {
+    "name": "Central African Republic",
+    "fifa": "CTA",
+    "iso": "cf"
+  },
+  {
+    "name": "Cuba",
+    "fifa": "CUB",
+    "iso": "cu"
+  },
+  {
+    "name": "Curaçao",
+    "fifa": "CUW",
+    "iso": "cw",
+    "aliases": [
+      "Curacao"
+    ]
+  },
+  {
+    "name": "Cyprus",
+    "fifa": "CYP",
+    "iso": "cy"
+  },
+  {
+    "name": "Czechia",
+    "fifa": "CZE",
+    "iso": "cz",
+    "aliases": [
+      "Czech Republic"
+    ]
+  },
+  {
+    "name": "Denmark",
+    "fifa": "DEN",
+    "iso": "dk"
+  },
+  {
+    "name": "Djibouti",
+    "fifa": "DJI",
+    "iso": "dj"
+  },
+  {
+    "name": "Dominica",
+    "fifa": "DMA",
+    "iso": "dm"
+  },
+  {
+    "name": "Dominican Republic",
+    "fifa": "DOM",
+    "iso": "do"
+  },
+  {
+    "name": "Ecuador",
+    "fifa": "ECU",
+    "iso": "ec"
+  },
+  {
+    "name": "Egypt",
+    "fifa": "EGY",
+    "iso": "eg"
+  },
+  {
+    "name": "England",
+    "fifa": "ENG",
+    "iso": "gb-eng"
+  },
+  {
+    "name": "Equatorial Guinea",
+    "fifa": "EQG",
+    "iso": "gq"
+  },
+  {
+    "name": "Eritrea",
+    "fifa": "ERI",
+    "iso": "er"
+  },
+  {
+    "name": "Spain",
+    "fifa": "ESP",
+    "iso": "es"
+  },
+  {
+    "name": "Estonia",
+    "fifa": "EST",
+    "iso": "ee"
+  },
+  {
+    "name": "Ethiopia",
+    "fifa": "ETH",
+    "iso": "et"
+  },
+  {
+    "name": "Fiji",
+    "fifa": "FIJ",
+    "iso": "fj"
+  },
+  {
+    "name": "Finland",
+    "fifa": "FIN",
+    "iso": "fi"
+  },
+  {
+    "name": "France",
+    "fifa": "FRA",
+    "iso": "fr"
+  },
+  {
+    "name": "Faroe Islands",
+    "fifa": "FRO",
+    "iso": "fo"
+  },
+  {
+    "name": "Gabon",
+    "fifa": "GAB",
+    "iso": "ga"
+  },
+  {
+    "name": "Gambia",
+    "fifa": "GAM",
+    "iso": "gm",
+    "aliases": [
+      "The Gambia"
+    ]
+  },
+  {
+    "name": "Georgia",
+    "fifa": "GEO",
+    "iso": "ge"
+  },
+  {
+    "name": "Germany",
+    "fifa": "GER",
+    "iso": "de"
+  },
+  {
+    "name": "Ghana",
+    "fifa": "GHA",
+    "iso": "gh"
+  },
+  {
+    "name": "Gibraltar",
+    "fifa": "GIB",
+    "iso": "gi"
+  },
+  {
+    "name": "Guinea-Bissau",
+    "fifa": "GNB",
+    "iso": "gw"
+  },
+  {
+    "name": "Greece",
+    "fifa": "GRE",
+    "iso": "gr"
+  },
+  {
+    "name": "Grenada",
+    "fifa": "GRN",
+    "iso": "gd"
+  },
+  {
+    "name": "Guatemala",
+    "fifa": "GUA",
+    "iso": "gt"
+  },
+  {
+    "name": "Guinea",
+    "fifa": "GUI",
+    "iso": "gn"
+  },
+  {
+    "name": "Guam",
+    "fifa": "GUM",
+    "iso": "gu"
+  },
+  {
+    "name": "Guyana",
+    "fifa": "GUY",
+    "iso": "gy"
+  },
+  {
+    "name": "Haiti",
+    "fifa": "HAI",
+    "iso": "ht"
+  },
+  {
+    "name": "Hong Kong",
+    "fifa": "HKG",
+    "iso": "hk",
+    "aliases": [
+      "Hong Kong, China",
+      "China, Hong Kong Special Administrative Region",
+      "Hong Kong SAR"
+    ]
+  },
+  {
+    "name": "Honduras",
+    "fifa": "HON",
+    "iso": "hn"
+  },
+  {
+    "name": "Hungary",
+    "fifa": "HUN",
+    "iso": "hu"
+  },
+  {
+    "name": "Indonesia",
+    "fifa": "IDN",
+    "iso": "id"
+  },
+  {
+    "name": "India",
+    "fifa": "IND",
+    "iso": "in"
+  },
+  {
+    "name": "Ireland",
+    "fifa": "IRL",
+    "iso": "ie",
+    "aliases": [
+      "Republic of Ireland"
+    ]
+  },
+  {
+    "name": "Iran",
+    "fifa": "IRN",
+    "iso": "ir",
+    "aliases": [
+      "IR Iran",
+      "Iran (Islamic Republic of)"
+    ]
+  },
+  {
+    "name": "Iraq",
+    "fifa": "IRQ",
+    "iso": "iq"
+  },
+  {
+    "name": "Iceland",
+    "fifa": "ISL",
+    "iso": "is"
+  },
+  {
+    "name": "Israel",
+    "fifa": "ISR",
+    "iso": "il"
+  },
+  {
+    "name": "Italy",
+    "fifa": "ITA",
+    "iso": "it"
+  },
+  {
+    "name": "Jamaica",
+    "fifa": "JAM",
+    "iso": "jm"
+  },
+  {
+    "name": "Jordan",
+    "fifa": "JOR",
+    "iso": "jo"
+  },
+  {
+    "name": "Japan",
+    "fifa": "JPN",
+    "iso": "jp"
+  },
+  {
+    "name": "Kazakhstan",
+    "fifa": "KAZ",
+    "iso": "kz"
+  },
+  {
+    "name": "Kenya",
+    "fifa": "KEN",
+    "iso": "ke"
+  },
+  {
+    "name": "Kyrgyz Republic",
+    "fifa": "KGZ",
+    "iso": "kg",
+    "aliases": [
+      "Kyrgyzstan"
+    ]
+  },
+  {
+    "name": "South Korea",
+    "fifa": "KOR",
+    "iso": "kr",
+    "aliases": [
+      "Korea Republic",
+      "Republic of Korea",
+      "Korea"
+    ]
+  },
+  {
+    "name": "Kosovo",
+    "fifa": "KOS",
+    "iso": "xk"
+  },
+  {
+    "name": "Saudi Arabia",
+    "fifa": "KSA",
+    "iso": "sa"
+  },
+  {
+    "name": "Kuwait",
+    "fifa": "KUW",
+    "iso": "kw"
+  },
+  {
+    "name": "Laos",
+    "fifa": "LAO",
+    "iso": "la",
+    "aliases": [
+      "Lao People's Democratic Republic"
+    ]
+  },
+  {
+    "name": "Lebanon",
+    "fifa": "LBN",
+    "iso": "lb"
+  },
+  {
+    "name": "Liberia",
+    "fifa": "LBR",
+    "iso": "lr"
+  },
+  {
+    "name": "Libya",
+    "fifa": "LBY",
+    "iso": "ly"
+  },
+  {
+    "name": "St Lucia",
+    "fifa": "LCA",
+    "iso": "lc",
+    "aliases": [
+      "Saint Lucia",
+      "St. Lucia"
+    ]
+  },
+  {
+    "name": "Lesotho",
+    "fifa": "LES",
+    "iso": "ls"
+  },
+  {
+    "name": "Liechtenstein",
+    "fifa": "LIE",
+    "iso": "li"
+  },
+  {
+    "name": "Lithuania",
+    "fifa": "LTU",
+    "iso": "lt"
+  },
+  {
+    "name": "Luxembourg",
+    "fifa": "LUX",
+    "iso": "lu"
+  },
+  {
+    "name": "Latvia",
+    "fifa": "LVA",
+    "iso": "lv"
+  },
+  {
+    "name": "Macau, China",
+    "fifa": "MAC",
+    "iso": "mo",
+    "aliases": [
+      "China, Macao Special Administrative Region",
+      "Macao SAR",
+      "Macau"
+    ]
+  },
+  {
+    "name": "Madagascar",
+    "fifa": "MAD",
+    "iso": "mg"
+  },
+  {
+    "name": "Morocco",
+    "fifa": "MAR",
+    "iso": "ma"
+  },
+  {
+    "name": "Malaysia",
+    "fifa": "MAS",
+    "iso": "my"
+  },
+  {
+    "name": "Moldova",
+    "fifa": "MDA",
+    "iso": "md",
+    "aliases": [
+      "Republic of Moldova"
+    ]
+  },
+  {
+    "name": "Maldives",
+    "fifa": "MDV",
+    "iso": "mv"
+  },
+  {
+    "name": "Mexico",
+    "fifa": "MEX",
+    "iso": "mx"
+  },
+  {
+    "name": "North Macedonia",
+    "fifa": "MKD",
+    "iso": "mk"
+  },
+  {
+    "name": "Mali",
+    "fifa": "MLI",
+    "iso": "ml"
+  },
+  {
+    "name": "Malta",
+    "fifa": "MLT",
+    "iso": "mt"
+  },
+  {
+    "name": "Montenegro",
+    "fifa": "MNE",
+    "iso": "me"
+  },
+  {
+    "name": "Mongolia",
+    "fifa": "MNG",
+    "iso": "mn"
+  },
+  {
+    "name": "Mozambique",
+    "fifa": "MOZ",
+    "iso": "mz"
+  },
+  {
+    "name": "Mauritius",
+    "fifa": "MRI",
+    "iso": "mu"
+  },
+  {
+    "name": "Montserrat",
+    "fifa": "MSR",
+    "iso": "ms"
+  },
+  {
+    "name": "Mauritania",
+    "fifa": "MTN",
+    "iso": "mr"
+  },
+  {
+    "name": "Malawi",
+    "fifa": "MWI",
+    "iso": "mw"
+  },
+  {
+    "name": "Myanmar",
+    "fifa": "MYA",
+    "iso": "mm"
+  },
+  {
+    "name": "Namibia",
+    "fifa": "NAM",
+    "iso": "na"
+  },
+  {
+    "name": "Nicaragua",
+    "fifa": "NCA",
+    "iso": "ni"
+  },
+  {
+    "name": "New Caledonia",
+    "fifa": "NCL",
+    "iso": "nc"
+  },
+  {
+    "name": "Netherlands",
+    "fifa": "NED",
+    "iso": "nl",
+    "aliases": [
+      "Netherlands (Kingdom of the)"
+    ]
+  },
+  {
+    "name": "Nepal",
+    "fifa": "NEP",
+    "iso": "np"
+  },
+  {
+    "name": "Nigeria",
+    "fifa": "NGA",
+    "iso": "ng"
+  },
+  {
+    "name": "Niger",
+    "fifa": "NIG",
+    "iso": "ne"
+  },
+  {
+    "name": "Northern Ireland",
+    "fifa": "NIR",
+    "iso": "gb-nir"
+  },
+  {
+    "name": "Norway",
+    "fifa": "NOR",
+    "iso": "no"
+  },
+  {
+    "name": "New Zealand",
+    "fifa": "NZL",
+    "iso": "nz"
+  },
+  {
+    "name": "Oman",
+    "fifa": "OMA",
+    "iso": "om"
+  },
+  {
+    "name": "Pakistan",
+    "fifa": "PAK",
+    "iso": "pk"
+  },
+  {
+    "name": "Panama",
+    "fifa": "PAN",
+    "iso": "pa"
+  },
+  {
+    "name": "Paraguay",
+    "fifa": "PAR",
+    "iso": "py"
+  },
+  {
+    "name": "Peru",
+    "fifa": "PER",
+    "iso": "pe"
+  },
+  {
+    "name": "Philippines",
+    "fifa": "PHI",
+    "iso": "ph"
+  },
+  {
+    "name": "Palestine",
+    "fifa": "PLE",
+    "iso": "ps",
+    "aliases": [
+      "State of Palestine",
+      "Palestinian Authority"
+    ]
+  },
+  {
+    "name": "Papua New Guinea",
+    "fifa": "PNG",
+    "iso": "pg"
+  },
+  {
+    "name": "Poland",
+    "fifa": "POL",
+    "iso": "pl"
+  },
+  {
+    "name": "Portugal",
+    "fifa": "POR",
+    "iso": "pt"
+  },
+  {
+    "name": "DPR Korea",
+    "fifa": "PRK",
+    "iso": "kp",
+    "aliases": [
+      "Democratic People's Republic of Korea",
+      "North Korea"
+    ]
+  },
+  {
+    "name": "Puerto Rico",
+    "fifa": "PUR",
+    "iso": "pr"
+  },
+  {
+    "name": "Qatar",
+    "fifa": "QAT",
+    "iso": "qa"
+  },
+  {
+    "name": "Romania",
+    "fifa": "ROU",
+    "iso": "ro"
+  },
+  {
+    "name": "South Africa",
+    "fifa": "RSA",
+    "iso": "za"
+  },
+  {
+    "name": "Russia",
+    "fifa": "RUS",
+    "iso": "ru",
+    "aliases": [
+      "Russian Federation"
+    ]
+  },
+  {
+    "name": "Rwanda",
+    "fifa": "RWA",
+    "iso": "rw"
+  },
+  {
+    "name": "Samoa",
+    "fifa": "SAM",
+    "iso": "ws"
+  },
+  {
+    "name": "Scotland",
+    "fifa": "SCO",
+    "iso": "gb-sct"
+  },
+  {
+    "name": "Sudan",
+    "fifa": "SDN",
+    "iso": "sd"
+  },
+  {
+    "name": "Senegal",
+    "fifa": "SEN",
+    "iso": "sn"
+  },
+  {
+    "name": "Seychelles",
+    "fifa": "SEY",
+    "iso": "sc"
+  },
+  {
+    "name": "Singapore",
+    "fifa": "SGP",
+    "iso": "sg",
+    "codeAliases": [
+      "SIN"
+    ]
+  },
+  {
+    "name": "St Kitts and Nevis",
+    "fifa": "SKN",
+    "iso": "kn",
+    "aliases": [
+      "Saint Kitts and Nevis",
+      "St. Kitts & Nevis"
+    ]
+  },
+  {
+    "name": "Sierra Leone",
+    "fifa": "SLE",
+    "iso": "sl"
+  },
+  {
+    "name": "El Salvador",
+    "fifa": "SLV",
+    "iso": "sv"
+  },
+  {
+    "name": "San Marino",
+    "fifa": "SMR",
+    "iso": "sm"
+  },
+  {
+    "name": "Solomon Islands",
+    "fifa": "SOL",
+    "iso": "sb"
+  },
+  {
+    "name": "Somalia",
+    "fifa": "SOM",
+    "iso": "so"
+  },
+  {
+    "name": "Serbia",
+    "fifa": "SRB",
+    "iso": "rs"
+  },
+  {
+    "name": "Sri Lanka",
+    "fifa": "SRI",
+    "iso": "lk"
+  },
+  {
+    "name": "South Sudan",
+    "fifa": "SSD",
+    "iso": "ss"
+  },
+  {
+    "name": "São Tomé and Príncipe",
+    "fifa": "STP",
+    "iso": "st",
+    "aliases": [
+      "Sao Tome and Principe",
+      "São Tomé & Príncipe"
+    ]
+  },
+  {
+    "name": "Switzerland",
+    "fifa": "SUI",
+    "iso": "ch"
+  },
+  {
+    "name": "Suriname",
+    "fifa": "SUR",
+    "iso": "sr"
+  },
+  {
+    "name": "Slovakia",
+    "fifa": "SVK",
+    "iso": "sk"
+  },
+  {
+    "name": "Slovenia",
+    "fifa": "SVN",
+    "iso": "si"
+  },
+  {
+    "name": "Sweden",
+    "fifa": "SWE",
+    "iso": "se"
+  },
+  {
+    "name": "Eswatini",
+    "fifa": "SWZ",
+    "iso": "sz"
+  },
+  {
+    "name": "Syria",
+    "fifa": "SYR",
+    "iso": "sy",
+    "aliases": [
+      "Syrian Arab Republic"
+    ]
+  },
+  {
+    "name": "Tahiti",
+    "fifa": "TAH",
+    "iso": "pf",
+    "aliases": [
+      "French Polynesia"
+    ]
+  },
+  {
+    "name": "Tanzania",
+    "fifa": "TAN",
+    "iso": "tz",
+    "aliases": [
+      "United Republic of Tanzania"
+    ]
+  },
+  {
+    "name": "Turks and Caicos Islands",
+    "fifa": "TCA",
+    "iso": "tc",
+    "aliases": [
+      "Turks & Caicos Islands"
+    ]
+  },
+  {
+    "name": "Tonga",
+    "fifa": "TGA",
+    "iso": "to"
+  },
+  {
+    "name": "Thailand",
+    "fifa": "THA",
+    "iso": "th"
+  },
+  {
+    "name": "Tajikistan",
+    "fifa": "TJK",
+    "iso": "tj"
+  },
+  {
+    "name": "Turkmenistan",
+    "fifa": "TKM",
+    "iso": "tm"
+  },
+  {
+    "name": "Timor-Leste",
+    "fifa": "TLS",
+    "iso": "tl"
+  },
+  {
+    "name": "Togo",
+    "fifa": "TOG",
+    "iso": "tg"
+  },
+  {
+    "name": "Chinese Taipei",
+    "fifa": "TPE",
+    "iso": "tw",
+    "aliases": [
+      "Taiwan"
+    ]
+  },
+  {
+    "name": "Trinidad and Tobago",
+    "fifa": "TRI",
+    "iso": "tt",
+    "aliases": [
+      "Trinidad & Tobago"
+    ]
+  },
+  {
+    "name": "Tunisia",
+    "fifa": "TUN",
+    "iso": "tn"
+  },
+  {
+    "name": "Turkey",
+    "fifa": "TUR",
+    "iso": "tr",
+    "aliases": [
+      "Türkiye",
+      "Turkiye"
+    ]
+  },
+  {
+    "name": "United Arab Emirates",
+    "fifa": "UAE",
+    "iso": "ae"
+  },
+  {
+    "name": "Uganda",
+    "fifa": "UGA",
+    "iso": "ug"
+  },
+  {
+    "name": "Ukraine",
+    "fifa": "UKR",
+    "iso": "ua"
+  },
+  {
+    "name": "Uruguay",
+    "fifa": "URU",
+    "iso": "uy"
+  },
+  {
+    "name": "USA",
+    "fifa": "USA",
+    "iso": "us",
+    "aliases": [
+      "United States",
+      "United States of America"
+    ]
+  },
+  {
+    "name": "Uzbekistan",
+    "fifa": "UZB",
+    "iso": "uz"
+  },
+  {
+    "name": "Vanuatu",
+    "fifa": "VAN",
+    "iso": "vu"
+  },
+  {
+    "name": "Venezuela",
+    "fifa": "VEN",
+    "iso": "ve",
+    "aliases": [
+      "Venezuela (Bolivarian Republic of)"
+    ]
+  },
+  {
+    "name": "British Virgin Islands",
+    "fifa": "VGB",
+    "iso": "vg"
+  },
+  {
+    "name": "Vietnam",
+    "fifa": "VIE",
+    "iso": "vn",
+    "aliases": [
+      "Viet Nam"
+    ]
+  },
+  {
+    "name": "St Vincent and the Grenadines",
+    "fifa": "VIN",
+    "iso": "vc",
+    "aliases": [
+      "Saint Vincent and the Grenadines",
+      "St. Vincent & Grenadines"
+    ]
+  },
+  {
+    "name": "US Virgin Islands",
+    "fifa": "VIR",
+    "iso": "vi",
+    "aliases": [
+      "United States Virgin Islands",
+      "U.S. Virgin Islands"
+    ]
+  },
+  {
+    "name": "Wales",
+    "fifa": "WAL",
+    "iso": "gb-wls"
+  },
+  {
+    "name": "Yemen",
+    "fifa": "YEM",
+    "iso": "ye"
+  },
+  {
+    "name": "Zambia",
+    "fifa": "ZAM",
+    "iso": "zm"
+  },
+  {
+    "name": "Zimbabwe",
+    "fifa": "ZIM",
+    "iso": "zw"
+  }
+]

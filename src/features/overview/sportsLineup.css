@@ -1,0 +1,90 @@
+/* Every starter uses the same fixed flag, rating and events slots. */
+.lp-pitch-viewport { min-width: 0; width: 100%; max-width: 480px; margin-inline: auto; overflow-x: auto; overscroll-behavior-x: contain; }
+.lp-pitch-viewport:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+/* Keep five-player rows readable inside narrow panels, without widening the panel itself. */
+.lp-pitch { min-width: 480px; max-width: 480px; --lp-player-edge: 60px; }
+/* Leave the central goalkeeper's info row clear, even with a long team name. */
+.lp .lp-team { max-width: calc(50% - 52px); white-space: nowrap; }
+.lp-team > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.lp-team > b { flex: none; }
+.lp .lp-team.is-home { top: 8px; bottom: auto; }
+.lp .lp-team.is-away { top: auto; bottom: 8px; }
+.lp-player-open {
+  display: grid; justify-items: center; gap: 2px; width: 100%; padding: 0;
+  border: 0; border-radius: 0; background: transparent; box-shadow: none; color: inherit; font: inherit;
+}
+button.lp-player-open:hover { background: transparent; transform: none; }
+button.lp-player-open:focus-visible { outline: none; }
+button.lp-player-open:hover .lp-shirt, button.lp-player-open:focus-visible .lp-shirt { box-shadow: 0 0 0 3px rgba(255, 255, 255, .55); }
+.lp-player > .lp-status {
+  position: absolute;
+  top: -8px;
+  left: calc(50% - 26px);
+  display: grid;
+  grid-template-columns: 26px 28px 26px;
+  align-items: center;
+  column-gap: 2px;
+  width: 84px;
+  height: 18px;
+  overflow: visible;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.lp-country-slot, .lp-rating-slot { display: flex; align-items: center; min-width: 0; overflow: visible; }
+/* Flag and rating centres mirror the shirt centre, with room inside both badges. */
+.lp-country-slot { pointer-events: auto; padding-left: 2px; }
+.lp-rating-slot { justify-content: center; }
+.lp .lp-status .lp-rating { position: static; flex: none; min-width: 0; padding: 1px 2px; font-size: 9.5px; line-height: 14px; border-radius: 4px; }
+.lp-country-link { display: inline-flex; width: 16px; height: 10px; min-width: 0; min-height: 0; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; line-height: 0; }
+.lp-country-link:hover { background: transparent; transform: none; }
+.lp-country-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.lp-country-slot .sp-country-flag, .lp-bench-flag .sp-country-flag {
+  display: block;
+  flex: none;
+  width: 16px;
+  height: 10px;
+  margin: 0;
+  border-radius: 0;
+  object-fit: fill;
+  box-shadow: none;
+}
+.lp-events { display: inline-flex; align-items: center; gap: 2px; min-width: 0; white-space: nowrap; }
+.lp-status > .lp-events { width: 26px; }
+.lp-goals { display: inline-flex; align-items: center; gap: 0; color: #ffffff; line-height: 1; }
+.lp-goals .football-icon-ball { fill: #ffffff; }
+.lp-goals .football-icon-pattern { fill: #172d22; stroke: #172d22; }
+.lp-goals small { font-size: 7px; font-weight: 800; line-height: 1; }
+.lp-bench .lp-goals { color: var(--text-strong); }
+.lp-bench .lp-goals .football-icon-ball { fill: var(--text-strong); }
+.lp-bench .lp-goals .football-icon-pattern { fill: var(--bg); stroke: var(--bg); }
+.lp .lp-events .lp-card { flex: none; width: 7px; height: 10px; box-shadow: 0 0 0 .5px rgba(15, 23, 42, .5); }
+/* Yellow behind, red in front. */
+.lp .lp-events .lp-card.is-yellow-red { position: relative; width: 11px; height: 13px; background: none; box-shadow: none; }
+.lp .lp-events .lp-card.is-yellow-red::before, .lp .lp-events .lp-card.is-yellow-red::after {
+  position: absolute;
+  width: 7px;
+  height: 10px;
+  border-radius: 1px;
+  box-shadow: 0 0 0 .5px rgba(15, 23, 42, .5);
+  content: '';
+}
+.lp .lp-events .lp-card.is-yellow-red::before { top: 0; left: 0; background: #facc15; }
+.lp .lp-events .lp-card.is-yellow-red::after { right: 0; bottom: 0; background: #ef4444; }
+/* Number, flag, name with events, substitution minute, rating. */
+.lp-bench-compare { min-width: 0; overflow-x: auto; overscroll-behavior-x: contain; }
+.lp-bench-compare:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.lp .lp-benches { grid-template-columns: repeat(2, minmax(0, 1fr)); min-width: 500px; gap: 12px; }
+.lp .lp-bench-row { grid-template-columns: 20px 16px minmax(0, 1fr) 26px 27px; gap: 4px; }
+.lp-bench-flag, .lp-bench-sub, .lp-bench-rating { display: flex; align-items: center; min-width: 0; }
+.lp-bench-rating, .lp-bench-sub { justify-content: flex-end; }
+.lp-bench-identity { display: flex; align-items: center; gap: 5px; min-width: 0; }
+button.lp-bench-identity { width: 100%; min-height: 20px; padding: 0; border: 0; border-radius: 3px; background: transparent; box-shadow: none; color: inherit; font: inherit; text-align: left; }
+button.lp-bench-identity:hover { color: var(--accent); background: transparent; transform: none; }
+button.lp-bench-identity:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.lp-bench-identity .lp-bench-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lp-bench-identity .lp-events { flex: none; }
+.lp-bench-identity .lp-events:empty { display: none; }
+
+.lp-coach-link { padding: 0; border: 0; background: transparent; color: var(--text-strong); font: inherit; cursor: pointer; }
+.lp-coach-link:hover { text-decoration: underline; }
+.lp-coach-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }

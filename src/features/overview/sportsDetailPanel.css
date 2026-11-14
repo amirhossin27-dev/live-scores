@@ -1,0 +1,4 @@
+/* Keep the live-score panel wide enough for both teams and their benches across every navigation path. */
+.side-drawer.sports-detail-drawer {
+  width: min(560px, 100vw);
+}

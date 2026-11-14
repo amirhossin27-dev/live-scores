@@ -1,0 +1,192 @@
+.side-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  justify-content: flex-end;
+  background: rgba(2, 6, 14, 0.5);
+  animation: side-drawer-fade 0.18s ease-out;
+}
+
+.side-drawer {
+  display: flex;
+  flex-direction: column;
+  width: min(480px, 100vw);
+  height: 100%;
+  border-left: 1px solid var(--border);
+  /* The panel colour is translucent; the page colour underneath keeps the list behind the panel from showing through. */
+  background: linear-gradient(var(--panel), var(--panel)), var(--bg);
+  box-shadow: -18px 0 40px rgba(0, 0, 0, 0.35);
+  animation: side-drawer-slide 0.22s ease-out;
+}
+
+.side-drawer.is-wide {
+  width: min(920px, 100vw);
+}
+
+.side-drawer-main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+.side-drawer.is-split {
+  flex-direction: row;
+  width: min(1560px, 100vw);
+}
+
+.side-drawer.is-split .side-drawer-main {
+  flex: 0 0 50%;
+  border-left: 1px solid var(--border);
+}
+
+.side-drawer-aside {
+  flex: 1;
+  min-width: 0;
+  overflow: auto;
+  background: var(--surface);
+}
+
+@media (max-width: 1000px) {
+  .side-drawer.is-split {
+    flex-direction: column;
+  }
+
+  .side-drawer.is-split .side-drawer-main {
+    flex: 1;
+    border-left: 0;
+  }
+
+  .side-drawer-aside {
+    flex: 0 0 auto;
+    max-height: 38vh;
+    border-bottom: 1px solid var(--border);
+  }
+}
+
+.side-drawer-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 22px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.side-drawer-header h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.side-drawer-header p {
+  margin: 4px 0 0;
+  color: var(--text-muted);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.side-drawer-close {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.side-drawer-body {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px 22px;
+}
+
+.side-drawer-body label {
+  display: grid;
+  gap: 6px;
+}
+
+.side-drawer-body textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+.side-drawer-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 22px 20px;
+  border-top: 1px solid var(--border);
+}
+
+@keyframes side-drawer-slide {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes side-drawer-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .side-drawer,
+  .side-drawer-backdrop {
+    animation: none;
+  }
+}
+
+.side-drawer-body {
+  overflow-x: hidden;
+}
+
+.side-drawer-body > * {
+  min-width: 0;
+}
+
+.side-drawer .task-editor-tabs {
+  flex-wrap: wrap;
+}
+
+/* Keep header/footer controls intact while the content scrolls. */
+.side-drawer-header,
+.side-drawer-footer {
+  flex-shrink: 0;
+}
+
+.side-drawer-header > div {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.side-drawer-body {
+  min-height: 0;
+  overflow-x: auto;
+}
+
+@media (max-height: 520px) {
+  .side-drawer-main,
+  .side-drawer:not(.is-split) {
+    overflow-y: auto;
+  }
+
+  .side-drawer-body {
+    flex: none;
+    overflow: visible;
+  }
+}
