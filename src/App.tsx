@@ -1,19 +1,19 @@
 import { useEffect, useState } from 'react'
 import { SportsWidget } from './features/overview/SportsWidget'
 import { apiBaseUrl } from './services/platformApi'
-import { readViewOptions } from './runtime.mjs'
+import { readViewOptions, readSetting, writeSetting } from './runtime.mjs'
 import type { Language } from './types/platform'
 import './app.css'
 const options = readViewOptions(window.location.href)
 export function App() {
  const { embedded,compact } = options
- const [language,setLanguage] = useState<Language>(()=>embedded ? options.language : localStorage.getItem('live-scores.language') === 'en' ? 'en' : 'de')
- const [theme,setTheme] = useState(()=>embedded ? options.theme : localStorage.getItem('live-scores.theme') || 'auto')
+ const [language,setLanguage] = useState<Language>(()=>embedded ? options.language : readSetting('live-scores.language','de',['de','en']))
+ const [theme,setTheme] = useState(()=>embedded ? options.theme : readSetting('live-scores.theme','auto',['auto','dark','light']))
  const [help,setHelp] = useState(false)
  const [now,setNow] = useState(()=>new Date())
  const de = language === 'de'
- useEffect(()=>{document.documentElement.lang=language; if(!embedded)localStorage.setItem('live-scores.language',language)},[language,embedded])
- useEffect(()=>{if(theme==='auto')delete document.documentElement.dataset.theme;else document.documentElement.dataset.theme=theme; if(!embedded)localStorage.setItem('live-scores.theme',theme)},[theme,embedded])
+ useEffect(()=>{document.documentElement.lang=language; if(!embedded)writeSetting('live-scores.language',language)},[language,embedded])
+ useEffect(()=>{if(theme==='auto')delete document.documentElement.dataset.theme;else document.documentElement.dataset.theme=theme; if(!embedded)writeSetting('live-scores.theme',theme)},[theme,embedded])
  useEffect(()=>{const timer=setInterval(()=>setNow(new Date()),30_000);return()=>clearInterval(timer)},[])
  useEffect(()=>{
   if(!embedded || !options.parentOrigin || window.parent===window)return
