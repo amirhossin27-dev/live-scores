@@ -25,7 +25,7 @@ import { standingsViews } from './sportsStandings'
 
 const copy = {
   de: {
-    close: 'Schließen',
+    close: 'Zur Übersicht',
     loading: 'Spieldaten werden geladen …',
     down: 'Die Spieldaten sind gerade nicht erreichbar.',
     retry: 'Erneut versuchen',
@@ -72,7 +72,7 @@ const copy = {
     nationalFailed: 'Die Nationalmannschaft konnte nicht geladen werden.',
   },
   en: {
-    close: 'Close',
+    close: 'Back to overview',
     loading: 'Loading match data …',
     down: 'The match data is not reachable right now.',
     retry: 'Try again',

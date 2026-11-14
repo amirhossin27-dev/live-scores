@@ -1243,3 +1243,48 @@ function profileOf(id: string, name: string): SportsPlayerProfile {
     marketValue: null, contractEnd: null, injury: null, seasonLeague: null, season: null, seasonStats: [], recentMatches: [], career: [], transfers: [], transfersSource: 'fotmob',
   }
 }
+
+describe.each(['de', 'en'] as const)('visible panel exits (%s)', (language) => {
+  it.each(['loading', 'failed'] as const)('returns from a %s match to the selected live filter', async (state) => {
+    api.loadMatchDetails.mockImplementation(() => state === 'loading'
+      ? new Promise(() => {})
+      : Promise.reject(new Error('offline')))
+    renderWidget(language)
+    fireEvent.click(await screen.findByRole('button', { name: /^Live/ }))
+    fireEvent.click(screen.getByRole('button', { name: language === 'de'
+      ? 'Statistik Bayern München gegen Borussia Dortmund'
+      : 'Statistics Bayern München vs Borussia Dortmund' }))
+    const panel = within(await screen.findByRole('dialog'))
+    if (state === 'failed') await panel.findByText(language === 'de'
+      ? 'Die Spieldaten sind gerade nicht erreichbar.'
+      : 'The match data is not reachable right now.')
+    const label = language === 'de' ? 'Zur Übersicht' : 'Back to overview'
+    const exit = panel.getByRole('button', { name: label })
+    expect(exit.textContent).toContain(label)
+    fireEvent.click(exit)
+    expect(screen.queryByRole('dialog')).toBeNull()
+    expect(screen.getByRole('button', { name: /^Live/ }).getAttribute('aria-pressed')).toBe('true')
+    expect(screen.getByText('Bayern München')).toBeTruthy()
+    expect(screen.queryByText('FC Sevilla')).toBeNull()
+  })
+
+  it.each(['loading', 'failed'] as const)('can leave a %s competition without waiting for data', async (state) => {
+    api.loadStandings.mockImplementation(() => state === 'loading'
+      ? new Promise(() => {})
+      : Promise.reject(new Error('offline')))
+    renderWidget(language)
+    fireEvent.click(await screen.findByRole('button', { name: language === 'de'
+      ? 'Tabelle: Spanien · LaLiga'
+      : 'Table: Spain · LaLiga' }))
+    const panel = within(await screen.findByRole('dialog', { name: 'LaLiga' }))
+    if (state === 'failed') await panel.findByText(language === 'de'
+      ? 'Die Tabelle ist gerade nicht erreichbar.'
+      : 'The table is not reachable right now.')
+    const label = language === 'de' ? 'Zur Übersicht' : 'Back to overview'
+    const exit = panel.getByRole('button', { name: label })
+    expect(exit.textContent).toContain(label)
+    fireEvent.click(exit)
+    expect(screen.queryByRole('dialog')).toBeNull()
+    expect(screen.getByText('FC Sevilla')).toBeTruthy()
+  })
+})

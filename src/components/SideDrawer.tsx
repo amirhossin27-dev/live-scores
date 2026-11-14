@@ -50,7 +50,7 @@ export function SideDrawer({ title, subtitle, closeLabel, onClose, children, foo
               <h2 id={titleId}>{title}</h2>
               {subtitle && <p>{subtitle}</p>}
             </div>
-            <button type="button" className="side-drawer-close" aria-label={closeLabel} title={closeLabel} onClick={onClose}>×</button>
+            <button type="button" className="side-drawer-close" aria-label={closeLabel} title={closeLabel} onClick={onClose}><span aria-hidden="true">×</span><span>{closeLabel}</span></button>
           </header>
           <div className="side-drawer-body">{children}</div>
           {footer && <footer className="side-drawer-footer">{footer}</footer>}

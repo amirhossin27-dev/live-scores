@@ -96,3 +96,23 @@ describe('Live Scores search', () => {
     expect(screen.queryByRole('listbox')).toBeNull()
   })
 })
+
+it.each(['de', 'en'] as const)('returns through the visible panel exit to the filtered search (%s)', async (language) => {
+  render(<SportsSearch language={language} />)
+  const input = screen.getByRole('combobox')
+  fireEvent.change(input, { target: { value: 'Alex' } })
+  await screen.findByRole('option', { name: /Alex Player/ })
+  const filters = within(screen.getByRole('group', { name: language === 'de' ? 'Suchergebnisse filtern' : 'Filter search results' }))
+  fireEvent.click(filters.getByRole('button', { name: language === 'de' ? /Vereine/ : /Clubs/ }))
+  fireEvent.click(screen.getByRole('option', { name: /Alex FC/ }))
+  const panel = within(await screen.findByRole('dialog', { name: 'Alex FC' }))
+  const label = language === 'de' ? 'Zu den Suchergebnissen' : 'Back to search results'
+  const exit = panel.getByRole('button', { name: label })
+  expect(exit.textContent).toContain(label)
+  fireEvent.click(exit)
+  expect(screen.queryByRole('dialog')).toBeNull()
+  expect((input as HTMLInputElement).value).toBe('Alex')
+  expect(screen.getAllByRole('option')).toHaveLength(1)
+  expect(screen.getByRole('option', { name: /Alex FC/ })).toBeTruthy()
+  expect(document.activeElement).toBe(input)
+})
