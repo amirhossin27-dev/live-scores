@@ -116,3 +116,16 @@ it.each(['de', 'en'] as const)('returns through the visible panel exit to the fi
   expect(screen.getByRole('option', { name: /Alex FC/ })).toBeTruthy()
   expect(document.activeElement).toBe(input)
 })
+
+it('keeps the query and filters usable when no search results exist', async () => {
+  api.searchSports.mockResolvedValue([])
+  render(<SportsSearch language="de" />)
+  const input = screen.getByRole('combobox')
+  fireEvent.change(input, { target: { value: 'Niemand' } })
+  await screen.findByText('Keine Treffer. Versuche einen anderen Namen.')
+  expect(screen.queryByRole('option')).toBeNull()
+  fireEvent.click(screen.getByRole('button', { name: /Trainer/ }))
+  expect((input as HTMLInputElement).value).toBe('Niemand')
+  fireEvent.keyDown(input, { key: 'Escape' })
+  expect(input.getAttribute('aria-expanded')).toBe('false')
+})

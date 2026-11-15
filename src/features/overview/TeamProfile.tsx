@@ -1,3 +1,4 @@
+import { DetailBack, DetailBoundary, useDetailNavigation } from '../../components/DetailNavigation'
 import { useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import './sportsTeam.css'
@@ -437,13 +438,14 @@ interface TeamProfileProps {
  * The page of a football team: the last and next matches (more on request), titles with their seasons, news, transfers and
  * squad. A click on an opponent opens its page, a click on a player his profile; "back" walks the way back.
  */
-export function TeamProfile({ team: start, language, locale, onBack, backLabel }: TeamProfileProps) {
+export function TeamProfile(props: TeamProfileProps) {
+  return <DetailBoundary><TeamContent {...props} /></DetailBoundary>
+}
+function TeamContent({ team: current, language, locale, onBack, backLabel }: TeamProfileProps) {
   const t = copy[language === 'de' ? 'de' : 'en']
-  const [trail, setTrail] = useState<SportsTeamRef[]>([start])
-  const current = trail[trail.length - 1]
   const { team, missing, loading, retry } = useTeam(current)
   const [tab, setTab] = useState<Tab>('matches')
-  const [player, setPlayer] = useState<{ id: string; name: string } | null>(null)
+  const navigation = useDetailNavigation()!
   const tabs: { id: Tab; label: string }[] = [
     { id: 'matches', label: t.matches },
     { id: 'titles', label: t.titles },
@@ -452,28 +454,11 @@ export function TeamProfile({ team: start, language, locale, onBack, backLabel }
     { id: 'squad', label: t.squad },
   ]
 
-  function openTeam(id: string) {
-    setTrail((items) => [...items, { id }])
-    setTab('matches')
+  const toTeam = language === 'de' ? `Zurück zu ${team ? teamName(team.name, language) : t.backToTeam}` : `Back to ${team?.name ?? 'team'}`
+  function openTeam(id: string, label = toTeam) {
+    navigation.push({ backLabel: label, content: <TeamProfile team={{ id }} language={language} locale={locale} backLabel={label} onBack={navigation.back} /> })
   }
-
-  const back = trail.length > 1 ? () => setTrail((items) => items.slice(0, -1)) : onBack
-  if (player) {
-    return (
-      <PlayerProfile
-        id={player.id}
-        name={player.name}
-        language={language}
-        locale={locale}
-        backLabel={t.backToTeam}
-        onBack={() => setPlayer(null)}
-        onOpenTeam={(id) => {
-          setPlayer(null)
-          if (team?.id !== id) openTeam(id)
-        }}
-      />
-    )
-  }
+  const openPlayer = (id: string, name: string) => navigation.push({ backLabel: t.backToTeam, content: <PlayerProfile id={id} name={name} language={language} locale={locale} backLabel={t.backToTeam} onBack={navigation.back} /> })
 
   let body: ReactNode
   if (!team) {
@@ -484,7 +469,6 @@ export function TeamProfile({ team: start, language, locale, onBack, backLabel }
     const facts: [string, ReactNode][] = []
     if (team.venue) facts.push([t.stadium, [team.venue, team.city].filter(Boolean).join(', ') + (team.capacity ? ` · ${t.seats(new Intl.NumberFormat(locale).format(team.capacity))}` : '')])
     if (team.coach) facts.push([t.coach, team.coach])
-    const openPlayer = (id: string, name: string) => setPlayer({ id, name })
     body = (
       <>
         <header className="tp-head">
@@ -520,7 +504,7 @@ export function TeamProfile({ team: start, language, locale, onBack, backLabel }
 
   return (
     <div className="tp">
-      {back && <button type="button" className="sp-text-button pp-back" onClick={back}>‹ {trail.length > 1 ? t.back : backLabel ?? t.back}</button>}
+      <DetailBack onBack={onBack} label={backLabel ?? t.back} />
       {body}
     </div>
   )

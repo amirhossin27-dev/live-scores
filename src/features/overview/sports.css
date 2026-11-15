@@ -2874,3 +2874,6 @@ button.pp-club:focus-visible strong {
 .md-moment.is-away .md-assist { order: -1; }
 .md-assist { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .md-sub-off { font-weight: 400; }
+
+.sp-settings-exit { position: sticky; top: calc(16px + var(--app-safe-top, env(safe-area-inset-top, 0px))); z-index: 2; display: flex; justify-content: flex-end; padding: 8px; background: var(--panel); }
+.sp-settings-exit button { min-height: 44px; }

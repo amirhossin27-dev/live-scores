@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react'
+import { DetailBoundary, useDetailNavigation } from '../../components/DetailNavigation'
+import { NationalTeamProfile } from './NationalTeamProfile'
+import { useState } from 'react'
 import type { Language } from '../../types/platform'
 import { localeFor } from './overviewCopy'
 import { teamName } from './sportsNames'
@@ -11,8 +13,6 @@ import { CountryFlag } from './CountryFlag'
 import { countryName } from './sportsCountries'
 import { SportsSeasonSelect } from './SportsSeasonSelect'
 import { normalizeSportsSeason, sportsSeasonOptions } from './sportsSeasons'
-import { loadNationalTeam } from './sportsApi'
-import type { SportsCountry } from './sportsApi'
 
 const copy = {
   de: {
@@ -53,9 +53,7 @@ function ScorerTable({ competition, season, language }: Props) {
   const [metric, setMetric] = useState<ScorerMetric>('goals')
   const [direction, setDirection] = useState<ScorerDirection>('descending')
   const [count, setCount] = useState(25)
-  const [playerProfile, setPlayerProfile] = useState<{ id: string; name: string } | null>(null)
-  const [nationality, setNationality] = useState<SportsCountry | null>(null)
-  const [teamProfile, setTeamProfile] = useState<string | null>(null)
+  const navigation = useDetailNavigation()!
   const players = sortScorers(data?.players ?? [], metric, direction)
   const ranked = sortScorers(data?.players ?? [], metric, 'descending')
   const rankOf = new Map<number, number>()
@@ -76,9 +74,8 @@ function ScorerTable({ competition, season, language }: Props) {
   }
 
   const backLabel = language === 'de' ? 'Zurück zu Top Scorers' : 'Back to Top Scorers'
-  if (nationality) return <ScorerNationalTeam country={nationality} language={language} onBack={() => setNationality(null)} />
-  if (teamProfile) return <TeamProfile key={teamProfile} team={{ id: teamProfile }} language={language} locale={localeFor(language)} backLabel={playerProfile ? playerProfile.name : backLabel} onBack={() => setTeamProfile(null)} />
-  if (playerProfile) return <PlayerProfile {...playerProfile} language={language} locale={localeFor(language)} backLabel={backLabel} onBack={() => setPlayerProfile(null)} onOpenTeam={setTeamProfile} />
+  const openTeam = (id: string, label = backLabel) => navigation.push({ backLabel: label, content: <TeamProfile team={{ id }} language={language} locale={localeFor(language)} backLabel={label} onBack={navigation.back} /> })
+  const openPlayer = (id: string, name: string) => navigation.push({ backLabel, content: <PlayerProfile id={id} name={name} language={language} locale={localeFor(language)} backLabel={backLabel} onBack={navigation.back} /> })
 
   return (
     <>
@@ -103,8 +100,8 @@ function ScorerTable({ competition, season, language }: Props) {
               </tr></thead>
               <tbody>{players.slice(0, count).map((player) => <tr key={player.id}>
                 <td className="scorer-number">{player[metric] === null ? '–' : rankOf.get(player[metric]!)}</td>
-                <th scope="row"><div className="scorer-player-cell">{player.hasProfile !== false ? <button type="button" className="scorer-player-link" title={player.name} onClick={() => setPlayerProfile({ id: player.id, name: player.name })}>{player.name}</button> : <span className="scorer-player-link" title={player.name}>{player.name}</span>}{player.country && (player.country.code ? <button type="button" className="scorer-country-link" aria-label={language === 'de' ? `Nationalmannschaft von ${countryName(player.country, language)} öffnen` : `Open ${countryName(player.country, language)} national team`} title={countryName(player.country, language)} onClick={() => setNationality(player.country!)}><CountryFlag country={player.country} language={language} rectangular /></button> : <CountryFlag country={player.country} language={language} rectangular />)}</div></th>
-                <td className="scorer-team">{player.teamId ? <button type="button" className="scorer-team-link" aria-label={player.team ? teamName(player.team, language) : t.team} title={player.team ? teamName(player.team, language) : t.team} onClick={() => setTeamProfile(player.teamId)}><ScorerBadge key={player.teamId} id={player.teamId} /></button> : player.teamLogo ? <span title={player.team ? teamName(player.team, language) : t.team}><ScorerBadge key={player.teamLogo} src={player.teamLogo} /></span> : '–'}</td>
+                <th scope="row"><div className="scorer-player-cell">{player.hasProfile !== false ? <button type="button" className="scorer-player-link" title={player.name} onClick={() => openPlayer(player.id, player.name)}>{player.name}</button> : <span className="scorer-player-link" title={player.name}>{player.name}</span>}{player.country && (player.country.code ? <button type="button" className="scorer-country-link" aria-label={language === 'de' ? `Nationalmannschaft von ${countryName(player.country, language)} öffnen` : `Open ${countryName(player.country, language)} national team`} title={countryName(player.country, language)} onClick={() => navigation.push({ backLabel, content: <NationalTeamProfile country={player.country!} language={language} backLabel={backLabel} /> })}><CountryFlag country={player.country} language={language} rectangular /></button> : <CountryFlag country={player.country} language={language} rectangular />)}</div></th>
+                <td className="scorer-team">{player.teamId ? <button type="button" className="scorer-team-link" aria-label={player.team ? teamName(player.team, language) : t.team} title={player.team ? teamName(player.team, language) : t.team} onClick={() => openTeam(player.teamId!)}><ScorerBadge key={player.teamId} id={player.teamId} /></button> : player.teamLogo ? <span title={player.team ? teamName(player.team, language) : t.team}><ScorerBadge key={player.teamLogo} src={player.teamLogo} /></span> : '–'}</td>
                 {metrics.map((item) => <td key={item} className={`scorer-number${item === metric ? ' is-sorted' : ''}`} title={player[item] === null ? t.unknown : undefined}>{player[item] ?? '–'}</td>)}
               </tr>)}</tbody>
             </table>
@@ -117,24 +114,6 @@ function ScorerTable({ competition, season, language }: Props) {
   )
 }
 
-function ScorerNationalTeam({ country, language, onBack }: { country: SportsCountry; language: Language; onBack: () => void }) {
-  const [team, setTeam] = useState<string | null>(null)
-  const [failed, setFailed] = useState(false)
-  const [attempt, setAttempt] = useState(0)
-  useEffect(() => {
-    const controller = new AbortController()
-    loadNationalTeam(country, controller.signal).then((result) => {
-      if (!controller.signal.aborted) setTeam(result.id)
-    }).catch(() => {
-      if (!controller.signal.aborted) setFailed(true)
-    })
-    return () => controller.abort()
-  }, [country, attempt])
-  const back = language === 'de' ? 'Zurück zu Top Scorers' : 'Back to Top Scorers'
-  if (team) return <TeamProfile team={{ id: team }} language={language} locale={localeFor(language)} backLabel={back} onBack={onBack} />
-  return <><button type="button" className="sp-text-button" onClick={onBack}>{back}</button><p role="status" className="scorer-status">{failed ? (language === 'de' ? 'Die Nationalmannschaft ist gerade nicht verfügbar.' : 'The national team is currently unavailable.') : (language === 'de' ? 'Nationalmannschaft wird geladen …' : 'Loading national team …')}</p>{failed && <button type="button" className="sp-text-button" onClick={() => { setFailed(false); setAttempt((value) => value + 1) }}>{language === 'de' ? 'Erneut versuchen' : 'Try again'}</button>}</>
-}
-
 function ScorerBadge({ id, src }: { id?: string; src?: string }) {
   const [failed, setFailed] = useState(false)
   return failed ? <span aria-hidden="true">◇</span> : <img src={src ?? `https://images.fotmob.com/image_resources/logo/teamlogo/${encodeURIComponent(id!)}.png`} alt="" width={22} height={22} loading="lazy" onError={() => setFailed(true)} />
@@ -142,5 +121,5 @@ function ScorerBadge({ id, src }: { id?: string; src?: string }) {
 
 /** The top scorers of a competition: the requests start when the tab is shown and stop when it is left. */
 export function TopScorers(props: Props) {
-  return <ScorerTable key={`${props.competition}|${props.season ?? ''}`} {...props} />
+  return <DetailBoundary><ScorerTable key={`${props.competition}|${props.season ?? ''}`} {...props} /></DetailBoundary>
 }

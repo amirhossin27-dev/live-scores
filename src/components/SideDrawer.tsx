@@ -1,5 +1,8 @@
 import type { ReactNode } from 'react'
-import { useEffect, useId } from 'react'
+import { useId, useLayoutEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
+import { useDetailNavigation } from './DetailNavigation'
+import { useModal } from './useModal'
 import './SideDrawer.css'
 
 interface SideDrawerProps {
@@ -25,37 +28,50 @@ interface SideDrawerProps {
 export function SideDrawer({ title, subtitle, closeLabel, onClose, children, footer, className = '', wide = false, dismissible = true, onBackdropClose, aside }: SideDrawerProps) {
   const titleId = useId()
 
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && dismissible) {
-        onClose()
+  const origin = useRef<HTMLSpanElement>(null)
+  const backdrop = useRef<HTMLDivElement>(null)
+  useLayoutEffect(() => {
+    // Body portals retain the app's explicit inset overrides in both embed modes.
+    for (const edge of ['top', 'right', 'bottom', 'left']) {
+      const property = `--app-safe-${edge}`
+      let ancestor: HTMLElement | null = origin.current
+      while (ancestor) {
+        const value = getComputedStyle(ancestor).getPropertyValue(property).trim()
+        if (value) { backdrop.current?.style.setProperty(property, value); break }
+        ancestor = ancestor.parentElement
       }
     }
+  })
+  const navigation = useDetailNavigation()
+  useModal(backdrop, true, () => {
+    if (!dismissible) return
+    if (navigation?.depth) navigation.back()
+    else onClose()
+  })
 
-    document.addEventListener('keydown', onKeyDown)
-    return () => document.removeEventListener('keydown', onKeyDown)
-  }, [onClose, dismissible])
-
-  return (
-    <div className="side-drawer-backdrop" onMouseDown={(event) => {
+  return <><span ref={origin} hidden />{createPortal(
+    <div ref={backdrop} className="side-drawer-backdrop" onMouseDown={(event) => {
       if (event.target !== event.currentTarget) return
       if (onBackdropClose) onBackdropClose()
       else if (dismissible) onClose()
     }}>
-      <aside className={`side-drawer${wide ? ' is-wide' : ''}${aside ? ' is-split' : ''}${className ? ` ${className}` : ''}`} role="dialog" aria-modal="true" aria-labelledby={titleId}>
+      <aside className={`side-drawer${wide ? ' is-wide' : ''}${aside ? ' is-split' : ''}${className ? ` ${className}` : ''}`} role="dialog" aria-modal="true" aria-labelledby={titleId} tabIndex={-1}>
         {aside && <section className="side-drawer-aside">{aside}</section>}
         <div className="side-drawer-main">
           <header className="side-drawer-header">
             <div>
-              <h2 id={titleId}>{title}</h2>
+              <h2 id={titleId}>{navigation?.title ?? title}</h2>
               {subtitle && <p>{subtitle}</p>}
             </div>
+            <nav className="side-drawer-actions" aria-label={closeLabel}>
+            {navigation?.depth ? <button type="button" className="side-drawer-back" onClick={navigation.back}>‹ {navigation.backLabel}</button> : null}
             <button type="button" className="side-drawer-close" aria-label={closeLabel} title={closeLabel} onClick={onClose}><span aria-hidden="true">×</span><span>{closeLabel}</span></button>
+            </nav>
           </header>
           <div className="side-drawer-body">{children}</div>
           {footer && <footer className="side-drawer-footer">{footer}</footer>}
         </div>
       </aside>
-    </div>
-  )
+    </div>, document.body,
+  )}</>
 }

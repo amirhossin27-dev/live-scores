@@ -365,6 +365,7 @@ function SportsSettings({ language, selection, t, onToggle, onMove, onReset, onC
   const lang = language === 'de' ? 'de' : 'en'
   return (
     <div className="sp-settings">
+      <div className="sp-settings-exit"><button type="button" className="sp-text-button is-primary" onClick={onClose}>{t.done}</button></div>
       <p className="sp-intro">{t.settingsIntro(selection.length)}</p>
       <CompetitionOrder language={language} selection={selection} t={t} onMove={onMove} />
       {sportsGroups.map((group) => (
@@ -388,7 +389,6 @@ function SportsSettings({ language, selection, t, onToggle, onMove, onReset, onC
       ))}
       <div className="sp-settings-foot">
         <button type="button" className="sp-text-button" onClick={onReset}>{t.reset}</button>
-        <button type="button" className="sp-text-button is-primary" onClick={onClose}>{t.done}</button>
       </div>
     </div>
   )

@@ -1,3 +1,4 @@
+import { useDetailNavigation } from '../../components/DetailNavigation'
 import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { SideDrawer } from '../../components/SideDrawer'
@@ -59,9 +60,14 @@ interface PanelProps {
  */
 export function CompetitionPanel({ competition, language, onClose }: PanelProps) {
   const t = copy[language === 'de' ? 'de' : 'en']
+  return <MatchLayers language={language} frame={(content) => <SideDrawer className="sports-detail-drawer" title={competitionName(competition, language)} subtitle={competitionCountry(competition, language)} closeLabel={t.close} onClose={onClose}>{content}</SideDrawer>}><CompetitionContent competition={competition} language={language} /></MatchLayers>
+}
+function CompetitionContent({ competition, language }: Omit<PanelProps, 'onClose'>) {
+  const t = copy[language === 'de' ? 'de' : 'en']
   const { standings, loading, retry } = useStandings(competition.id, null)
   const [chosen, setChosen] = useState<StandingsView | null>(null)
-  const [team, setTeam] = useState<string | null>(null)
+  const navigation = useDetailNavigation()!
+  const openTeam = (id: string) => navigation.push({ backLabel: t.backToTable, content: <TeamProfile team={{ id }} language={language} locale={localeFor(language)} backLabel={t.backToTable} onBack={navigation.back} /> })
   const views = standingsViews(standings)
   const football = competition.id.startsWith('soccer/')
   const view = chosen && views.includes(chosen) ? chosen : standings ? firstView(standings, views) : 'table'
@@ -74,25 +80,8 @@ export function CompetitionPanel({ competition, language, onClose }: PanelProps)
   } else if (views.length === 0) {
     body = <p className="md-empty">{t.none}</p>
   } else {
-    body = <StandingsBody standings={standings} view={view} language={language} onOpenTeam={football ? setTeam : undefined} />
+    body = <StandingsBody standings={standings} view={view} language={language} onOpenTeam={football ? openTeam : undefined} />
   }
 
-  return (
-    <MatchLayers
-      language={language}
-      frame={(content) => (
-        <SideDrawer className="sports-detail-drawer" title={competitionName(competition, language)} subtitle={competitionCountry(competition, language)} closeLabel={t.close} onClose={onClose}>
-          {content}
-        </SideDrawer>
-      )}
-    >
-      {team ? (
-        <TeamProfile key={team} team={{ id: team }} language={language} locale={localeFor(language)} backLabel={t.backToTable} onBack={() => setTeam(null)} />
-      ) : (
-        <SportsTabs tabs={views.map((item) => ({ id: item, label: t[item] }))} active={view} label={competitionName(competition, language)} onSelect={setChosen}>
-          {body}
-        </SportsTabs>
-      )}
-    </MatchLayers>
-  )
+  return <SportsTabs tabs={views.map((item) => ({ id: item, label: t[item] }))} active={view} label={competitionName(competition, language)} onSelect={setChosen}>{body}</SportsTabs>
 }

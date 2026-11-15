@@ -1,6 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { SideDrawer } from '../../components/SideDrawer'
+import { DetailBack, DetailBoundary, DetailStack, useDetailNavigation, useDetailTitle } from '../../components/DetailNavigation'
+import { NationalTeamProfile } from './NationalTeamProfile'
 import './sportsDetailPanel.css'
 import type { Language } from '../../types/platform'
 import { localeFor } from './overviewCopy'
@@ -13,8 +15,8 @@ import { CountryFlag } from './CountryFlag'
 import { TeamProfile } from './TeamProfile'
 import { StandingsBody } from './Standings'
 import { SportsTabs } from './SportsTabs'
-import { findMatch, loadNationalTeam } from './sportsApi'
-import type { SportsCountry, SportsEvent, SportsLineup, SportsMatch, SportsMatchDetails, SportsMatchLink, SportsPlayer, SportsSide, SportsStat, SportsTeamRef } from './sportsApi'
+import { findMatch } from './sportsApi'
+import type { SportsCountry, SportsEvent, SportsLineup, SportsMatch, SportsMatchDetails, SportsPlayer, SportsSide, SportsStat } from './sportsApi'
 import { competitionLabelOf, hasStandings } from './sportsCatalog'
 import { OpenMatchContext } from './sportsMatchNav'
 import type { MatchTarget } from './sportsMatchNav'
@@ -319,7 +321,10 @@ interface MatchViewProps {
 }
 
 /** Statistics, timeline, line-ups, table and streams of one match: the content of the match panel, also as a layer of another panel. */
-export function MatchView({ competition, competitionLabel, match, language, onBack, backLabel }: MatchViewProps) {
+export function MatchView(props: MatchViewProps) {
+  return <DetailBoundary><MatchContent {...props} /></DetailBoundary>
+}
+function MatchContent({ competition, competitionLabel, match, language, onBack, backLabel }: MatchViewProps) {
   const t = copy[language === 'de' ? 'de' : 'en']
   const locale = localeFor(language)
   const { details, failed, loading, retry } = useMatchDetails(competition, match.id)
@@ -327,37 +332,13 @@ export function MatchView({ competition, competitionLabel, match, language, onBa
   const { standings } = useStandings(hasStandings(competition) ? competition : null, match.id)
   const football = competition.startsWith('soccer/')
   const [chosenTab, setChosenTab] = useState<Tab | null>(null)
-  const [player, setPlayer] = useState<SportsPlayer | null>(null)
-  const [team, setTeam] = useState<SportsTeamRef | null>(null)
-  const nationalRequest = useRef<AbortController | null>(null)
-  const [nationalStatus, setNationalStatus] = useState<{ country: SportsCountry; failed: boolean } | null>(null)
-  useEffect(() => () => nationalRequest.current?.abort(), [])
-  const cancelNationalRequest = () => {
-    nationalRequest.current?.abort()
-    nationalRequest.current = null
-    setNationalStatus(null)
+  const navigation = useDetailNavigation()!
+  const openTeam = (id: string, label = t.backToMatch) => navigation.push({ backLabel: label, content: <TeamProfile team={{ id }} language={language} locale={locale} backLabel={label} onBack={navigation.back} /> })
+  const openPlayer = (player: SportsPlayer) => {
+    if (!player.profileId) return
+    navigation.push({ backLabel: t.backToMatch, content: <PlayerProfile id={player.profileId} name={player.name} language={language} locale={locale} backLabel={t.backToMatch} onBack={navigation.back} /> })
   }
-  const openPlayer = (next: SportsPlayer) => {
-    cancelNationalRequest()
-    setPlayer(next)
-  }
-  const openTeam = (id: string) => {
-    cancelNationalRequest()
-    setPlayer(null)
-    setTeam({ id })
-  }
-  const openCountry = async (country: SportsCountry) => {
-    nationalRequest.current?.abort()
-    const controller = new AbortController()
-    nationalRequest.current = controller
-    setNationalStatus({ country, failed: false })
-    try {
-      const national = await loadNationalTeam(country, controller.signal)
-      if (!controller.signal.aborted) openTeam(national.id)
-    } catch {
-      if (!controller.signal.aborted) setNationalStatus({ country, failed: true })
-    }
-  }
+  const openCountry = (country: SportsCountry) => navigation.push({ backLabel: t.backToMatch, content: <NationalTeamProfile country={country} language={language} backLabel={t.backToMatch} /> })
   const time = useMemo(() => new Intl.DateTimeFormat(locale, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }), [locale])
 
   // Until the details are there, the line of the scoreboard fills the head of the panel.
@@ -409,7 +390,6 @@ export function MatchView({ competition, competitionLabel, match, language, onBa
     body = <><MatchFacts details={details} t={t} language={language} /><Moments events={details.events} t={t} details={details} onOpenPlayer={openPlayer} /></>
   } else {
     body = <>
-      {nationalStatus && <p className="sp-notice" role="status">{nationalStatus.failed ? t.nationalFailed : t.nationalLoading}{nationalStatus.failed && <> <button type="button" className="sp-text-button" onClick={() => void openCountry(nationalStatus.country)}>{t.retry}</button></>}</p>}
       <LineupPitch lineups={details.lineups} events={details.events} homeName={homeName} awayName={awayName} language={language} locale={locale} onOpenPlayer={openPlayer} onOpenCountry={openCountry} />
     </>
   }
@@ -425,24 +405,9 @@ export function MatchView({ competition, competitionLabel, match, language, onBa
       : <span className="md-side">{content}</span>
   }
 
-  if (team) return <TeamProfile team={team} language={language} locale={locale} backLabel={t.backToMatch} onBack={() => setTeam(null)} />
-  if (player?.profileId) {
-    return (
-      <PlayerProfile
-        id={player.profileId}
-        name={player.name}
-        language={language}
-        locale={locale}
-        backLabel={t.backToMatch}
-        onBack={() => setPlayer(null)}
-        onOpenTeam={openTeam}
-      />
-    )
-  }
-
   return (
     <>
-      {onBack && <button type="button" className="sp-text-button pp-back" onClick={onBack}>‹ {backLabel ?? t.back}</button>}
+      <DetailBack onBack={onBack} label={backLabel ?? t.back} />
       <div className={`md-head is-${details?.status ?? match.status}`}>
         {teamButton('home', <>{home && <Crest side={home} />}<strong>{homeName}</strong></>, homeName)}
         <span className="md-result">
@@ -452,7 +417,7 @@ export function MatchView({ competition, competitionLabel, match, language, onBa
         {teamButton('away', <>{away && <Crest side={away} />}<strong>{awayName}</strong></>, awayName)}
       </div>
 
-      <SportsTabs tabs={tabs} active={tab} label={competitionLabel} onSelect={(id) => { cancelNationalRequest(); setChosenTab(id) }}>
+      <SportsTabs tabs={tabs} active={tab} label={competitionLabel} onSelect={(id) => { setChosenTab(id) }}>
         {body}
       </SportsTabs>
 
@@ -467,98 +432,40 @@ export function MatchView({ competition, competitionLabel, match, language, onBa
 interface MatchLayersProps {
   language: Language
   children: ReactNode
-  /** Puts the layers into the panel; `top` is the match on top (null while it is searched), `depth` the number of layers. */
-  frame: (content: ReactNode, top: { link: SportsMatchLink | null; depth: number }) => ReactNode
+  frame: (content: ReactNode) => ReactNode
 }
 
-interface MatchLayer {
-  key: number
-  target: MatchTarget
-  link: SportsMatchLink | null
-  state: 'loading' | 'ready' | 'missing' | 'down'
-  /** Where the panel was scrolled to below this layer, for the way back. */
-  scroll: number
-}
-
-/**
- * The matches opened inside a side panel, as layers over its content: each one is found in ESPN's scores and shown as a match
- * view with "back". The layers below stay mounted (only hidden), so the table, the team page or the profile come back as they
- * were, scrolled to where they were. `frame` puts the content and the layers into the panel; it gets the match on top.
- */
-export function MatchLayers({ language, children, frame }: MatchLayersProps) {
+function ResolvedMatch({ target, language }: { target: MatchTarget; language: Language }) {
   const t = copy[language === 'de' ? 'de' : 'en']
-  const [layers, setLayers] = useState<MatchLayer[]>([])
-  const hostRef = useRef<HTMLDivElement>(null)
-  const nextKey = useRef(0)
-  const controllers = useRef<AbortController[]>([])
-
+  const navigation = useDetailNavigation()!
+  const [result, setResult] = useState<Awaited<ReturnType<typeof findMatch>> | null>(null)
+  const [state, setState] = useState<'loading' | 'missing' | 'down'>('loading')
+  const [attempt, setAttempt] = useState(0)
   useEffect(() => {
-    const running = controllers.current
-    return () => running.forEach((controller) => controller.abort())
-  }, [])
-
-  const scroller = () => hostRef.current?.closest<HTMLElement>('.side-drawer-body') ?? null
-  const scrollTo = (top: number) => window.requestAnimationFrame(() => {
-    const element = scroller()
-    if (element) element.scrollTop = top
-  })
-
-  function resolve(key: number, target: MatchTarget) {
     const controller = new AbortController()
-    controllers.current.push(controller)
-    const update = (patch: Partial<MatchLayer>) => setLayers((items) => items.map((layer) => (layer.key === key ? { ...layer, ...patch } : layer)))
-    findMatch(target.fotmob, controller.signal)
-      .then((link) => update({ link, state: 'ready' }))
-      .catch((error: unknown) => {
-        if (!controller.signal.aborted) update({ state: (error as { status?: number }).status === 404 ? 'missing' : 'down' })
-      })
-  }
-
-  function open(target: MatchTarget) {
-    const key = nextKey.current
-    nextKey.current += 1
-    setLayers((items) => [...items, { key, target, link: null, state: 'loading', scroll: scroller()?.scrollTop ?? 0 }])
-    resolve(key, target)
-    scrollTo(0)
-  }
-
-  function close(index: number) {
-    const scroll = layers[index]?.scroll ?? 0
-    setLayers((items) => items.slice(0, index))
-    scrollTo(scroll)
-  }
-
-  function retry(layer: MatchLayer) {
-    setLayers((items) => items.map((item) => (item.key === layer.key ? { ...item, state: 'loading' } : item)))
-    resolve(layer.key, layer.target)
-  }
-
-  function layerBody(layer: MatchLayer, index: number) {
-    if (layer.link) {
-      return <MatchView competition={layer.link.competition} competitionLabel={competitionLabelOf(layer.link.competition, language)} match={layer.link.match} language={language} onBack={() => close(index)} backLabel={layer.target.back} />
-    }
-    return (
-      <>
-        <button type="button" className="sp-text-button pp-back" onClick={() => close(index)}>‹ {layer.target.back}</button>
-        {layer.state === 'loading' && <p className="md-empty" aria-live="polite">{t.searching}</p>}
-        {layer.state === 'missing' && <p className="md-empty" aria-live="polite">{t.notListed}</p>}
-        {layer.state === 'down' && <div className="md-empty" aria-live="polite"><span>{t.down}</span> <button type="button" className="sp-text-button" onClick={() => retry(layer)}>{t.retry}</button></div>}
-      </>
-    )
-  }
-
-  const content = (
-    <OpenMatchContext.Provider value={open}>
-      <div ref={hostRef} className="md-layers">
-        <div hidden={layers.length > 0}>{children}</div>
-        {layers.map((layer, index) => (
-          <div key={layer.key} hidden={index < layers.length - 1}>{layerBody(layer, index)}</div>
-        ))}
-      </div>
-    </OpenMatchContext.Provider>
-  )
-
-  return frame(content, { link: layers.length > 0 ? layers[layers.length - 1].link : null, depth: layers.length })
+    findMatch(target.fotmob, controller.signal).then((link) => {
+      if (!controller.signal.aborted) setResult(link)
+    }).catch((error: unknown) => {
+      if (!controller.signal.aborted) setState((error as { status?: number }).status === 404 ? 'missing' : 'down')
+    })
+    return () => controller.abort()
+  }, [target, attempt])
+  useDetailTitle(result?.match.home && result.match.away ? `${teamName(result.match.home.name, language)} – ${teamName(result.match.away.name, language)}` : null)
+  if (result) return <MatchView competition={result.competition} competitionLabel={competitionLabelOf(result.competition, language)} match={result.match} language={language} onBack={navigation.back} backLabel={target.back} />
+  return <>
+    <DetailBack onBack={navigation.back} label={target.back} />
+    {state === 'loading' && <p className="md-empty" aria-live="polite">{t.searching}</p>}
+    {state === 'missing' && <p className="md-empty" aria-live="polite">{t.notListed}</p>}
+    {state === 'down' && <div className="md-empty" aria-live="polite"><span>{t.down}</span> <button type="button" className="sp-text-button" onClick={() => { setState('loading'); setAttempt((value) => value + 1) }}>{t.retry}</button></div>}
+  </>
+}
+function MatchNavigation({ language, children }: { language: Language; children: ReactNode }) {
+  return <OpenMatchContext.Provider value={(target) => <ResolvedMatch target={target} language={language} />}>{children}</OpenMatchContext.Provider>
+}
+/** Match and profile visits share one stack, preserving the actual path and all covered state. */
+export function MatchLayers({ language, children, frame }: MatchLayersProps) {
+  // Place the match opener above every entry so fixtures in any profile use the same stack.
+  return <DetailStack frame={(content) => <MatchNavigation language={language}>{frame(content)}</MatchNavigation>}>{children}</DetailStack>
 }
 
 interface MatchDetailsProps {
@@ -575,11 +482,11 @@ export function MatchDetails({ competition, competitionLabel, match, language, o
   return (
     <MatchLayers
       language={language}
-      frame={(content, top) => {
+      frame={(content) => {
         // the title follows the match on top
-        const shown = top.depth > 0 ? top.link?.match ?? null : match
+        const shown = match
         const title = shown?.home && shown.away ? `${teamName(shown.home.name, language)} – ${teamName(shown.away.name, language)}` : competitionLabel
-        const subtitle = top.depth > 0 ? (top.link ? competitionLabelOf(top.link.competition, language) : undefined) : competitionLabel
+        const subtitle = competitionLabel
         return <SideDrawer className="sports-detail-drawer" title={title} subtitle={subtitle} closeLabel={t.close} onClose={onClose}>{content}</SideDrawer>
       }}
     >

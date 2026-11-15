@@ -1,4 +1,5 @@
-import { useEffect, useId, useRef, useState } from 'react'
+import { useDetailNavigation } from '../../components/DetailNavigation'
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import type { KeyboardEvent } from 'react'
 import { SideDrawer } from '../../components/SideDrawer'
 import './sportsDetailPanel.css'
@@ -58,26 +59,15 @@ const kinds: Kind[] = ['player', 'coach', 'club', 'national']
 
 function SearchProfile({ result, language, onClose }: { result: SportsSearchResult; language: Language; onClose: () => void }) {
   const t = copy[language === 'de' ? 'de' : 'en']
-  const [team, setTeam] = useState<string | null>(null)
-  const profileRef = useRef<HTMLDivElement>(null)
-  useEffect(() => { profileRef.current?.querySelector<HTMLButtonElement>('button')?.focus() }, [])
-  const isTeam = result.kind === 'club' || result.kind === 'national'
-  return (
-    <MatchLayers language={language} frame={(content) => (
-      <SideDrawer className="sports-detail-drawer" title={result.name} subtitle={t.singular[result.kind]} closeLabel={t.close} onClose={onClose}>{content}</SideDrawer>
-    )}>
-      <div ref={profileRef}>
-        <div hidden={team !== null}>
-          {isTeam ? (
-            <TeamProfile key={result.id} team={{ id: result.id }} language={language} locale={localeFor(language)} backLabel={t.back} onBack={onClose} />
-          ) : (
-            <PlayerProfile key={result.id} id={result.id} name={result.name} language={language} locale={localeFor(language)} backLabel={t.back} onBack={onClose} onOpenTeam={setTeam} />
-          )}
-        </div>
-        {team && <TeamProfile key={team} team={{ id: team }} language={language} locale={localeFor(language)} backLabel={t.backTo(result.name)} onBack={() => setTeam(null)} />}
-      </div>
-    </MatchLayers>
-  )
+  return <MatchLayers language={language} frame={(content) => <SideDrawer className="sports-detail-drawer" title={result.name} subtitle={t.singular[result.kind]} closeLabel={t.close} onClose={onClose}>{content}</SideDrawer>}><SearchRoot result={result} language={language} onClose={onClose} /></MatchLayers>
+}
+function SearchRoot({ result, language, onClose }: { result: SportsSearchResult; language: Language; onClose: () => void }) {
+  const t = copy[language === 'de' ? 'de' : 'en']
+  const navigation = useDetailNavigation()!
+  const openTeam = (id: string) => navigation.push({ backLabel: t.backTo(result.name), content: <TeamProfile team={{ id }} language={language} locale={localeFor(language)} backLabel={t.backTo(result.name)} onBack={navigation.back} /> })
+  return result.kind === 'club' || result.kind === 'national'
+    ? <TeamProfile team={{ id: result.id }} language={language} locale={localeFor(language)} backLabel={t.back} onBack={onClose} />
+    : <PlayerProfile id={result.id} name={result.name} language={language} locale={localeFor(language)} backLabel={t.back} onBack={onClose} onOpenTeam={openTeam} />
 }
 
 /** Debounced football discovery, independent of the selected day and competitions. */
@@ -95,6 +85,14 @@ export function SportsSearch({ language }: { language: Language }) {
   const [loaded, setLoaded] = useState<{ key: string; results: SportsSearchResult[] } | null>(null)
   const [failed, setFailed] = useState<string | null>(null)
   const [selected, setSelected] = useState<SportsSearchResult | null>(null)
+  const restoreSearch = useRef(false)
+  useLayoutEffect(() => {
+    if (!selected && restoreSearch.current) {
+      restoreSearch.current = false
+      input.current?.focus({ preventScroll: true })
+      setOpen(true)
+    }
+  }, [selected])
   const term = query.trim()
   const key = `${lang}|${term}`
   const ready = term.length >= 2
@@ -202,7 +200,7 @@ export function SportsSearch({ language }: { language: Language }) {
           </div>
         )}
       </div>
-      {selected && <SearchProfile key={`${selected.kind}-${selected.id}`} result={selected} language={language} onClose={() => { setSelected(null); setOpen(true); input.current?.focus() }} />}
+      {selected && <SearchProfile key={`${selected.kind}-${selected.id}`} result={selected} language={language} onClose={() => { restoreSearch.current = true; setSelected(null) }} />}
     </>
   )
 }

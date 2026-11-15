@@ -105,3 +105,17 @@ describe('DatePicker', () => {
     expect(screen.queryByRole('dialog')).toBeNull()
   })
 })
+
+it('cancels after browsing another month without changing the chosen date', async () => {
+  const changed = vi.fn()
+  const user = userEvent.setup()
+  render(<Harness initial="2026-10-15" language="de" onSelect={changed} />)
+  const trigger = screen.getByRole('button', { name: 'Deadline' })
+  await user.click(trigger)
+  await user.click(screen.getByRole('button', { name: 'Nächster Monat' }))
+  await user.click(screen.getByRole('button', { name: 'Abbrechen' }))
+  expect(changed).not.toHaveBeenCalled()
+  expect(screen.queryByRole('dialog')).toBeNull()
+  expect(trigger.textContent).toBe('15.10.2026')
+  expect(document.activeElement).toBe(trigger)
+})

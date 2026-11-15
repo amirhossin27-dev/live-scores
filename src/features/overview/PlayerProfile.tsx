@@ -1,3 +1,5 @@
+import { DetailBack, useDetailNavigation } from '../../components/DetailNavigation'
+import { TeamProfile } from './TeamProfile'
 import { useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { Language } from '../../types/platform'
@@ -843,6 +845,11 @@ function ProfilePortrait({ id, name }: { id: string; name: string }) {
 /** The profile of a player or a coach, shown in the panel instead of the match or the team until "back". */
 export function PlayerProfile({ id, name, language, locale, onBack, backLabel, onOpenTeam }: PlayerProfileProps) {
   const t = copy[language === 'de' ? 'de' : 'en']
+  const navigation = useDetailNavigation()
+  const openTeam = navigation ? (teamId: string) => {
+    const label = language === 'de' ? `Zurück zu ${name}` : `Back to ${name}`
+    navigation.push({ backLabel: label, content: <TeamProfile team={{ id: teamId }} language={language} locale={locale} backLabel={label} onBack={navigation.back} /> })
+  } : onOpenTeam
   const { profile, loading, retry } = usePlayerProfile(id, language === 'de' ? 'de' : 'en')
   const [chosen, setChosen] = useState<Tab | null>(null)
   const coach = profile?.isCoach ?? false
@@ -879,12 +886,12 @@ export function PlayerProfile({ id, name, language, locale, onBack, backLabel, o
           ))}
         </div>
         <div role="tabpanel">
-          {!coach && <section className="pp-recent-panel" hidden={tab !== 'recent'} key={profile.id}><RecentMatches profile={profile} t={t} language={language} locale={locale} onOpenTeam={onOpenTeam} /></section>}
-          {tab === 'career' && <Career profile={profile} t={t} locale={locale} onOpenTeam={onOpenTeam} />}
-          {tab === 'coaching' && <CoachCareer stints={profile.coachCareer ?? []} t={t} locale={locale} onOpenTeam={onOpenTeam} />}
+          {!coach && <section className="pp-recent-panel" hidden={tab !== 'recent'} key={profile.id}><RecentMatches profile={profile} t={t} language={language} locale={locale} onOpenTeam={openTeam} /></section>}
+          {tab === 'career' && <Career profile={profile} t={t} locale={locale} onOpenTeam={openTeam} />}
+          {tab === 'coaching' && <CoachCareer stints={profile.coachCareer ?? []} t={t} locale={locale} onOpenTeam={openTeam} />}
           {tab === 'transfers' && <Transfers profile={profile} t={t} language={language} locale={locale} />}
           {tab === 'injuries' && <Injuries profile={profile} t={t} language={language} locale={locale} />}
-          {tab === 'titles' && <Titles trophies={profile.trophies ?? []} t={t} onOpenTeam={onOpenTeam} />}
+          {tab === 'titles' && <Titles trophies={profile.trophies ?? []} t={t} onOpenTeam={openTeam} />}
         </div>
       </>
     )
@@ -892,7 +899,7 @@ export function PlayerProfile({ id, name, language, locale, onBack, backLabel, o
 
   return (
     <div className="pp" aria-label={name}>
-      <button type="button" className="sp-text-button pp-back" onClick={onBack}>‹ {backLabel ?? t.back}</button>
+      <DetailBack onBack={onBack} label={backLabel ?? t.back} />
       {body}
     </div>
   )

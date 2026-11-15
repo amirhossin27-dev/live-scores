@@ -597,7 +597,7 @@ describe('SportsWidget', () => {
     expect(panel.queryByRole('heading', { level: 3, name: 'Deutschland' })).toBeNull()
   })
 
-  it('keeps the line-up open when a national-team flag cannot be resolved without opening a player profile', async () => {
+  it('returns to the preserved line-up when national-team resolution fails', async () => {
     const country = { name: 'Germany', code: 'GER', iso: 'de', flag: 'https://images.fotmob.com/image_resources/logo/teamlogo/ger.png' }
     api.loadMatchDetails.mockResolvedValue({
       ...details,
@@ -609,7 +609,8 @@ describe('SportsWidget', () => {
     const panel = within(await screen.findByRole('dialog', { name: 'Bayern München – Borussia Dortmund' }))
     fireEvent.click(await panel.findByRole('tab', { name: 'Aufstellung' }))
     fireEvent.click(panel.getByRole('button', { name: 'Nationalmannschaft von Deutschland öffnen' }))
-    expect(await panel.findByText('Die Nationalmannschaft konnte nicht geladen werden.')).toBeTruthy()
+    expect(await panel.findByText('Die Nationalmannschaft ist gerade nicht verfügbar.')).toBeTruthy()
+    fireEvent.click(panel.getByRole('button', { name: '‹ Zurück zum Spiel' }))
     expect(panel.getByRole('tab', { name: 'Aufstellung' }).getAttribute('aria-selected')).toBe('true')
     expect(api.loadNationalTeam).toHaveBeenCalledWith(country, expect.any(AbortSignal))
     expect(api.loadTeam).not.toHaveBeenCalled()
@@ -617,7 +618,7 @@ describe('SportsWidget', () => {
     expect(panel.getByRole('button', { name: 'Nationalmannschaft von Deutschland öffnen' })).toBeTruthy()
   })
 
-  it('aborts national-team navigation when leaving the line-up and ignores a late resolver response', async () => {
+  it('aborts national-team navigation on back and ignores a late resolver response', async () => {
     const country = { name: 'Germany', code: 'GER', iso: 'de', flag: 'https://images.fotmob.com/image_resources/logo/teamlogo/ger.png' }
     api.loadMatchDetails.mockResolvedValue({
       ...details,
@@ -632,6 +633,7 @@ describe('SportsWidget', () => {
     fireEvent.click(panel.getByRole('button', { name: 'Nationalmannschaft von Deutschland öffnen' }))
     expect(panel.getByRole('status').textContent).toBe('Nationalmannschaft wird geladen …')
     const signal = api.loadNationalTeam.mock.calls[0][1] as AbortSignal
+    fireEvent.click(panel.getByRole('button', { name: '‹ Zurück zum Spiel' }))
     fireEvent.click(panel.getByRole('tab', { name: 'Statistik' }))
     expect(signal.aborted).toBe(true)
     await act(async () => resolveNationalTeam({ id: '8570', name: 'Deutschland' }))
@@ -1028,6 +1030,148 @@ describe('SportsWidget team pages', () => {
     return panel
   }
 
+  it('walks the real player → team visit path using the persistent header and restores the squad', async () => {
+    api.loadTeam.mockImplementation(({ id }: { id: string }) => Promise.resolve(id === '9823' ? bayern : dortmund))
+    api.loadPlayerProfile.mockResolvedValue({ ...profileOf('27299', 'Manuel Neuer'), teamId: '9789', career: [{ teamId: '9789', team: 'Borussia Dortmund', logo: null, kind: 'club', start: null, end: null, active: false, appearances: 5, goals: 0, assists: 0 }] })
+    const panel = await openBayern()
+    await panel.findByRole('heading', { level: 3, name: 'Bayern München' })
+    fireEvent.click(panel.getByRole('tab', { name: 'Kader' }))
+    fireEvent.click(panel.getByRole('button', { name: 'Manuel Neuer' }))
+    await panel.findByRole('heading', { name: 'Manuel Neuer' })
+    fireEvent.click(panel.getByRole('tab', { name: 'Karriere' }))
+    fireEvent.click(panel.getByRole('button', { name: /Borussia Dortmund/ }))
+    await panel.findByRole('heading', { name: 'Borussia Dortmund' })
+    const header = () => within(document.querySelector('.side-drawer-header') as HTMLElement)
+    fireEvent.click(header().getByRole('button', { name: /Zurück/ }))
+    expect(panel.getByRole('heading', { name: 'Manuel Neuer' })).toBeTruthy()
+    expect(panel.getByRole('tab', { name: 'Karriere' }).getAttribute('aria-selected')).toBe('true')
+    fireEvent.click(header().getByRole('button', { name: /Zurück/ }))
+    expect(panel.getByRole('tab', { name: 'Kader' }).getAttribute('aria-selected')).toBe('true')
+    fireEvent.click(header().getByRole('button', { name: /Zurück/ }))
+    expect(panel.getByRole('tab', { name: 'Spielverlauf' })).toBeTruthy()
+    fireEvent.click(header().getByRole('button', { name: 'Zur Übersicht' }))
+    expect(screen.queryByRole('dialog')).toBeNull()
+  })
+
+  it('restores team pagination and scroll after leaving a still-loading match, ignoring its late result', async () => {
+    api.loadTeam.mockResolvedValue(bayern)
+    let finish!: (value: unknown) => void
+    api.findMatch.mockReturnValue(new Promise((resolve) => { finish = resolve }))
+    const panel = await openBayern()
+    await panel.findByRole('heading', { level: 3, name: 'Bayern München' })
+    fireEvent.click(panel.getByRole('button', { name: 'Frühere Spiele anzeigen' }))
+    const scroller = document.querySelector('.side-drawer-body') as HTMLElement
+    scroller.scrollTop = 420
+    fireEvent.click(panel.getByText('Gegner 6'))
+    expect(scroller.scrollTop).toBe(0)
+    expect(panel.getByText('Spiel wird gesucht …')).toBeTruthy()
+    const signal = api.findMatch.mock.calls.at(-1)![1] as AbortSignal
+    fireEvent.click(panel.getByRole('button', { name: '‹ Zurück zum Verein' }))
+    expect(signal.aborted).toBe(true)
+    expect(scroller.scrollTop).toBe(420)
+    expect(panel.queryByRole('button', { name: 'Frühere Spiele anzeigen' })).toBeNull()
+    await act(async () => finish({ competition: 'soccer/ger.1', match: scores.competitions[1].matches[0] }))
+    expect(panel.getByRole('tab', { name: 'Spiele' })).toBeTruthy()
+    expect(panel.queryByRole('tab', { name: 'Spielverlauf' })).toBeNull()
+  })
+
+  it('preserves competition season through team → match and exposes back during missing match data', async () => {
+    const table = { columns: ['gamesPlayed', 'points'], groups: [{ name: null, rows: [{ rank: 1, name: 'Bayern München', logo: null, values: ['5', '13'], zone: null, highlight: false, teamId: '9823' }] }], zones: [], source: 'espn' }
+    api.loadStandings.mockImplementation((_competition: string, _match: string | null, _signal: AbortSignal, season?: string) => Promise.resolve({ competition: 'soccer/ger.1', season: season ?? '2026/2027', seasons: ['2026/2027', '2025/2026'], table, bracket: null }))
+    api.loadTeam.mockResolvedValue(bayern)
+    api.findMatch.mockRejectedValue({ status: 404 })
+    renderWidget()
+    fireEvent.click(await screen.findByRole('button', { name: 'Tabelle: Deutschland · Bundesliga' }))
+    const panel = within(await screen.findByRole('dialog'))
+    fireEvent.change(await panel.findByRole('combobox', { name: 'Saison' }), { target: { value: '2025/2026' } })
+    fireEvent.click(await panel.findByRole('button', { name: 'Verein: Bayern München' }))
+    await panel.findByRole('heading', { name: 'Bayern München' })
+    fireEvent.click(panel.getByText('Gegner 6'))
+    await panel.findByText('Für dieses Spiel gibt es keine Spielinfo: der Wettbewerb ist nicht in den Live-Scores.')
+    fireEvent.click(panel.getByRole('button', { name: '‹ Zurück zum Verein' }))
+    expect(panel.getByRole('tab', { name: 'Spiele' })).toBeTruthy()
+    fireEvent.click(panel.getByRole('button', { name: '‹ Zurück zur Tabelle' }))
+    expect((panel.getByRole('combobox', { name: 'Saison' }) as HTMLSelectElement).value).toBe('2025/2026')
+  })
+
+  it.each(['Escape', 'Schließen', 'Spiel'] as const)('keeps a table form portal operable and %s restores trigger focus without reopening', async (dismiss) => {
+    const form = [finished[0]]
+    const table = { columns: ['gamesPlayed', 'points'], groups: [{ name: null, rows: [{ rank: 1, name: 'Bayern München', logo: null, values: ['5', '13'], zone: null, highlight: false, teamId: '9823', form }] }], zones: [], source: 'espn' }
+    api.loadStandings.mockResolvedValue({ competition: 'soccer/ger.1', season: '2026/2027', table, bracket: null })
+    renderWidget()
+    fireEvent.click(await screen.findByRole('button', { name: 'Tabelle: Deutschland · Bundesliga' }))
+    const drawer = await screen.findByRole('dialog', { name: 'Bundesliga' })
+    const trigger = await within(drawer).findByRole('button', { name: '5 · Form von Bayern München' })
+    const nativeFocus = trigger.focus.bind(trigger)
+    vi.spyOn(trigger, 'focus').mockImplementation((options) => {
+      // Native browsers refuse focus while a containing drawer is inert; jsdom does not.
+      if ((trigger.closest('.side-drawer-backdrop') as HTMLElement).inert) return
+      nativeFocus(options)
+    })
+    trigger.focus()
+    const popup = await screen.findByRole('dialog', { name: 'Form von Bayern München' })
+    const close = within(popup).getByRole('button', { name: 'Schließen' })
+    close.focus()
+    expect(document.activeElement).toBe(close)
+    if (dismiss === 'Spiel') {
+      api.findMatch.mockReturnValue(new Promise(() => {}))
+      const fixture = within(popup).getByRole('button', { name: /Sieg:/ })
+      fixture.focus()
+      fireEvent.click(fixture)
+      expect(screen.queryByRole('dialog', { name: 'Form von Bayern München' })).toBeNull()
+      fireEvent.click(within(drawer).getByRole('button', { name: '‹ Zurück zur Tabelle' }))
+      expect(screen.queryByRole('dialog', { name: 'Form von Bayern München' })).toBeNull()
+      expect(drawer.contains(document.activeElement)).toBe(true)
+      return
+    }
+    if (dismiss === 'Escape') fireEvent.keyDown(close, { key: 'Escape' })
+    else fireEvent.click(close)
+    expect(screen.queryByRole('dialog', { name: 'Form von Bayern München' })).toBeNull()
+    expect(document.activeElement).toBe(trigger)
+    expect(screen.getByRole('dialog', { name: 'Bundesliga' })).toBeTruthy()
+    fireEvent.keyDown(document, { key: 'Escape' })
+    expect(screen.queryByRole('dialog')).toBeNull()
+  })
+
+  it('returns from search → coach → team through the selected profile and original filtered search', async () => {
+    api.searchSports.mockResolvedValue([{ id: 'coach-1', name: 'Alex Coach', kind: 'coach', description: null, logo: null, country: null }, { id: 'other', name: 'Alex Club', kind: 'club', description: null, logo: null, country: null }])
+    api.loadPlayerProfile.mockResolvedValue({ ...profileOf('coach-1', 'Alex Coach'), isCoach: true, coachCareer: [{ team: 'Bayern München', teamId: '9823', logo: null, start: null, end: null, active: false, matches: 10, wins: 6, draws: 2, losses: 2, pointsPerGame: 2 }] })
+    api.loadTeam.mockResolvedValue(bayern)
+    renderWidget()
+    const input = screen.getByRole('combobox')
+    fireEvent.change(input, { target: { value: 'Alex' } })
+    await screen.findByRole('option', { name: /Alex Coach/ })
+    fireEvent.click(screen.getByRole('button', { name: /Trainer1/ }))
+    fireEvent.click(screen.getByRole('option', { name: /Alex Coach/ }))
+    const panel = within(await screen.findByRole('dialog', { name: 'Alex Coach' }))
+    fireEvent.click(await panel.findByRole('button', { name: /Bayern München/ }))
+    await panel.findByRole('heading', { name: 'Bayern München' })
+    fireEvent.click(panel.getByRole('button', { name: '‹ Zurück zu Alex Coach' }))
+    expect(panel.getByRole('heading', { level: 3, name: 'Alex Coach' })).toBeTruthy()
+    fireEvent.click(panel.getByRole('button', { name: 'Zu den Suchergebnissen' }))
+    expect(screen.queryByRole('dialog')).toBeNull()
+    expect((input as HTMLInputElement).value).toBe('Alex')
+    expect(screen.getAllByRole('option')).toHaveLength(1)
+    expect(screen.getByRole('option').textContent).toContain('Alex Coach')
+    expect(document.activeElement).toBe(input)
+  })
+
+  it('preserves the selected bracket round through a team visit', async () => {
+    const tie = { home: { name: 'Bayern München', logo: null, winner: false, teamId: '9823' }, away: null, homeScore: null, awayScore: null, games: [], highlight: false }
+    api.loadStandings.mockResolvedValue({ competition: 'soccer/ger.1', season: '2026/2027', table: { columns: ['points'], groups: [{ name: null, rows: [] }], zones: [], source: 'espn' }, bracket: { rounds: [{ stage: '1/2', feedsNext: false, matchups: [tie] }, { stage: 'final', feedsNext: false, matchups: [tie] }] } })
+    api.loadTeam.mockResolvedValue(bayern)
+    renderWidget()
+    fireEvent.click(await screen.findByRole('button', { name: 'Tabelle: Deutschland · Bundesliga' }))
+    const panel = within(await screen.findByRole('dialog'))
+    fireEvent.click(await panel.findByRole('tab', { name: 'Turnierbaum' }))
+    fireEvent.click(panel.getByRole('button', { name: 'Finale' }))
+    fireEvent.click(panel.getByRole('button', { name: 'Verein: Bayern München' }))
+    await panel.findByRole('heading', { name: 'Bayern München' })
+    fireEvent.click(panel.getByRole('button', { name: '‹ Zurück zur Tabelle' }))
+    expect(panel.getByRole('button', { name: 'Finale' }).getAttribute('aria-pressed')).toBe('true')
+    expect(panel.getByRole('tab', { name: 'Turnierbaum' }).getAttribute('aria-selected')).toBe('true')
+  })
+
   it('opens the page of a football team from the match: next and last five matches, more on request', async () => {
     api.loadTeam.mockResolvedValue(bayern)
     const panel = await openBayern()
@@ -1287,4 +1431,35 @@ describe.each(['de', 'en'] as const)('visible panel exits (%s)', (language) => {
     expect(screen.queryByRole('dialog')).toBeNull()
     expect(screen.getByText('FC Sevilla')).toBeTruthy()
   })
+})
+
+it('offers an explicit settings exit before the competition choices and preserves the chosen live filter', async () => {
+  renderWidget()
+  fireEvent.click(await screen.findByRole('button', { name: /^Live/ }))
+  fireEvent.click(screen.getByRole('button', { name: 'Wettbewerbe auswählen' }))
+  const exit = screen.getByRole('button', { name: 'Fertig' })
+  const firstChoice = screen.getAllByRole('checkbox')[0]
+  expect(exit.compareDocumentPosition(firstChoice) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  fireEvent.click(exit)
+  expect(screen.queryByRole('checkbox')).toBeNull()
+  expect(screen.getByRole('button', { name: /^Live/ }).getAttribute('aria-pressed')).toBe('true')
+})
+
+it.each(['club', 'player'] as const)('can repeatedly leave an unknown %s search result without losing the query', async (kind) => {
+  api.searchSports.mockResolvedValue([{ id: 'unknown', name: 'Unbekannt', kind, description: null, logo: null, country: null }])
+  api.loadTeam.mockRejectedValue(Object.assign(new Error('missing team'), { status: 404 }))
+  api.loadPlayerProfile.mockRejectedValue(Object.assign(new Error('missing person'), { status: 404 }))
+  renderWidget()
+  const input = screen.getByRole('combobox')
+  fireEvent.change(input, { target: { value: 'Unbekannt' } })
+  await screen.findByRole('option', { name: /Unbekannt/ })
+  for (let visit = 0; visit < 2; visit += 1) {
+    fireEvent.click(screen.getByRole('option', { name: /Unbekannt/ }))
+    const panel = within(await screen.findByRole('dialog', { name: 'Unbekannt' }))
+    await panel.findByRole('button', { name: 'Erneut versuchen' })
+    fireEvent.click(panel.getByRole('button', { name: 'Zu den Suchergebnissen' }))
+    expect(screen.queryByRole('dialog')).toBeNull()
+    expect((input as HTMLInputElement).value).toBe('Unbekannt')
+    expect(document.activeElement).toBe(input)
+  }
 })

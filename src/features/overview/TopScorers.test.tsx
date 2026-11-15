@@ -82,7 +82,7 @@ describe('top scorer table', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Erneut versuchen' }))
     await tick()
     const signal = fetchJson.mock.calls.at(-1)![1].signal as AbortSignal
-    fireEvent.click(screen.getByRole('button', { name: 'Zurück zu Top Scorers' }))
+    fireEvent.click(screen.getByRole('button', { name: '‹ Zurück zu Top Scorers' }))
     expect(signal.aborted).toBe(true)
     expect(names()[0]).toBe('Goal Leader')
   })

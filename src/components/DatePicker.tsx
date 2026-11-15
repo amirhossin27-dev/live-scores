@@ -1,3 +1,4 @@
+import { useModal } from './useModal'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { createPortal } from 'react-dom'
@@ -27,7 +28,7 @@ interface DatePickerProps {
 }
 
 const popoverWidth = 288
-const popoverHeight = 342
+const popoverHeight = 386
 
 function toIso(year: number, month: number, day: number) {
   return `${String(year).padStart(4, '0')}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
@@ -78,8 +79,8 @@ export function DatePicker({
   })
 
   const copy = language === 'de'
-    ? { placeholder: 'Datum wählen', today: 'Heute', clear: 'Löschen', previous: 'Vorheriger Monat', next: 'Nächster Monat' }
-    : { placeholder: 'Select date', today: 'Today', clear: 'Clear', previous: 'Previous month', next: 'Next month' }
+    ? { placeholder: 'Datum wählen', today: 'Heute', clear: 'Löschen', previous: 'Vorheriger Monat', next: 'Nächster Monat', cancel: 'Abbrechen' }
+    : { placeholder: 'Select date', today: 'Today', clear: 'Clear', previous: 'Previous month', next: 'Next month', cancel: 'Cancel' }
 
   const today = new Date()
   const todayIso = toIso(today.getFullYear(), today.getMonth(), today.getDate())
@@ -132,28 +133,21 @@ export function DatePicker({
       }
     }
 
-    function closeOnEscape(event: KeyboardEvent) {
-      if (event.key === 'Escape') {
-        setOpen(false)
-        trigger.current?.focus()
-      }
-    }
-
     function close() {
       setOpen(false)
     }
 
     document.addEventListener('mousedown', closeOutside)
-    document.addEventListener('keydown', closeOnEscape)
     window.addEventListener('resize', close)
     window.addEventListener('scroll', close, true)
     return () => {
       document.removeEventListener('mousedown', closeOutside)
-      document.removeEventListener('keydown', closeOnEscape)
       window.removeEventListener('resize', close)
       window.removeEventListener('scroll', close, true)
     }
   }, [open])
+
+  useModal(popover, open, () => setOpen(false))
 
   function select(iso: string) {
     onChange(iso)
@@ -197,9 +191,12 @@ export function DatePicker({
           ref={popover}
           className="date-picker-popover"
           role="dialog"
+          aria-modal="true"
+          tabIndex={-1}
           aria-label={label}
           style={{ top: position.top, left: position.left, width: popoverWidth }}
         >
+          <div className="date-picker-exit"><button type="button" onClick={() => setOpen(false)}>{copy.cancel}</button></div>
           <div className="date-picker-header">
             <button type="button" className="date-picker-nav" aria-label={copy.previous} onClick={() => shiftMonth(-1)}>‹</button>
             <strong className={`date-picker-month${isCurrentMonth ? ' is-current' : ''}`} aria-live="polite">{monthLabel}</strong>

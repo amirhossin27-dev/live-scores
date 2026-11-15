@@ -1,3 +1,4 @@
+import { useModal } from '../../components/useModal'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { FocusEvent, KeyboardEvent } from 'react'
 import { createPortal } from 'react-dom'
@@ -18,7 +19,7 @@ const copy = {
     live: 'Läuft',
     last: (count: number) => `Letzte ${count} Spiele`,
     open: 'Spielinfo öffnen',
-    backToTable: 'Zurück zur Tabelle',
+    backToTable: 'Zurück zur Tabelle', close: 'Schließen',
   },
   en: {
     title: (team: string) => `Form of ${team}`,
@@ -28,7 +29,7 @@ const copy = {
     live: 'Live',
     last: (count: number) => `Last ${count} matches`,
     open: 'Open the match info',
-    backToTable: 'Back to the table',
+    backToTable: 'Back to the table', close: 'Close',
   },
 }
 
@@ -85,12 +86,20 @@ export function FormCell({ row, value, language }: FormCellProps) {
   const timer = useRef(0)
   const popRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
+  const restoringFocus = useRef(false)
+  const dismiss = () => { setAnchor(null); setChosen(null) }
+  useModal(popRef, anchor !== null, dismiss, (previous) => {
+    // Restoring the trigger is not a fresh request to open its focus popup.
+    restoringFocus.current = previous === triggerRef.current
+    try { previous.focus({ preventScroll: true }) }
+    finally { restoringFocus.current = false }
+  })
   useKeepInViewport(popRef, { anchor, open: anchor !== null, key: anchor })
 
   // a fixed pop-up does not move with the panel: it closes when anything scrolls
   useEffect(() => {
     if (!anchor) return undefined
-    const close = () => setAnchor(null)
+    const close = () => { setAnchor(null); setChosen(null) }
     window.addEventListener('scroll', close, true)
     return () => window.removeEventListener('scroll', close, true)
   }, [anchor])
@@ -122,13 +131,12 @@ export function FormCell({ row, value, language }: FormCellProps) {
     if (event.key !== 'Escape' || !anchor) return
     // the panel closes on Escape too: only the pop-up does here
     event.stopPropagation()
-    setAnchor(null)
-    triggerRef.current?.focus()
+    dismiss()
   }
   const open = (fixture: SportsTeamFixture) => {
     if (!openMatch) return
     window.clearTimeout(timer.current)
-    setAnchor(null)
+    dismiss()
     openMatch({ fotmob: fixture.id, back: t.backToTable })
   }
 
@@ -153,7 +161,7 @@ export function FormCell({ row, value, language }: FormCellProps) {
         aria-label={`${value} · ${t.title(name)}`}
         onMouseEnter={show}
         onMouseLeave={hide}
-        onFocus={show}
+        onFocus={() => { if (!restoringFocus.current) show() }}
         onBlur={onBlur}
         onClick={() => (anchor ? setAnchor(null) : show())}
         onKeyDown={onKeyDown}
@@ -165,6 +173,8 @@ export function FormCell({ row, value, language }: FormCellProps) {
           ref={popRef}
           className="st-form-pop"
           role="dialog"
+          aria-modal="true"
+          tabIndex={-1}
           aria-label={t.title(name)}
           style={{ left: anchor.x, top: anchor.bottom + 6 }}
           onMouseEnter={keep}
@@ -173,6 +183,7 @@ export function FormCell({ row, value, language }: FormCellProps) {
           onBlur={onBlur}
           onKeyDown={onKeyDown}
         >
+          <button type="button" className="sp-text-button" onClick={dismiss}>{t.close}</button>
           <ol className="st-form" aria-label={t.last(form.length)}>
             {items.map((item) => (
               <li key={item.fixture.id}>
