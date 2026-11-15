@@ -196,7 +196,9 @@ export function SportsSearch({ language, autoFocus = false, onCollapse }: { lang
         {expanded && (
           <div className={`sp-search-popover${availableHeight < 190 ? ' is-short' : ''}${shown.length ? ' has-results' : ''}`} style={{ '--sp-search-room': `${availableHeight}px` } as CSSProperties}>
             <div className="sp-search-filters" role="group" aria-label={t.filter}>
-              {(['all', ...kinds] as const).map((value) => (
+              {availableHeight < 190 ? <select className="sp-search-kind-select" aria-label={t.filter} value={kind} onChange={(event) => { setKind(event.target.value as Kind | 'all'); setActive(-1); input.current?.focus({ preventScroll: true }) }}>
+                {(['all', ...kinds] as const).map(value => <option key={value} value={value}>{value === 'all' ? t.all : t.kinds[value]}{results ? ` (${value === 'all' ? results.length : results.filter(item => item.kind === value).length})` : ''}</option>)}
+              </select> : (['all', ...kinds] as const).map((value) => (
                 <button type="button" key={value} aria-pressed={kind === value} className={kind === value ? 'is-active' : ''} onClick={() => { setKind(value); setActive(-1); input.current?.focus() }}>
                   {value === 'all' ? t.all : t.kinds[value]}
                   {results && <small>{value === 'all' ? results.length : results.filter((item) => item.kind === value).length}</small>}

@@ -49,6 +49,9 @@
 .sp-search-popover { display: flex; flex-direction: column; overflow: hidden; max-height: min(420px, max(0px, calc(var(--sp-search-room, 60dvh) - var(--sp-utility-obstruction, 0px)))); }
 .sp-search-popover .sp-search-filters, .sp-search-popover .sp-search-status { flex: none; }
 .sp-search-popover .sp-search-results { flex: 1; min-height: 0; max-height: none; }
-.sp-search-popover.is-short .sp-search-filters { display: none; }
+.sp-search-popover.is-short { overflow-y: auto; }
+.sp-search-popover.is-short .sp-search-filters { overflow: visible; padding-bottom: 0; }
+.sp-search-kind-select { width: 100%; min-height: 44px; padding: 4px 8px; font-size: 16px; }
+.sp-search-popover.is-short .sp-search-results { flex: none; overflow: visible; }
 .sp-search-popover.is-short.has-results .sp-search-status { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); }
 .sp-search-popover.is-short { padding: 4px; }

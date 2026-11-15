@@ -129,3 +129,32 @@ it('keeps the query and filters usable when no search results exist', async () =
   fireEvent.keyDown(input, { key: 'Escape' })
   expect(input.getAttribute('aria-expanded')).toBe('false')
 })
+
+it('keeps a selected category visible and switchable after the visual viewport shrinks', async () => {
+  const viewport = document.createElement('div')
+  let viewportHeight = 800
+  Object.defineProperties(viewport, { height: { get: () => viewportHeight }, offsetTop: { value: 0 } })
+  vi.stubGlobal('visualViewport', viewport)
+  try {
+    render(<SportsSearch language="en" />)
+    const input = screen.getByRole('combobox', { name: 'Search players, coaches, clubs or national teams' })
+    fireEvent.change(input, { target: { value: 'Alex' } })
+    await screen.findByRole('option', { name: /Alex Player/ })
+    const filters = screen.getByRole('group', { name: 'Filter search results' })
+    fireEvent.click(within(filters).getByRole('button', { name: /Clubs/ }))
+    expect(screen.getAllByRole('option')).toHaveLength(1)
+    viewportHeight = 170
+    fireEvent(viewport, new Event('resize'))
+    const category = screen.getByRole('combobox', { name: 'Filter search results' }) as HTMLSelectElement
+    expect(category.value).toBe('club')
+    fireEvent.change(input, { target: { value: 'Alex new' } })
+    await waitFor(() => expect(api.searchSports).toHaveBeenCalledWith('Alex new', 'en', expect.any(AbortSignal)))
+    await waitFor(() => expect(within(screen.getByRole('listbox')).getAllByRole('option')).toHaveLength(1))
+    fireEvent.change(category, { target: { value: 'all' } })
+    expect(within(screen.getByRole('listbox')).getAllByRole('option')).toHaveLength(4)
+    viewportHeight = 800
+    fireEvent(viewport, new Event('resize'))
+    expect(within(screen.getByRole('group', { name: 'Filter search results' })).getByRole('button', { name: /^All/ }).getAttribute('aria-pressed')).toBe('true')
+    expect((input as HTMLInputElement).value).toBe('Alex new')
+  } finally { cleanup(); vi.unstubAllGlobals() }
+})
