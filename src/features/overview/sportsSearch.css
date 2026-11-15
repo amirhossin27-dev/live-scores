@@ -30,3 +30,13 @@
 .sp-search-kind { flex: none; padding: 3px 6px; border: 1px solid var(--border); border-radius: 5px; color: var(--text-muted); font-size: 9px; font-weight: 500; }
 .sp-search-arrow { flex: none; color: var(--accent-strong); }
 @media (max-width: 480px) { .sp-search-kind { display: none; } }
+
+@media (max-width: 900px) {
+  .sp-toolbar > .sp-search { position: relative; grid-column: 1 / -1; grid-row: 2; width: 100%; min-width: 0; max-width: none; margin: 0; }
+  .sp-search-field input { height: 44px; font-size: 16px; }
+  .sp-search-field > svg { width: 18px; height: 18px; }
+  .sp-search-clear { min-width: 44px; min-height: 44px; }
+  .sp-toolbar .sp-search-popover { left: 0; width: 100%; transform: none; }
+  .sp-search-filters button { min-height: 44px; }
+  .sp-search-results { max-height: min(330px, 45dvh); }
+}

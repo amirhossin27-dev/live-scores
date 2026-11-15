@@ -667,7 +667,7 @@ describe('SportsWidget favourites', () => {
     // "Alle" lists the match once, in its competition: the favourites are not repeated on top
     expect(screen.queryByRole('region', { name: 'Favoriten' })).toBeNull()
     expect(screen.getAllByText('RB Leipzig')).toHaveLength(1)
-    expect(screen.getByRole('button', { name: 'Favoriten' }).textContent).toBe('★ 1')
+    expect(screen.getByRole('button', { name: 'Favoriten' }).textContent).toBe('★ Favoriten 1')
     expect(JSON.parse(window.localStorage.getItem('dwh.sports.favorites.v1') ?? '[]')).toEqual([{ competition: 'soccer/ger.1', id: '2', start: scores.competitions[1].matches[1].start }])
 
     fireEvent.click(screen.getByRole('button', { name: 'Favoriten' }))
@@ -697,7 +697,7 @@ describe('SportsWidget favourites', () => {
     expect(JSON.parse(window.localStorage.getItem('dwh.sports.favoriteCompetitions.v1') ?? '[]')).toEqual(['soccer/ger.1', 'soccer/esp.1'])
     // a single match of another competition joins them
     fireEvent.click(screen.getByRole('button', { name: 'Fighter One – Fighter Two als Favorit merken' }))
-    expect(screen.getByRole('button', { name: 'Favoriten' }).textContent).toBe('★ 5')
+    expect(screen.getByRole('button', { name: 'Favoriten' }).textContent).toBe('★ Favoriten 5')
 
     fireEvent.click(screen.getByRole('button', { name: 'Favoriten' }))
     expect(screen.getByRole('region', { name: 'Deutschland Bundesliga' })).toBeTruthy()
@@ -707,7 +707,7 @@ describe('SportsWidget favourites', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Deutschland · Bundesliga aus den Favoriten nehmen' }))
     expect(screen.queryByText('RB Leipzig')).toBeNull()
-    expect(screen.getByRole('button', { name: 'Favoriten' }).textContent).toBe('★ 2')
+    expect(screen.getByRole('button', { name: 'Favoriten' }).textContent).toBe('★ Favoriten 2')
   })
 
   it('shows red cards and second yellows next to the team', async () => {
@@ -1462,4 +1462,21 @@ it.each(['club', 'player'] as const)('can repeatedly leave an unknown %s search 
     expect((input as HTMLInputElement).value).toBe('Unbekannt')
     expect(document.activeElement).toBe(input)
   }
+})
+
+describe('mobile date return', () => {
+  it.each([
+    ['de', 'Nächster Tag', 'Zurück zu heute', 'Favoriten'],
+    ['en', 'Next day', 'Back to today', 'Favourites'],
+  ] as const)('returns explicitly to today while retaining the selected filter (%s)', async (language, nextDay, backToday, favoritesLabel) => {
+    renderWidget(language)
+    await screen.findByRole('button', { name: language === 'de' ? 'Statistik Bayern München gegen Borussia Dortmund' : 'Statistics Bayern München vs Borussia Dortmund' })
+    fireEvent.click(screen.getByRole('button', { name: favoritesLabel }))
+    fireEvent.click(screen.getByRole('button', { name: nextDay }))
+    await waitFor(() => expect(api.loadSportsScores.mock.calls.at(-1)?.[1]).toBe('20261008'))
+    fireEvent.click(screen.getByRole('button', { name: backToday }))
+    await waitFor(() => expect(api.loadSportsScores.mock.calls.at(-1)?.[1]).toBe('20261007'))
+    expect(screen.getByRole('button', { name: favoritesLabel }).getAttribute('aria-pressed')).toBe('true')
+    expect(screen.queryByRole('button', { name: backToday })).toBeNull()
+  })
 })

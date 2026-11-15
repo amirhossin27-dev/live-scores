@@ -6,7 +6,7 @@
 **Architecture:** React/TypeScript und die bestehende gemeinsame Oberfläche bleiben erhalten. Zuerst werden App-Rahmen und Detailfenster korrigiert; anschließend werden die bereits vorhandenen Rückwege vereinheitlicht und ihr Zustand erhalten.
 **Tech Stack:** React 19, TypeScript, Vite, Vitest/Testing Library; .NET-Backend; GitHub Pages und vorhandene Render-API.
 **Spec:** Die Abschnitte Zielbild, Grenzen und Navigation dieses Dokuments bilden den vorläufigen Entwurf. Der Nutzer hat den Plan und den Start von Etappe 1 mit „passt, go!“ freigegeben.
-**Stand:** 15.11.2026, Etappe 1 veröffentlicht und vom Nutzer bestätigt. Etappe 2 veröffentlicht, getestet und geprüft; iPhone-Abnahme CP2 offen.
+**Stand:** 15.11.2026, Etappen1/2 veröffentlicht; Nutzer bestätigt Verbesserung. Etappe3 lokal umgesetzt und geprüft; Veröffentlichung und CP3-Geräteabnahme offen.
 **Repository:** https://github.com/amirhossin27-dev/live-scores
 **Analysierte Basis:** main, Commit 905999b356228f6745cdd2f55fd66d326c7d43ad.
 **Live-App:** https://amirhossin27-dev.github.io/live-scores/
@@ -17,11 +17,11 @@
 | --- | --- | --- |
 | CP0 – Bestandsaufnahme | Erledigt, iOS-Reproduktion offen | Quellcode und veröffentlichte App bei 393 × 852 geprüft |
 | CP1 – Sichere Ränder und Ausgänge | Veröffentlicht; Nutzer bestätigt Funktion | Zusätzliche Gerätefälle wie Tastatur/große Schrift weiter offen |
-| CP2 – Durchgängige Navigation | Veröffentlicht; Geräteabnahme offen | Besuchspfad und Zustand bleiben erhalten; Live-Version 6622942 |
-| CP3 – Mobile Bedienung | Vorschlag | Größere Ziele, übersichtliche Werkzeuge, klare Einstellungen |
+| CP2 – Durchgängige Navigation | Veröffentlicht; Nutzer bestätigt Verbesserung | Zusatzwunsch Header/kompaktes Layout in Etappe3 aufgenommen |
+| CP3 – Mobile Bedienung | Lokal technisch geprüft; Veröffentlichung/Geräteabnahme offen | Embleme, kompakte Aufstellung, größere Ziele und einfachere Werkzeuge |
 | CP4 – Datenzustände und Veröffentlichung | Geplant | Verlässliche Rückmeldungen und dokumentierte iPhone-Abnahme |
 
-**Aktueller nächster Schritt:** Veröffentlichte Etappe 2 in der Home-Bildschirm-App auf dem iPhone 15 testen (Prüffolge am Dokumentende). Etappe 3 beginnt erst nach CP2 und ihrer vereinbarten Vorschau.
+**Aktueller nächster Schritt:** Konkrete Etappe3-Vorschau zur Veröffentlichung abnehmen, danach CP3 in der Home-Bildschirm-App testen. Details im Etappe3-Arbeitsstand am Dokumentende.
 **Fortsetzungsauftrag:** „Lies diesen Etappenplan, prüfe den aktuellen Repository-Stand und fahre mit dem ersten freigegebenen, offenen Checkpoint fort.“
 **Arbeitsverzeichnis:** C:/Users/amirh/Documents/ChatGPT/Live Scores
 **Lokaler Stand:** Checkout unter app/, Branch fix/iphone-stage-2. Implementierung Etappe 2: 5ca09f6f831f4b106d0b9d56d482f21fdd338cd9. Alle Projektprüfungen erfolgreich; Details unten.
@@ -148,18 +148,18 @@ Der Nutzer hat das etappenweise Vorgehen bestätigt.
 **Zweck:** Weniger Fehlklicks und schneller zu den relevanten Ergebnissen.
 **Betroffene Dateien:** App.tsx, app.css, SportsWidget.tsx, sports.css, SportsSearch.tsx / sportsSearch.css, DatePicker.tsx / DatePicker.css, SportsTabs.tsx sowie betroffene Profil-Styles.
 
-Vor der Umsetzung dieser Etappe eine kompakte Vorher-/Nachher-Vorschau zur gemeinsamen Auswahl erstellen.
+Nutzer hat am15.11.2026 die kompakte Richtung mit konkreten Ergänzungen freigegeben. Die lokale Vorschau wird vor der Veröffentlichung am Checkpoint abgenommen; Umsetzungsplan:2026-11-15-iphone-stage-3.md.
 
-- [ ] „Aufs iPhone“ in bereits installierter Standalone-App ausblenden; Hilfe über Einstellungen erreichbar lassen. Desktop und Safari nicht anhand der Bildschirmbreite allein als installierte App behandeln.
-- [ ] Sprache und Darstellung eindeutig bedienbar machen; „Automatisch / Hell / Dunkel“ als verständliche Auswahl vorschlagen.
-- [ ] Suchfeld auf Mobilgeräten mit genügend Platz platzieren; sinnvolle Eingabeschrift und Verhalten mit iPhone-Tastatur prüfen.
-- [ ] Hauptfilter „Alle“, „Live“, „Favoriten“ sichtbar beschriften; Zähler verständlich halten.
-- [ ] Primäre Touch-Flächen auf mindestens 44 × 44 CSS-Pixel bringen, ohne dass Favoritenstern und Spielöffnung sich überlagern.
-- [ ] Lange Mannschaftsnamen und dichte Detailreiter lesbarer darstellen; Tabellen dürfen gezielt seitlich scrollen, die ganze Seite nicht.
-- [ ] Sichtbaren Sprung zu „Heute“ ergänzen; automatischen Wechsel zum nächsten Spieltag entweder klar erklären oder nach gemeinsamem Entscheid deaktivieren.
-- [ ] Einstellungen in sinnvolle Gruppen gliedern, Abschlussaktion oben erreichbar halten; bestehende Wettbewerbsreihenfolge/Favoriten erhalten.
-- [ ] VoiceOver-Beschriftungen, Fokus, Kontrast und vergrößerte Schrift kontrollieren.
-- [ ] Vorhandene Interaktionstests gezielt erweitern und Projektprüfungen ausführen.
+- [x] Nutzeränderung: „Aufs iPhone“ vollständig samt zugehörigem Zustand, Hilfe-Markup und Styles aus dem App-Code entfernen; auch beide Footerhinweise in DE/EN entfernen.
+- [x] Sprache und Darstellung eindeutig bedienbar machen; „Automatisch / Hell / Dunkel“ als verständliche Auswahl vorschlagen.
+- [x] Suchfeld auf Mobilgeräten mit genügend Platz platzieren; sinnvolle Eingabeschrift und Verhalten mit iPhone-Tastatur prüfen.
+- [x] Hauptfilter „Alle“, „Live“, „Favoriten“ sichtbar beschriften; Zähler verständlich halten.
+- [x] Primäre Touch-Flächen auf mindestens 44 × 44 CSS-Pixel bringen, ohne dass Favoritenstern und Spielöffnung sich überlagern.
+- [x] Lange Mannschaftsnamen und dichte Detailreiter lesbarer darstellen; Tabellen dürfen gezielt seitlich scrollen, die ganze Seite nicht.
+- [x] Sichtbaren Sprung zu „Heute“ ergänzen; automatischen Wechsel zum nächsten Spieltag entweder klar erklären oder nach gemeinsamem Entscheid deaktivieren.
+- [x] Einstellungen in sinnvolle Gruppen gliedern, Abschlussaktion oben erreichbar halten; bestehende Wettbewerbsreihenfolge/Favoriten erhalten.
+- [ ] Echte iOS-Prüfung: VoiceOver und vergrößerte Schrift. Browser-Fokus und Darstellung in Hell/Dunkel kontrolliert.
+- [x] Vorhandene Interaktionstests gezielt erweitern und Projektprüfungen ausführen.
 
 **CP3 – Gemeinsame Abnahme:** Auf dem iPhone ein Spiel finden, favorisieren, Datum ändern, zu heute zurückkehren, Teamdetails lesen und Einstellungen verlassen. Entscheidend sind Verständlichkeit und Treffgenauigkeit, nicht nur das Aussehen.
 **Priorisierung:** Neue dauerhafte untere Navigation nur aufnehmen, wenn die Vorschau einen konkreten Nutzen zeigt; derzeit zurückgestellt.
@@ -262,3 +262,13 @@ Vor der Umsetzung dieser Etappe eine kompakte Vorher-/Nachher-Vorschau zur gemei
 - Live geprüft: https://amirhossin27-dev.github.io/live-scores/ liefert HTTP 200 und referenziert index-DwFDAKPG.js / index-Ls9oaT_0.css. Beide Assets liefern HTTP 200. sw.js liefert HTTP 200, CACHE entspricht live-scores-6622942aa3b2587e6c4fe2b497452bf15e7abbfa.
 - Die neue Version ist ausgeliefert; damit ist noch keine Geräteabnahme behauptet. App auf dem iPhone vollständig schließen und vom Home-Bildschirm erneut öffnen. Bei zunächst alter Ansicht nach kurzem Online-Start nochmals schließen/öffnen, damit der aktualisierte Service Worker greifen kann. Keine Neuinstallation erforderlich.
 - Weiter bei CP2: tiefen Besuchspfad, Suche, Kalender und Einstellungen auf dem iPhone prüfen. Rückmeldung ausstehend; Etappe 3 bleibt bis dahin offen.
+
+## Arbeitsstand Etappe3 – 15.11.2026
+
+- Nutzer bestätigt Etappe2 als besser und gibt Etappe3 mit konkreten Ergänzungen frei. Neuer Branch fix/iphone-stage-3, Basis4fd1052.
+- Header mobil12px tiefer (28px Komfortabstand plus Safe Area); Installationsbutton, Hilfecode und beide Footerhinweise vollständig entfernt. Installierte PWA bleibt nutzbar.
+- Übersicht mit sichtbaren Emblemen, mobilen Teamzeilen und umbrechenden langen Namen. Aufstellung passt sich der Panelbreite an; Mannschaftsnamen außerhalb des Felds, Ersatzbänke bei Platzmangel untereinander. Keine seitliche Verschiebung nötig.
+- Suche mobil in eigener Zeile/16px Eingabeschrift, Hauptfilter sichtbar beschriftet, Heute-Rücksprung und explizite Themeauswahl; primäre Touchziele44px. Regeln bis900px berücksichtigen Querformat. Bestehende Sportarten-/Reihenfolgegruppen in Einstellungen erhalten.
+- Nachweise:392 Tests (387 Vitest+5 Runtime), Frontend-/Backend-Build erfolgreich; Backend0 Warnungen/Fehler. Unabhängige Codeprüfung ohne wesentliche Befunde. Browser320–1280px, Einbettungen, Querformat, Profil-/Nationalitätsaktionen und Einstellungen geprüft. Details und Wiederaufnahme in docs/superpowers/plans/2026-11-15-iphone-stage-3.md.
+- Vorschau: C:/Users/amirh/Documents/ChatGPT/Live Scores/stage3-preview.jpg. Linke Ansicht echte API-Daten, rechte Ansicht Aufstellungs-Testdaten mit Fünferreihen.
+- CP3 und Veröffentlichung offen. Nächster Schritt: Vorschau zur Veröffentlichung freigeben; danach die installierte iPhone-App prüfen. Echte Systemränder, Tastatur, VoiceOver und größere Schrift bleiben Geräteabnahme.

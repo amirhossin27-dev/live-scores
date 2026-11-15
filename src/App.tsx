@@ -9,7 +9,6 @@ export function App() {
  const { embedded,compact } = options
  const [language,setLanguage] = useState<Language>(()=>embedded ? options.language : readSetting('live-scores.language','de',['de','en']))
  const [theme,setTheme] = useState(()=>embedded ? options.theme : readSetting('live-scores.theme','auto',['auto','dark','light']))
- const [help,setHelp] = useState(false)
  const [now,setNow] = useState(()=>new Date())
  const de = language === 'de'
  useEffect(()=>{document.documentElement.lang=language; if(!embedded)writeSetting('live-scores.language',language)},[language,embedded])
@@ -26,10 +25,8 @@ export function App() {
   return()=>{resize.disconnect();mutations.disconnect()}
  },[embedded])
  return <div className={`standalone ${embedded?'is-embedded':''} ${compact?'is-compact':''}`}>
-  {!embedded && <header className="app-header"><div className="brand"><img src="./icons/icon-192.png" alt=""/><div><span className="app-eyebrow">{de?'DEINE ÜBERSICHT':'YOUR OVERVIEW'}</span><h1>Live Scores</h1></div></div><div className="app-actions"><button type="button" aria-label={de?'Sprache wechseln':'Change language'} onClick={()=>setLanguage(language==='de'?'en':'de')}>{language.toUpperCase()}</button><button type="button" aria-label={de?'Darstellung wechseln':'Change appearance'} onClick={()=>setTheme(theme==='dark'?'light':theme==='light'?'auto':'dark')}>{theme==='dark'?'☾':theme==='light'?'☀':'◐'}</button><button type="button" onClick={()=>setHelp(v=>!v)} aria-expanded={help}>{de?'Aufs iPhone':'Install'}</button></div></header>}
-  {help && <aside className="install-tip"><button type="button" className="install-tip-close" onClick={()=>setHelp(false)}>{de?'Schließen':'Close'}</button><strong>{de?'Als eigene App öffnen':'Open as an app'}</strong><p>{de?'Öffne diese Seite auf deinem iPhone in Safari. Tippe auf Teilen → Zum Home-Bildschirm und aktiviere „Als Web-App öffnen“, falls angeboten.':'Open this page in Safari on your iPhone. Tap Share → Add to Home Screen and enable Open as Web App if offered.'}</p></aside>}
+  {!embedded && <header className="app-header"><div className="brand"><img src="./icons/icon-192.png" alt=""/><div><span className="app-eyebrow">{de?'DEINE ÜBERSICHT':'YOUR OVERVIEW'}</span><h1>Live Scores</h1></div></div><div className="app-actions"><button type="button" aria-label={de?'Sprache wechseln':'Change language'} onClick={()=>setLanguage(language==='de'?'en':'de')}>{language.toUpperCase()}</button><select aria-label={de?'Darstellung':'Appearance'} value={theme} onChange={event=>setTheme(event.target.value)}><option value="auto">{de?'Automatisch':'Automatic'}</option><option value="light">{de?'Hell':'Light'}</option><option value="dark">{de?'Dunkel':'Dark'}</option></select></div></header>}
   {!apiBaseUrl && <aside className="connection-notice" role="status">{de?'Die Verbindung für vollständige Live-Daten ist noch nicht eingerichtet.':'The connection for complete live data has not been configured yet.'}</aside>}
   <main>{<SportsWidget language={language} now={now} />}</main>
-  {!embedded && <footer className="app-footer"><span>{de?'Einstellungen bleiben auf diesem Gerät.':'Settings stay on this device.'}</span><span>{de?'Live-Daten benötigen Internet.':'Live data requires internet.'}</span></footer>}
  </div>
 }

@@ -504,9 +504,7 @@
     font-size: 13px;
   }
 
-  .sp-logo {
-    display: none;
-  }
+
 
   .sp-day {
     min-width: 0;
@@ -2877,3 +2875,43 @@ button.pp-club:focus-visible strong {
 
 .sp-settings-exit { position: sticky; top: calc(16px + var(--app-safe-top, env(safe-area-inset-top, 0px))); z-index: 2; display: flex; justify-content: flex-end; padding: 8px; background: var(--panel); }
 .sp-settings-exit button { min-height: 44px; }
+
+/* Mobile scores: each club keeps its crest, name and own score on one row. */
+.sp-today { min-height: 44px; font-size: 12px; }
+@media (max-width: 900px) {
+  .start-sports .sp-toolbar { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
+  .start-sports .sp-days { min-width: 0; }
+  .start-sports .sp-days .sp-day { flex: 1; flex-wrap: wrap; justify-content: center; }
+  .start-sports .sp-step { min-width: 44px; min-height: 44px; }
+  .start-sports .sp-today { grid-column: 2; grid-row: 1; }
+  .start-sports .sp-filter { grid-column: 1 / -1; grid-row: 3; gap: 4px; }
+  .start-sports .sp-filter button { flex: 1; min-height: 44px; padding: 6px; font-size: 12px; }
+  .start-sports .sp-filter button b { margin-left: 2px; }
+  .start-sports .sp-icon-button { width: 44px; height: 44px; }
+  .start-sports .sp-match { grid-template-columns: 42px minmax(0, 1fr) 28px 44px; gap: 0 6px; min-height: 56px; padding: 6px 0; font-size: 13px; }
+  .start-sports .sp-team { justify-content: flex-start; gap: 6px; min-height: 24px; text-align: left; }
+  .start-sports .sp-team.is-home { grid-column: 2; grid-row: 1; }
+  .start-sports .sp-team.is-away { grid-column: 2; grid-row: 2; }
+  .start-sports .sp-name { white-space: normal; overflow-wrap: anywhere; }
+  .start-sports .sp-logo { display: block; width: 18px; height: 18px; order: -1; }
+  .start-sports .sp-when { grid-column: 1; grid-row: 1 / span 2; font-size: 11px; }
+  .start-sports .sp-score { display: contents; }
+  .start-sports .sp-score > b { grid-column: 3; text-align: center; font-size: 14px; }
+  .start-sports .sp-score > b:first-child { grid-row: 1; }
+  .start-sports .sp-score > b:last-child { grid-row: 2; }
+  .start-sports .sp-score > i { display: none; }
+  .start-sports .sp-versus { grid-column: 3; grid-row: 1 / span 2; text-align: center; }
+  .start-sports .sp-star { width: 44px; height: 44px; grid-column: 4; grid-row: 1 / span 2; opacity: .85; }
+  .start-sports .sp-note { grid-column: 2 / -1; grid-row: 3; }
+  .start-sports .sp-match.is-single { grid-template-columns: 42px minmax(0, 1fr) 44px; }
+  .start-sports .sp-match.is-single .sp-when { grid-row: 1; }
+  .start-sports .sp-match.is-single .sp-single { grid-column: 2; grid-row: 1; }
+  .start-sports .sp-match.is-single .sp-star { grid-column: 3; grid-row: 1; }
+  .start-sports .sp-comp-title.is-button .sp-star { flex: none; width: 44px; height: 44px; }
+  .sp-option { min-height: 44px; }
+  .sp-order-move { min-width: 44px; min-height: 44px; }
+  .sp-order-row { grid-template-columns: 12px 20px 18px minmax(0, 1fr) 44px 44px; }
+  .sp-order-name { white-space: normal; overflow-wrap: anywhere; }
+  .md-tabs button { min-height: 44px; }
+  .md-side strong { overflow-wrap: anywhere; }
+}

@@ -227,10 +227,9 @@ export function LineupPitch({ lineups, events, homeName, awayName, language, loc
 
   return (
     <div className="lp">
+      <div className="lp-teams"><span className="lp-team is-home" title={homeName}><span>{homeName}</span>{home?.formation && <b>{home.formation}</b>}</span><span className="lp-team is-away" title={awayName}><span>{awayName}</span>{away?.formation && <b>{away.formation}</b>}</span></div>
       <div className="lp-pitch-viewport" role="region" aria-label={t.pitch} tabIndex={0}>
        <div className="lp-pitch">
-        <span className="lp-team is-home" title={homeName}><span>{homeName}</span>{home?.formation && <b>{home.formation}</b>}</span>
-        <span className="lp-team is-away" title={awayName}><span>{awayName}</span>{away?.formation && <b>{away.formation}</b>}</span>
         <svg className="lp-lines" viewBox="0 0 68 105" preserveAspectRatio="none" aria-hidden="true">
           <rect x="1" y="1" width="66" height="103" />
           <line x1="1" y1="52.5" x2="67" y2="52.5" />

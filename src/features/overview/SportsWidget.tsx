@@ -26,6 +26,7 @@ const copy = {
     previous: 'Vorheriger Tag',
     next: 'Nächster Tag',
     today: 'Heute',
+    backToday: 'Zurück zu heute',
     yesterday: 'Gestern',
     tomorrow: 'Morgen',
     loading: 'Ergebnisse werden geladen …',
@@ -82,6 +83,7 @@ const copy = {
     previous: 'Previous day',
     next: 'Next day',
     today: 'Today',
+    backToday: 'Back to today',
     yesterday: 'Yesterday',
     tomorrow: 'Tomorrow',
     loading: 'Loading scores …',
@@ -600,11 +602,12 @@ export function SportsWidget({ language, now }: { language: Language; now: Date 
               </DatePicker>
               <button type="button" className="sp-step" disabled={offset >= maxOffset} aria-label={t.next} onClick={() => { setAuto(false); setOffset((value) => value + 1) }}>›</button>
             </div>
+            {offset !== 0 && <button type="button" className="sp-today" aria-label={t.backToday} onClick={() => { setAuto(false); setOffset(0) }}>{t.today}</button>}
             <SportsSearch language={language} />
             <div className="sp-filter" role="group" aria-label={t.title}>
               <button type="button" className={filter === 'all' ? 'active' : ''} aria-pressed={filter === 'all'} onClick={() => setFilter('all')}>{t.all}</button>
               <button type="button" className={filter === 'live' ? 'active is-live' : ''} aria-pressed={filter === 'live'} onClick={() => setFilter('live')}>{t.live} <b>{liveCount}</b></button>
-              <button type="button" className={filter === 'favorites' ? 'active is-favorites' : ''} aria-pressed={filter === 'favorites'} aria-label={t.favorites} title={t.favorites} onClick={() => setFilter('favorites')}>★ <b>{favoriteCount}</b></button>
+              <button type="button" className={filter === 'favorites' ? 'active is-favorites' : ''} aria-pressed={filter === 'favorites'} aria-label={t.favorites} title={t.favorites} onClick={() => setFilter('favorites')}><span aria-hidden="true">★</span> {t.favorites} <b>{favoriteCount}</b></button>
             </div>
           </div>
           {auto && offset > 0 && shown.length > 0 && <p className="sp-notice is-info" aria-live="polite">{t.skipped}</p>}
