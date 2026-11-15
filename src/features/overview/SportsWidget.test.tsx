@@ -181,7 +181,7 @@ describe('SportsWidget', () => {
     fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Nächster Monat' }))
     fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Samstag, 21. November 2026' }))
     await waitFor(() => expect(api.loadSportsScores).toHaveBeenLastCalledWith(expect.any(Array), '20261121', expect.anything()))
-    expect(screen.getByText('Sa., 21. Nov.')).toBeTruthy()
+    expect(screen.getByText('21. Nov.')).toBeTruthy()
   })
 
   it('lets the user pick the competitions, remembers the choice in this browser and can go back to the preset', async () => {
@@ -1139,7 +1139,8 @@ describe('SportsWidget team pages', () => {
     api.loadPlayerProfile.mockResolvedValue({ ...profileOf('coach-1', 'Alex Coach'), isCoach: true, coachCareer: [{ team: 'Bayern München', teamId: '9823', logo: null, start: null, end: null, active: false, matches: 10, wins: 6, draws: 2, losses: 2, pointsPerGame: 2 }] })
     api.loadTeam.mockResolvedValue(bayern)
     renderWidget()
-    const input = screen.getByRole('combobox')
+    fireEvent.click(screen.getByRole('button', { name: /^(Suche öffnen|Open search)$/ }))
+  const input = screen.getByRole('combobox')
     fireEvent.change(input, { target: { value: 'Alex' } })
     await screen.findByRole('option', { name: /Alex Coach/ })
     fireEvent.click(screen.getByRole('button', { name: /Trainer1/ }))
@@ -1451,6 +1452,7 @@ it.each(['club', 'player'] as const)('can repeatedly leave an unknown %s search 
   api.loadTeam.mockRejectedValue(Object.assign(new Error('missing team'), { status: 404 }))
   api.loadPlayerProfile.mockRejectedValue(Object.assign(new Error('missing person'), { status: 404 }))
   renderWidget()
+  fireEvent.click(screen.getByRole('button', { name: /^(Suche öffnen|Open search)$/ }))
   const input = screen.getByRole('combobox')
   fireEvent.change(input, { target: { value: 'Unbekannt' } })
   await screen.findByRole('option', { name: /Unbekannt/ })
@@ -1489,15 +1491,15 @@ describe('saved results while refreshing', () => {
     api.loadSportsScores.mockReturnValue(new Promise(() => {}))
     renderWidget(language)
     expect(screen.getByText('Bayern München')).toBeTruthy()
-    expect(screen.getByText(language === 'de' ? /Gespeicherte Ergebnisse vom/ : /Saved results from/)).toBeTruthy()
+    expect(screen.getByText(language === 'de' ? /Gespeichert ·/ : /Saved ·/)).toBeTruthy()
     expect(document.querySelector('.sp-dot')?.classList.contains('is-live')).toBe(false)
-    expect((screen.getByRole('button', { name: language === 'de' ? 'Aktualisieren' : 'Refresh' }) as HTMLButtonElement).disabled).toBe(true)
+    expect(screen.queryByRole('button', { name: language === 'de' ? 'Aktualisieren' : 'Refresh' })).toBeNull()
   })
   it('waits for a fresh answer before automatically skipping a saved empty day', async () => {
     saveScoreSnapshot('https://api.test', { date: '20261007', failed: [], competitions: presetSelection.map(id => ({ id, name: id, matches: [] })) })
     api.loadSportsScores.mockReturnValue(new Promise(() => {}))
     renderWidget()
-    expect(screen.getByText(/Gespeicherte Ergebnisse vom/)).toBeTruthy()
+    expect(screen.getByText(/Gespeichert ·/)).toBeTruthy()
     await waitFor(() => expect(api.loadSportsScores).toHaveBeenCalledTimes(1))
     expect(api.loadSportsScores.mock.calls[0][1]).toBe('20261007')
   })
@@ -1507,5 +1509,29 @@ describe('saved results while refreshing', () => {
     expect(await screen.findByText('Die Ergebnisse sind gerade nicht erreichbar.')).toBeTruthy()
     expect(api.loadSportsScores).toHaveBeenCalledTimes(1)
     expect(screen.getByRole('button', { name: 'Erneut versuchen' })).toBeTruthy()
+  })
+})
+
+describe('compact search controls', () => {
+  it.each([
+    ['de', 'Suche öffnen', 'Suche schließen', 'Nächster Tag'],
+    ['en', 'Open search', 'Close search', 'Next day'],
+  ] as const)('expands, focuses and clears search while retaining date and live filter (%s)', async (language, openLabel, closeLabel, nextDay) => {
+    renderWidget(language)
+    await screen.findByText('Bayern München')
+    expect(screen.queryByRole('combobox')).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: /^Live/ }))
+    fireEvent.click(screen.getByRole('button', { name: nextDay }))
+    fireEvent.click(screen.getByRole('button', { name: openLabel }))
+    const input = screen.getByRole('combobox') as HTMLInputElement
+    expect(document.activeElement).toBe(input)
+    fireEvent.change(input, { target: { value: 'A' } })
+    fireEvent.click(screen.getByRole('button', { name: closeLabel }))
+    expect(screen.queryByRole('combobox')).toBeNull()
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: openLabel }))
+    fireEvent.click(screen.getByRole('button', { name: openLabel }))
+    expect((screen.getByRole('combobox') as HTMLInputElement).value).toBe('')
+    expect(screen.getByRole('button', { name: /^Live/ }).getAttribute('aria-pressed')).toBe('true')
+    expect(api.loadSportsScores.mock.calls.at(-1)?.[1]).toBe('20261008')
   })
 })

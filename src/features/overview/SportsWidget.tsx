@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react'
-import type { DragEvent, ReactNode } from 'react'
+import { useLayoutEffect, useMemo, useRef, useState } from 'react'
+import type { CSSProperties, DragEvent, ReactNode } from 'react'
 import './sports.css'
 import { DatePicker } from '../../components/DatePicker'
 import type { Language } from '../../types/platform'
@@ -8,6 +8,7 @@ import { MatchDetails } from './MatchDetails'
 import { localeFor } from './overviewCopy'
 import { CompetitionPanel } from './CompetitionPanel'
 import { SportsSearch } from './SportsSearch'
+import { SportsUtilityBar } from './SportsUtilityBar'
 import type { SportsMatch, SportsSide } from './sportsApi'
 import { competitionById, competitionCountry, competitionName, groupLabels, hasStandings, maxCompetitions, presetSelection, sportsCatalog, sportsGroups } from './sportsCatalog'
 import type { SportsCompetition } from './sportsCatalog'
@@ -31,7 +32,13 @@ const copy = {
     tomorrow: 'Morgen',
     loading: 'Ergebnisse werden geladen …',
     retry: 'Erneut versuchen',
-    refresh: 'Aktualisieren',
+    tools: 'App-Werkzeuge',
+    openSearch: 'Suche öffnen',
+    closeSearch: 'Suche schließen',
+    loadingShort: 'Lädt …',
+    unavailableShort: 'Kein Datenstand',
+    savedShort: (stamp: string) => `Gespeichert · ${stamp}`,
+    offlineShort: (stamp: string) => `Offline · ${stamp}`,
     refreshing: 'Wird aktualisiert …',
     saved: (stamp: string) => `Gespeicherte Ergebnisse vom ${stamp}.`,
     offlineSaved: (stamp: string) => `Offline · gespeicherte Ergebnisse vom ${stamp}.`,
@@ -46,7 +53,6 @@ const copy = {
     noLive: 'Gerade läuft nichts live.',
     pick: 'Wettbewerbe auswählen',
     updated: (time: string) => `Stand ${time}`,
-    everyThirty: 'live alle 30 s',
     winner: 'Sieg',
     postponed: 'Verschoben',
     canceled: 'Abgesagt',
@@ -94,7 +100,13 @@ const copy = {
     tomorrow: 'Tomorrow',
     loading: 'Loading scores …',
     retry: 'Try again',
-    refresh: 'Refresh',
+    tools: 'App tools',
+    openSearch: 'Open search',
+    closeSearch: 'Close search',
+    loadingShort: 'Loading …',
+    unavailableShort: 'No saved results',
+    savedShort: (stamp: string) => `Saved · ${stamp}`,
+    offlineShort: (stamp: string) => `Offline · ${stamp}`,
     refreshing: 'Updating …',
     saved: (stamp: string) => `Saved results from ${stamp}.`,
     offlineSaved: (stamp: string) => `Offline · saved results from ${stamp}.`,
@@ -109,7 +121,6 @@ const copy = {
     noLive: 'Nothing is live right now.',
     pick: 'Choose competitions',
     updated: (time: string) => `Updated ${time}`,
-    everyThirty: 'live every 30 s',
     winner: 'Winner',
     postponed: 'Postponed',
     canceled: 'Canceled',
@@ -409,11 +420,33 @@ function SportsSettings({ language, selection, t, onToggle, onMove, onReset, onC
 }
 
 /** Live scores of the competitions the user picked (preset: the Flashscore leagues, cups, European and national tournaments, Formula 1, UFC). */
-export function SportsWidget({ language, now }: { language: Language; now: Date }) {
+export function SportsWidget({ language, now, appearanceControls }: { language: Language; now: Date; appearanceControls?: ReactNode }) {
   const t = copy[language === 'de' ? 'de' : 'en']
   const locale = localeFor(language)
   const [selection, setSelection] = useState(readSportsSelection)
   const [settingsOpen, setSettingsOpen] = useState(false)
+
+  const hasUtility = appearanceControls !== undefined
+  const [utilityHeight, setUtilityHeight] = useState(76)
+  const [searchExpanded, setSearchExpanded] = useState(false)
+  const searchTrigger = useRef<HTMLButtonElement>(null)
+  const settingsTrigger = useRef<HTMLButtonElement>(null)
+  const settingsPane = useRef<HTMLDivElement>(null)
+  const list = useRef<HTMLDivElement>(null)
+  const restoreSettings = useRef(false)
+  const previousScroll = useRef({ page: 0, list: 0 })
+  useLayoutEffect(() => {
+    if (settingsOpen) {
+      settingsPane.current?.scrollIntoView?.({ block: 'start' })
+      settingsPane.current?.querySelector<HTMLButtonElement>('button')?.focus({ preventScroll: true })
+    } else if (restoreSettings.current) {
+      restoreSettings.current = false
+      if (document.scrollingElement) document.scrollingElement.scrollTop = previousScroll.current.page
+      if (list.current) list.current.scrollTop = previousScroll.current.list
+      settingsTrigger.current?.focus({ preventScroll: true })
+    }
+  }, [settingsOpen])
+
   const [filter, setFilter] = useState<'all' | 'live' | 'favorites'>('all')
   const [favorites, setFavorites] = useState<SportsFavorite[]>(() => readSportsFavorites(now.getTime()))
   const [favoriteLeagues, setFavoriteLeagues] = useState<string[]>(readFavoriteCompetitions)
@@ -433,7 +466,7 @@ export function SportsWidget({ language, now }: { language: Language; now: Date 
   const { scores, updatedAt, failed, loading, retry, cached, refreshing, offline, slow } = useSportsScores(requested, day.code)
 
   const time = useMemo(() => new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' }), [locale])
-  const dayFormat = useMemo(() => new Intl.DateTimeFormat(locale, { weekday: 'short', day: 'numeric', month: 'short' }), [locale])
+  const dayFormat = useMemo(() => new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short' }), [locale])
   const savedTime = useMemo(() => new Intl.DateTimeFormat(locale, { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }), [locale])
   const dayName = offset === 0 ? t.today : offset === -1 ? t.yesterday : offset === 1 ? t.tomorrow : null
 
@@ -513,9 +546,23 @@ export function SportsWidget({ language, now }: { language: Language; now: Date 
     change(next)
   }
 
+  function closeSearch() {
+    setSearchExpanded(false)
+    searchTrigger.current?.focus({ preventScroll: true })
+  }
+  function closeSettings() {
+    restoreSettings.current = true
+    setSettingsOpen(false)
+  }
+  function toggleSettings() {
+    if (settingsOpen) { closeSettings(); return }
+    previousScroll.current = { page: document.scrollingElement?.scrollTop ?? 0, list: list.current?.scrollTop ?? 0 }
+    setSettingsOpen(true)
+  }
+
   let body: ReactNode
   if (selection.length === 0) {
-    body = <div className="sp-state"><span>{t.noSelection}</span><button type="button" className="sp-text-button" onClick={() => setSettingsOpen(true)}>{t.pick}</button></div>
+    body = <div className="sp-state"><span>{t.noSelection}</span><button type="button" className="sp-text-button" onClick={toggleSettings}>{t.pick}</button></div>
   } else if (loading) {
     body = <div className="sp-state" aria-live="polite"><span>{t.loading}</span>{slow && <small className="sp-slow">{t.slow}</small>}</div>
   } else if (offline && !scores) {
@@ -528,7 +575,7 @@ export function SportsWidget({ language, now }: { language: Language; now: Date 
     body = <div className="sp-state" aria-live="polite"><span>{filter === 'live' ? t.noLive : t.noMatches}</span></div>
   } else {
     body = (
-      <div className="sp-list">
+      <div className="sp-list" ref={list}>
         {filter === 'favorites' && favoriteMatches.length > 0 && (
           <section className="sp-comp is-favorites" aria-label={t.favorites}>
             <h3 className="sp-comp-title">
@@ -577,30 +624,31 @@ export function SportsWidget({ language, now }: { language: Language; now: Date 
     )
   }
 
+  const settingsControl = <button ref={settingsTrigger} type="button" className={`sp-icon-button${settingsOpen ? ' active' : ''}`} aria-expanded={settingsOpen} title={t.settings} aria-label={t.settings} onClick={toggleSettings}>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10" /><circle cx="16" cy="7" r="2" /><circle cx="8" cy="17" r="2" /></svg>
+  </button>
+  const stamp = updatedAt !== null ? savedTime.format(new Date(updatedAt)) : ''
+  const statusText = updatedAt !== null
+    ? offline ? t.offlineShort(stamp) : cached ? t.savedShort(stamp) : t.updated(time.format(new Date(updatedAt)))
+    : loading ? t.loadingShort : t.unavailableShort
+  const statusDescription = updatedAt !== null
+    ? offline ? t.offlineSaved(stamp) : cached ? t.saved(stamp) : t.updated(stamp)
+    : offline ? t.offlineEmpty : failed ? t.down : t.loading
+  const status = <div className={`sp-utility-status${cached || offline || failed ? ' is-stale' : ''}`} role="status" aria-label={statusDescription} title={statusDescription}>
+    <span className={`sp-dot${liveCount > 0 && !cached && !offline && !failed ? ' is-live' : ''}`} aria-hidden="true" />
+    <span>{statusText}</span>{refreshing && <span className="sp-sr">{t.refreshing}</span>}
+  </div>
+
   return (
-    <article className={`panel start-sports${cached || offline ? ' is-snapshot' : ''}`} aria-label={`${t.eyebrow} · ${t.title}`}>
-      <div className="panel-header">
-        <div>
-          <p className="eyebrow sp-eyebrow">
-            <span className={`sp-dot${liveCount > 0 && !cached && !offline && !failed ? ' is-live' : ''}`} aria-hidden="true" />{t.eyebrow}
-          </p>
-          <h2>{t.title}</h2>
-        </div>
-        <div className="sp-panel-actions">
-        <button type="button" className="sp-icon-button" aria-label={t.refresh} title={refreshing ? t.refreshing : t.refresh} disabled={refreshing || offline || selection.length === 0} onClick={retry}>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M6 7a7 7 0 0 1 12-1l2 3M4 15l2 3a7 7 0 0 0 12-1" /></svg>
-        </button>
-        <button type="button" className={`sp-icon-button${settingsOpen ? ' active' : ''}`} aria-expanded={settingsOpen} title={t.settings} aria-label={t.settings} onClick={() => setSettingsOpen((open) => !open)}>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10" /><circle cx="16" cy="7" r="2" /><circle cx="8" cy="17" r="2" /></svg>
-        </button>
-        </div>
-      </div>
+    <article style={{ '--sp-utility-height': `${hasUtility ? utilityHeight : 0}px` } as CSSProperties} className={`panel start-sports sp-overview${hasUtility ? ' has-utility' : ''}${cached || offline ? ' is-snapshot' : ''}`} aria-label={`${t.eyebrow} · ${t.title}`}>
+      <h2 className="sp-sr">{t.title}</h2>
 
       {settingsOpen ? (
-        <SportsSettings language={language} selection={selection} t={t} onToggle={toggle} onMove={move} onReset={() => change(presetSelection)} onClose={() => setSettingsOpen(false)} />
+        <div ref={settingsPane}><SportsSettings language={language} selection={selection} t={t} onToggle={toggle} onMove={move} onReset={() => change(presetSelection)} onClose={closeSettings} /></div>
       ) : (
         <>
-          <div className="sp-toolbar">
+          <div className="sp-toolbar sp-toolbar-compact">
+            <div className="sp-date-row">
             <div className="sp-days" role="group" aria-label={t.group}>
               <button type="button" className="sp-step" disabled={offset <= -maxOffset} aria-label={t.previous} onClick={() => { setAuto(false); setOffset((value) => value - 1) }}>‹</button>
               <DatePicker
@@ -610,7 +658,7 @@ export function SportsWidget({ language, now }: { language: Language; now: Date 
                 value={isoDay(day.date)}
                 min={isoDay(new Date(now.getFullYear(), now.getMonth(), now.getDate() - maxOffset))}
                 max={isoDay(new Date(now.getFullYear(), now.getMonth(), now.getDate() + maxOffset))}
-                showIcon={false}
+                showIcon
                 onChange={(iso) => {
                   if (!iso) return
                   setAuto(false)
@@ -623,7 +671,12 @@ export function SportsWidget({ language, now }: { language: Language; now: Date 
               <button type="button" className="sp-step" disabled={offset >= maxOffset} aria-label={t.next} onClick={() => { setAuto(false); setOffset((value) => value + 1) }}>›</button>
             </div>
             {offset !== 0 && <button type="button" className="sp-today" aria-label={t.backToday} onClick={() => { setAuto(false); setOffset(0) }}>{t.today}</button>}
-            <SportsSearch language={language} />
+            <button ref={searchTrigger} type="button" className="sp-icon-button sp-search-toggle" aria-label={searchExpanded ? t.closeSearch : t.openSearch} aria-expanded={searchExpanded} onClick={() => searchExpanded ? closeSearch() : setSearchExpanded(true)}>
+              {searchExpanded ? <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg> : <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" /><path d="m16 16 4.5 4.5" /></svg>}
+            </button>
+            {!hasUtility && settingsControl}
+            </div>
+            {searchExpanded && <SportsSearch language={language} autoFocus onCollapse={closeSearch} />}
             <div className="sp-filter" role="group" aria-label={t.title}>
               <button type="button" className={filter === 'all' ? 'active' : ''} aria-pressed={filter === 'all'} onClick={() => setFilter('all')}>{t.all}</button>
               <button type="button" className={filter === 'live' ? 'active is-live' : ''} aria-pressed={filter === 'live'} onClick={() => setFilter('live')}>{t.live} <b>{liveCount}</b></button>
@@ -631,16 +684,18 @@ export function SportsWidget({ language, now }: { language: Language; now: Date 
             </div>
           </div>
           {auto && offset > 0 && shown.length > 0 && <p className="sp-notice is-info" aria-live="polite">{t.skipped}</p>}
-          {scores && updatedAt !== null && (cached || offline) && <p className="sp-notice is-info" aria-live="polite">{offline ? t.offlineSaved(savedTime.format(new Date(updatedAt))) : t.saved(savedTime.format(new Date(updatedAt)))}{refreshing && !offline && <> {t.refreshing}</>}</p>}
-          {scores && !cached && !offline && <p className="sp-refresh-status" role="status">{refreshing ? t.refreshing : '\u00a0'}</p>}
-          {failed && scores && <p className="sp-notice" aria-live="polite">{t.stale} <button type="button" className="sp-text-button" disabled={refreshing || offline} onClick={retry}>{t.retry}</button></p>}
+          {offline && scores && updatedAt !== null && <p className="sp-notice is-info" aria-live="polite">{t.offlineSaved(savedTime.format(new Date(updatedAt)))}</p>}
+
+          {failed && scores && !offline && <p className="sp-notice" aria-live="polite">{t.stale} <button type="button" className="sp-text-button" disabled={refreshing || offline} onClick={retry}>{t.retry}</button></p>}
           {scores && scores.failed.length > 0 && <p className="sp-notice">{t.partial(scores.failed.length)}</p>}
           {body}
-          {(updatedAt !== null || liveCount > 0) && <p className="sp-foot">
-            {[updatedAt !== null ? t.updated(time.format(new Date(updatedAt))) : null, liveCount > 0 && !cached && !offline && !failed ? t.everyThirty : null].filter(Boolean).join(' · ')}
-          </p>}
+
         </>
       )}
+      {hasUtility ? <>
+        <div className="sp-utility-spacer" aria-hidden="true" style={{ height: utilityHeight }} />
+        <SportsUtilityBar label={t.tools} status={status} onHeightChange={setUtilityHeight}>{appearanceControls}{settingsControl}</SportsUtilityBar>
+      </> : <div className="sp-inline-status">{status}</div>}
       {opened && <MatchDetails competition={opened.competition} competitionLabel={opened.label} match={opened.match} language={language} onClose={() => setOpened(null)} />}
       {standingsOf && <CompetitionPanel competition={standingsOf} language={language} onClose={() => setStandingsOf(null)} />}
     </article>

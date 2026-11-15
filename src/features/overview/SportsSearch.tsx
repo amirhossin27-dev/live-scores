@@ -1,6 +1,6 @@
 import { useDetailNavigation } from '../../components/DetailNavigation'
 import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
-import type { KeyboardEvent } from 'react'
+import type { CSSProperties, KeyboardEvent } from 'react'
 import { SideDrawer } from '../../components/SideDrawer'
 import './sportsDetailPanel.css'
 import type { Language } from '../../types/platform'
@@ -71,7 +71,7 @@ function SearchRoot({ result, language, onClose }: { result: SportsSearchResult;
 }
 
 /** Debounced football discovery, independent of the selected day and competitions. */
-export function SportsSearch({ language }: { language: Language }) {
+export function SportsSearch({ language, autoFocus = false, onCollapse }: { language: Language; autoFocus?: boolean; onCollapse?: () => void }) {
   const lang = language === 'de' ? 'de' : 'en'
   const t = copy[lang]
   const id = useId()
@@ -86,6 +86,7 @@ export function SportsSearch({ language }: { language: Language }) {
   const [failed, setFailed] = useState<string | null>(null)
   const [selected, setSelected] = useState<SportsSearchResult | null>(null)
   const restoreSearch = useRef(false)
+  const [availableHeight, setAvailableHeight] = useState(420)
   useLayoutEffect(() => {
     if (!selected && restoreSearch.current) {
       restoreSearch.current = false
@@ -128,6 +129,27 @@ export function SportsSearch({ language }: { language: Language }) {
     if (expanded && active >= 0) document.getElementById(`${id}-result-${active}`)?.scrollIntoView?.({ block: 'nearest' })
   }, [active, expanded, id])
 
+  useLayoutEffect(() => {
+    if (!expanded) return
+    const updateRoom = () => {
+      if (!host.current) return
+      const viewport = window.visualViewport
+      const bottom = viewport ? viewport.offsetTop + viewport.height : window.innerHeight
+      setAvailableHeight(Math.max(0, Math.floor(bottom - host.current.getBoundingClientRect().bottom - 12)))
+    }
+    updateRoom()
+    window.addEventListener('resize', updateRoom)
+    document.addEventListener('scroll', updateRoom, true)
+    window.visualViewport?.addEventListener('resize', updateRoom)
+    window.visualViewport?.addEventListener('scroll', updateRoom)
+    return () => {
+      window.removeEventListener('resize', updateRoom)
+      document.removeEventListener('scroll', updateRoom, true)
+      window.visualViewport?.removeEventListener('resize', updateRoom)
+      window.visualViewport?.removeEventListener('scroll', updateRoom)
+    }
+  }, [expanded])
+
   function choose(result: SportsSearchResult) {
     setSelected(result)
     setOpen(false)
@@ -135,10 +157,14 @@ export function SportsSearch({ language }: { language: Language }) {
   }
 
   function onKeyDown(event: KeyboardEvent<HTMLInputElement>) {
-    if (event.key === 'Escape' && open) {
+    if (event.key === 'Escape' && open && ready) {
       event.stopPropagation()
       setOpen(false)
       setActive(-1)
+    } else if (event.key === 'Escape' && onCollapse) {
+      event.preventDefault()
+      event.stopPropagation()
+      onCollapse()
     } else if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
       event.preventDefault()
       setOpen(true)
@@ -160,7 +186,7 @@ export function SportsSearch({ language }: { language: Language }) {
             ref={input} type="search" role="combobox" aria-label={t.label} placeholder={t.placeholder} title={t.label} aria-describedby={`${id}-hint`}
             aria-autocomplete="list" aria-expanded={expanded} aria-controls={expanded ? `${id}-results` : undefined}
             aria-activedescendant={expanded && active >= 0 && shown[active] ? `${id}-result-${active}` : undefined}
-            autoComplete="off" spellCheck={false} maxLength={80} value={query}
+            autoFocus={autoFocus} autoComplete="off" spellCheck={false} maxLength={80} value={query}
             onChange={(event) => { setQuery(event.target.value); setOpen(true); setActive(-1) }}
             onFocus={() => setOpen(true)} onKeyDown={onKeyDown}
           />
@@ -168,7 +194,7 @@ export function SportsSearch({ language }: { language: Language }) {
         </div>
         <span id={`${id}-hint`} className="sp-search-hint">{t.hint}</span>
         {expanded && (
-          <div className="sp-search-popover">
+          <div className={`sp-search-popover${availableHeight < 190 ? ' is-short' : ''}${shown.length ? ' has-results' : ''}`} style={{ '--sp-search-room': `${availableHeight}px` } as CSSProperties}>
             <div className="sp-search-filters" role="group" aria-label={t.filter}>
               {(['all', ...kinds] as const).map((value) => (
                 <button type="button" key={value} aria-pressed={kind === value} className={kind === value ? 'is-active' : ''} onClick={() => { setKind(value); setActive(-1); input.current?.focus() }}>

@@ -2916,10 +2916,49 @@ button.pp-club:focus-visible strong {
   .md-side strong { overflow-wrap: anywhere; }
 }
 
-/* Refresh the results without removing their last useful state. */
-.sp-panel-actions { display: flex; flex: none; align-items: center; gap: 6px; }
-.sp-refresh-status, .sp-slow { color: var(--text-muted); font-size: 12px; }
-.sp-refresh-status { min-height: 18px; margin: 0 0 8px; }
+/* Keep exceptional load states visible without a normal refresh button. */
+.sp-slow { color: var(--text-muted); font-size: 12px; }
 .sp-slow { display: block; max-width: 38em; }
 .sp-notice .sp-text-button { min-height: 44px; margin-left: 4px; }
 .is-snapshot .sp-match.is-live .sp-when, .is-snapshot .sp-match.is-live .sp-score { color: var(--text-strong); }
+
+
+/* Compact overview: the controls precede the results, without a visible title block. */
+.sp-overview { --sp-utility-obstruction: var(--sp-utility-height, 0px); }
+.standalone:not(.is-embedded) .sp-overview { padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; overflow: visible; }
+.start-sports .sp-toolbar-compact { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; max-width: 640px; margin-bottom: 8px; }
+.sp-date-row { display: flex; align-items: center; gap: 2px; min-width: 0; grid-column: 1 / -1; grid-row: 1; }
+.sp-toolbar-compact .sp-days { flex: 1; min-width: 0; max-width: none; border: 0; border-radius: 0; }
+.sp-toolbar-compact .sp-days .sp-day { flex: 1; min-width: 0; padding: 4px 2px; gap: 4px; border: 0; font-size: 13px; justify-content: center; flex-wrap: wrap; }
+.sp-toolbar-compact .sp-day small { font-size: 12px; }
+.sp-toolbar-compact .sp-step { width: 44px; min-width: 44px; min-height: 44px; padding: 0; }
+.sp-toolbar-compact .sp-today { flex: none; min-width: 44px; min-height: 44px; padding: 4px 6px; border: 0; color: var(--accent-strong); background: transparent; font-size: 12px; }
+.sp-toolbar-compact .sp-icon-button { width: 44px; height: 44px; flex: none; }
+.sp-toolbar-compact .sp-search-toggle { border-color: transparent; background: transparent; }
+.sp-search-toggle[aria-expanded='true'] { color: var(--accent-strong); background: var(--accent-soft); }
+.start-sports .sp-toolbar-compact > .sp-search { grid-column: 1 / -1; grid-row: 2; width: 100%; max-width: none; min-width: 0; margin: 0; position: relative; }
+.sp-toolbar-compact .sp-filter { grid-column: 1 / -1; grid-row: 3; display: flex; gap: 0; margin-top: 2px; border-bottom: 1px solid var(--border); }
+.sp-toolbar-compact .sp-filter button { flex: 1; min-width: 0; min-height: 44px; padding: 6px 4px; border: 0; border-bottom: 2px solid transparent; border-radius: 0; font-size: 13px; background: transparent; color: var(--text-muted); }
+.sp-toolbar-compact .sp-filter button.active { border-bottom-color: var(--accent); background: transparent; color: var(--accent-strong); }
+.sp-toolbar-compact .sp-filter button b { margin-left: 3px; font-size: 11px; }
+
+/* Fixed utility bar: the overview reserves its measured height, including safe-area padding. */
+.sp-utility-spacer { flex: none; }
+.sp-utility-bar { position: fixed; z-index: 20; right: 0; bottom: 0; left: 0; display: flex; justify-content: center; padding: 6px calc(10px + var(--app-safe-right, 0px)) calc(6px + var(--app-safe-bottom, 0px)) calc(10px + var(--app-safe-left, 0px)); border-top: 1px solid var(--border); background: linear-gradient(var(--panel), var(--panel)), var(--bg); }
+.sp-utility-inner { display: flex; justify-content: space-between; align-items: center; gap: 8px; width: 100%; max-width: 1560px; }
+.sp-utility-controls { display: flex; flex: none; align-items: center; gap: 4px; }
+.sp-utility-controls .sp-icon-button { width: 44px; height: 44px; border-color: transparent; background: transparent; }
+.sp-utility-controls .sp-icon-button.active { background: var(--accent-soft); border-color: var(--accent); }
+.sp-utility-status { display: flex; flex: 1; align-items: center; gap: 6px; min-width: 0; font-size: 11px; line-height: 1.3; color: var(--text-muted); }
+.sp-utility-status > span:not(.sp-dot) { min-width: 0; overflow-wrap: anywhere; }
+.sp-utility-status .sp-dot { flex: none; width: 5px; height: 5px; }
+.sp-utility-status.is-stale .sp-dot { background: var(--warning); }
+.sp-inline-status { margin-top: 8px; }
+@media (min-width: 901px) { .sp-utility-bar { padding-right: calc(20px + var(--app-safe-right, 0px)); padding-left: calc(20px + var(--app-safe-left, 0px)); } }
+@media (pointer: coarse) {
+  .sp-overview:has(.sp-search-popover.is-short) { --sp-utility-obstruction: 0px; }
+  .sp-overview:has(.sp-search-popover.is-short) .sp-utility-bar { visibility: hidden; pointer-events: none; }
+}
+
+.sp-toolbar-compact .sp-day .date-picker-icon { width: 14px; height: 14px; }
+@media (max-width: 380px) { .is-embedded .sp-toolbar-compact .sp-day .date-picker-icon { display: none; } }
