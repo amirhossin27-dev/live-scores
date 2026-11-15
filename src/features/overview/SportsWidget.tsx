@@ -31,9 +31,15 @@ const copy = {
     tomorrow: 'Morgen',
     loading: 'Ergebnisse werden geladen …',
     retry: 'Erneut versuchen',
+    refresh: 'Aktualisieren',
+    refreshing: 'Wird aktualisiert …',
+    saved: (stamp: string) => `Gespeicherte Ergebnisse vom ${stamp}.`,
+    offlineSaved: (stamp: string) => `Offline · gespeicherte Ergebnisse vom ${stamp}.`,
+    offlineEmpty: 'Du bist offline. Für diesen Spieltag sind keine Ergebnisse gespeichert.',
+    slow: 'Der Abruf dauert länger. Bereits gespeicherte Ergebnisse erscheinen beim nächsten Öffnen sofort.',
     down: 'Die Ergebnisse sind gerade nicht erreichbar.',
     stale: 'Aktualisierung fehlgeschlagen – zuletzt geladene Ergebnisse.',
-    partial: (count: number) => `Für ${count} ${count === 1 ? 'Wettbewerb' : 'Wettbewerbe'} gerade keine Daten.`,
+    partial: (count: number) => `${count} ${count === 1 ? 'Wettbewerb konnte' : 'Wettbewerbe konnten'} nicht aktualisiert werden.`,
     noSelection: 'Keine Wettbewerbe ausgewählt.',
     noMatches: 'An diesem Tag keine Spiele in deinen Wettbewerben.',
     skipped: 'Heute keine Spiele – der nächste Tag mit Spielen wird gezeigt.',
@@ -88,9 +94,15 @@ const copy = {
     tomorrow: 'Tomorrow',
     loading: 'Loading scores …',
     retry: 'Try again',
+    refresh: 'Refresh',
+    refreshing: 'Updating …',
+    saved: (stamp: string) => `Saved results from ${stamp}.`,
+    offlineSaved: (stamp: string) => `Offline · saved results from ${stamp}.`,
+    offlineEmpty: 'You are offline. No results are saved for this matchday.',
+    slow: 'This request is taking longer. Saved results will appear immediately on your next visit.',
     down: 'The scores are not reachable right now.',
     stale: 'Refresh failed – showing the scores loaded last.',
-    partial: (count: number) => `No data for ${count} ${count === 1 ? 'competition' : 'competitions'} right now.`,
+    partial: (count: number) => `Could not refresh ${count} ${count === 1 ? 'competition' : 'competitions'}.`,
     noSelection: 'No competitions selected.',
     noMatches: 'No matches on this day in your competitions.',
     skipped: 'No matches today – showing the next day with matches.',
@@ -418,10 +430,11 @@ export function SportsWidget({ language, now }: { language: Language; now: Date 
   // The scores do not depend on the order of the competitions: moving one must not start a new request.
   const requestedKey = [...selection].sort().join('|')
   const requested = useMemo(() => (requestedKey ? requestedKey.split('|') : []), [requestedKey])
-  const { scores, updatedAt, failed, loading, retry } = useSportsScores(requested, day.code)
+  const { scores, updatedAt, failed, loading, retry, cached, refreshing, offline, slow } = useSportsScores(requested, day.code)
 
   const time = useMemo(() => new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' }), [locale])
   const dayFormat = useMemo(() => new Intl.DateTimeFormat(locale, { weekday: 'short', day: 'numeric', month: 'short' }), [locale])
+  const savedTime = useMemo(() => new Intl.DateTimeFormat(locale, { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }), [locale])
   const dayName = offset === 0 ? t.today : offset === -1 ? t.yesterday : offset === 1 ? t.tomorrow : null
 
   const sections = useMemo(() => {
@@ -433,7 +446,7 @@ export function SportsWidget({ language, now }: { language: Language; now: Date 
       .map((competition) => ({ competition, matches: received.get(competition.id)?.matches ?? [] }))
       .filter((section) => section.matches.length > 0)
   }, [scores, selection])
-  if (auto && scores && sections.length === 0 && offset < autoSkipDays) setOffset(offset + 1)
+  if (auto && scores && !cached && !refreshing && !offline && !failed && scores.failed.length === 0 && sections.length === 0 && offset < autoSkipDays) setOffset(offset + 1)
   const liveCount = sections.reduce((sum, section) => sum + section.matches.filter((match) => match.status === 'live').length, 0)
   const favoriteKeys = useMemo(() => new Set(favorites.map((item) => favoriteKey(item.competition, item.id))), [favorites])
   const isFavorite = (competitionId: string, match: SportsMatch) => favoriteKeys.has(favoriteKey(competitionId, match.id))
@@ -504,8 +517,10 @@ export function SportsWidget({ language, now }: { language: Language; now: Date 
   if (selection.length === 0) {
     body = <div className="sp-state"><span>{t.noSelection}</span><button type="button" className="sp-text-button" onClick={() => setSettingsOpen(true)}>{t.pick}</button></div>
   } else if (loading) {
-    body = <div className="sp-state" aria-live="polite"><span>{t.loading}</span></div>
-  } else if (!scores) {
+    body = <div className="sp-state" aria-live="polite"><span>{t.loading}</span>{slow && <small className="sp-slow">{t.slow}</small>}</div>
+  } else if (offline && !scores) {
+    body = <div className="sp-state" aria-live="polite"><span>{t.offlineEmpty}</span></div>
+  } else if (!scores || sections.length === 0 && scores.failed.length > 0) {
     body = <div className="sp-state" aria-live="polite"><span>{t.down}</span><button type="button" className="sp-text-button" onClick={retry}>{t.retry}</button></div>
   } else if (filter === 'favorites' && favoriteCount === 0) {
     body = <div className="sp-state" aria-live="polite"><span>{t.noFavorites}</span></div>
@@ -563,17 +578,22 @@ export function SportsWidget({ language, now }: { language: Language; now: Date 
   }
 
   return (
-    <article className="panel start-sports" aria-label={`${t.eyebrow} · ${t.title}`}>
+    <article className={`panel start-sports${cached || offline ? ' is-snapshot' : ''}`} aria-label={`${t.eyebrow} · ${t.title}`}>
       <div className="panel-header">
         <div>
           <p className="eyebrow sp-eyebrow">
-            <span className={`sp-dot${liveCount > 0 ? ' is-live' : ''}`} aria-hidden="true" />{t.eyebrow}
+            <span className={`sp-dot${liveCount > 0 && !cached && !offline && !failed ? ' is-live' : ''}`} aria-hidden="true" />{t.eyebrow}
           </p>
           <h2>{t.title}</h2>
         </div>
+        <div className="sp-panel-actions">
+        <button type="button" className="sp-icon-button" aria-label={t.refresh} title={refreshing ? t.refreshing : t.refresh} disabled={refreshing || offline || selection.length === 0} onClick={retry}>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M6 7a7 7 0 0 1 12-1l2 3M4 15l2 3a7 7 0 0 0 12-1" /></svg>
+        </button>
         <button type="button" className={`sp-icon-button${settingsOpen ? ' active' : ''}`} aria-expanded={settingsOpen} title={t.settings} aria-label={t.settings} onClick={() => setSettingsOpen((open) => !open)}>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10" /><circle cx="16" cy="7" r="2" /><circle cx="8" cy="17" r="2" /></svg>
         </button>
+        </div>
       </div>
 
       {settingsOpen ? (
@@ -611,11 +631,13 @@ export function SportsWidget({ language, now }: { language: Language; now: Date 
             </div>
           </div>
           {auto && offset > 0 && shown.length > 0 && <p className="sp-notice is-info" aria-live="polite">{t.skipped}</p>}
-          {failed && scores && <p className="sp-notice" aria-live="polite">{t.stale}</p>}
+          {scores && updatedAt !== null && (cached || offline) && <p className="sp-notice is-info" aria-live="polite">{offline ? t.offlineSaved(savedTime.format(new Date(updatedAt))) : t.saved(savedTime.format(new Date(updatedAt)))}{refreshing && !offline && <> {t.refreshing}</>}</p>}
+          {scores && !cached && !offline && <p className="sp-refresh-status" role="status">{refreshing ? t.refreshing : '\u00a0'}</p>}
+          {failed && scores && <p className="sp-notice" aria-live="polite">{t.stale} <button type="button" className="sp-text-button" disabled={refreshing || offline} onClick={retry}>{t.retry}</button></p>}
           {scores && scores.failed.length > 0 && <p className="sp-notice">{t.partial(scores.failed.length)}</p>}
           {body}
           {(updatedAt !== null || liveCount > 0) && <p className="sp-foot">
-            {[updatedAt !== null ? t.updated(time.format(new Date(updatedAt))) : null, liveCount > 0 ? t.everyThirty : null].filter(Boolean).join(' · ')}
+            {[updatedAt !== null ? t.updated(time.format(new Date(updatedAt))) : null, liveCount > 0 && !cached && !offline && !failed ? t.everyThirty : null].filter(Boolean).join(' · ')}
           </p>}
         </>
       )}

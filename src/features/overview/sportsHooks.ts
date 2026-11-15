@@ -1,71 +1,98 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { loadBroadcasts, loadMatchDetails, loadPlayerMatches, loadPlayerProfile, loadPlayerSeason, loadSportsScores, loadStandings, loadTeam, loadTeamNews } from './sportsApi'
 import type { SportsBroadcasts, SportsMatchDetails, SportsNewsItem, SportsPlayerMatch, SportsPlayerProfile, SportsScores, SportsSeasonStat, SportsStandings, SportsTeamProfile, SportsTeamRef } from './sportsApi'
+import { apiBaseUrl } from '../../services/platformApi'
+import { readScoreSnapshot, saveScoreSnapshot } from './sportsScoreCache'
+import type { ScoreSnapshot } from './sportsScoreCache'
 
 const liveRefreshMs = 30_000
 const idleRefreshMs = 2 * 60_000
+interface Loaded extends ScoreSnapshot { key: string; cached: boolean }
 
-interface Loaded {
-  key: string
-  scores: SportsScores
-  at: number
-}
-
-/**
- * Loads the results of the competitions for one day. Refreshes every 30 seconds while a match is running (the API caches them
- * for the same time), otherwise every two minutes, and not at all while the tab is hidden.
- * `ids` must be the same array between renders (state, not a new array each time), or every render would start a new request.
- */
+/** Restore the last matching scores immediately, then revalidate through the normal API. */
 export function useSportsScores(ids: string[], date: string) {
-  const [loaded, setLoaded] = useState<Loaded | null>(null)
-  const [failedKey, setFailedKey] = useState<string | null>(null)
-  const [attempt, setAttempt] = useState(0)
   const key = `${date}|${ids.join(',')}`
+  const saved = useMemo(() => ids.length ? readScoreSnapshot(apiBaseUrl, ids, date) : null, [key])
+  const [loaded, setLoaded] = useState<Loaded | null>(null)
+  const latest = useRef(loaded)
+  latest.current = loaded
+  const [failedKey, setFailedKey] = useState<string | null>(null)
+  const [refreshingKey, setRefreshingKey] = useState<string | null>(null)
+  const [slow, setSlow] = useState(false)
+  const [offline, setOffline] = useState(() => !navigator.onLine)
+  const [attempt, setAttempt] = useState(0)
 
   useEffect(() => {
-    if (ids.length === 0) return undefined
-    const controller = new AbortController()
-    const requestKey = `${date}|${ids.join(',')}`
-    let timer = 0
+    const online = () => { setOffline(false); setAttempt(value => value + 1) }
+    const disconnected = () => setOffline(true)
+    window.addEventListener('online', online)
+    window.addEventListener('offline', disconnected)
+    return () => { window.removeEventListener('online', online); window.removeEventListener('offline', disconnected) }
+  }, [])
 
+  useEffect(() => {
+    setSlow(false)
+    setRefreshingKey(null)
+    if (!ids.length || offline) return
+    const controller = new AbortController()
+    const requestKey = key
+    let timer = 0
+    let slowTimer = 0
+    let inFlight = false
     function schedule(scores: SportsScores | null) {
-      const live = scores?.competitions.some((competition) => competition.matches.some((match) => match.status === 'live'))
+      const live = scores?.competitions.some(c => c.matches.some(match => match.status === 'live'))
       timer = window.setTimeout(run, live ? liveRefreshMs : idleRefreshMs)
     }
-
     function run() {
-      if (document.visibilityState === 'hidden') {
-        schedule(null)
-        return
-      }
-      loadSportsScores(ids, date, controller.signal)
-        .then((scores) => {
-          setLoaded({ key: requestKey, scores, at: Date.now() })
-          setFailedKey(null)
-          schedule(scores)
-        })
-        .catch(() => {
-          if (controller.signal.aborted) return
-          // A failed refresh keeps the results that are already on screen.
-          setFailedKey(requestKey)
-          schedule(null)
-        })
-    }
-
-    run()
-    return () => {
-      controller.abort()
+      if (controller.signal.aborted || inFlight) return
       window.clearTimeout(timer)
+      if (document.visibilityState === 'hidden') { schedule(null); return }
+      inFlight = true
+      setRefreshingKey(requestKey)
+      slowTimer = window.setTimeout(() => setSlow(true), 8_000)
+      loadSportsScores(ids, date, controller.signal).then(scores => {
+        if (controller.signal.aborted) return
+        const previous = latest.current?.key === requestKey ? latest.current : saved
+        const failed = new Set(scores.failed)
+        const retained = previous?.scores.competitions.filter(c => failed.has(c.id) && !scores.competitions.some(fresh => fresh.id === c.id)) ?? []
+        const merged = { ...scores, competitions: [...scores.competitions, ...retained] }
+        const at = retained.length && previous ? Math.min(previous.at, Date.now()) : Date.now()
+        const next = { key: requestKey, scores: merged, at, cached: retained.length > 0, complete: !scores.failed.length }
+        latest.current = next
+        setLoaded(next)
+        if (scores.date === date) saveScoreSnapshot(apiBaseUrl, scores)
+        setFailedKey(null)
+        schedule(merged)
+      }).catch(() => {
+        if (controller.signal.aborted) return
+        setFailedKey(requestKey)
+        schedule(null)
+      }).finally(() => {
+        if (controller.signal.aborted) return
+        inFlight = false
+        window.clearTimeout(slowTimer)
+        setSlow(false)
+        setRefreshingKey(null)
+      })
     }
-  }, [ids, date, attempt])
+    const visible = () => { if (document.visibilityState === 'visible') run() }
+    document.addEventListener('visibilitychange', visible)
+    run()
+    return () => { controller.abort(); window.clearTimeout(timer); window.clearTimeout(slowTimer); document.removeEventListener('visibilitychange', visible) }
+  }, [ids, date, attempt, offline])
 
-  const scores = loaded?.key === key ? loaded.scores : null
+  const current = loaded?.key === key ? loaded : null
+  const snapshot = current ?? saved
+  const scores = snapshot?.scores ?? null
+  const cached = current ? current.cached : saved !== null
+  const refreshing = refreshingKey === key && !offline
+  const failed = failedKey === key
+  const hasMatches = scores?.competitions.some(c => c.matches.length > 0)
   return {
-    scores,
-    updatedAt: loaded?.key === key ? loaded.at : null,
-    failed: failedKey === key,
-    loading: ids.length > 0 && scores === null && failedKey !== key,
-    retry: () => setAttempt((value) => value + 1),
+    scores, updatedAt: snapshot?.at ?? null, cached, refreshing, offline, failed,
+    slow: slow && refreshing && !scores,
+    loading: ids.length > 0 && !offline && !failed && (!scores || refreshing && cached && !snapshot?.complete && !hasMatches),
+    retry: () => setAttempt(value => value + 1),
   }
 }
 

@@ -1,12 +1,13 @@
 import { act, cleanup, createEvent, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { SportsWidget } from './SportsWidget'
+import { saveScoreSnapshot } from './sportsScoreCache'
 import type { SportsMatch, SportsMatchDetails, SportsPlayer, SportsPlayerProfile, SportsScores, SportsSide, SportsStandings, SportsTeamProfile } from './sportsApi'
 import { maxCompetitions, presetSelection, sportsCatalog } from './sportsCatalog'
 
 const api = vi.hoisted(() => ({ loadSportsScores: vi.fn(), loadMatchDetails: vi.fn(), loadPlayerProfile: vi.fn(), loadStandings: vi.fn(), loadBroadcasts: vi.fn(), loadTeam: vi.fn(), loadTeamNews: vi.fn(), findMatch: vi.fn(), loadPlayerSeason: vi.fn(), loadPlayerMatches: vi.fn(), searchSports: vi.fn(), loadNationalTeam: vi.fn() }))
 vi.mock('./sportsApi', () => api)
-const platform = vi.hoisted(() => ({ fetchJson: vi.fn() }))
+const platform = vi.hoisted(() => ({ fetchJson: vi.fn(), apiBaseUrl: 'https://api.test' }))
 vi.mock('../../services/platformApi', () => platform)
 
 const now = new Date(2026, 9, 7, 12, 0)
@@ -335,7 +336,7 @@ describe('SportsWidget', () => {
     api.loadSportsScores.mockResolvedValue({ ...scores, failed: ['soccer/ita.1', 'soccer/fra.1'] })
     renderWidget('en')
     expect(await screen.findByText('Bayern München')).toBeTruthy()
-    expect(screen.getByText('No data for 2 competitions right now.')).toBeTruthy()
+    expect(screen.getByText('Could not refresh 2 competitions.')).toBeTruthy()
     expect(screen.getByRole('heading', { level: 2, name: 'Live Scores' })).toBeTruthy()
     expect(screen.queryByText('Source: ESPN', { exact: false })).toBeNull()
   })
@@ -1478,5 +1479,33 @@ describe('mobile date return', () => {
     await waitFor(() => expect(api.loadSportsScores.mock.calls.at(-1)?.[1]).toBe('20261007'))
     expect(screen.getByRole('button', { name: favoritesLabel }).getAttribute('aria-pressed')).toBe('true')
     expect(screen.queryByRole('button', { name: backToday })).toBeNull()
+  })
+})
+
+
+describe('saved results while refreshing', () => {
+  it.each(['de', 'en'] as const)('shows a saved overview immediately with its age and no fresh live pulse (%s)', language => {
+    saveScoreSnapshot('https://api.test', scores, Date.now() - 300_000)
+    api.loadSportsScores.mockReturnValue(new Promise(() => {}))
+    renderWidget(language)
+    expect(screen.getByText('Bayern München')).toBeTruthy()
+    expect(screen.getByText(language === 'de' ? /Gespeicherte Ergebnisse vom/ : /Saved results from/)).toBeTruthy()
+    expect(document.querySelector('.sp-dot')?.classList.contains('is-live')).toBe(false)
+    expect((screen.getByRole('button', { name: language === 'de' ? 'Aktualisieren' : 'Refresh' }) as HTMLButtonElement).disabled).toBe(true)
+  })
+  it('waits for a fresh answer before automatically skipping a saved empty day', async () => {
+    saveScoreSnapshot('https://api.test', { date: '20261007', failed: [], competitions: presetSelection.map(id => ({ id, name: id, matches: [] })) })
+    api.loadSportsScores.mockReturnValue(new Promise(() => {}))
+    renderWidget()
+    expect(screen.getByText(/Gespeicherte Ergebnisse vom/)).toBeTruthy()
+    await waitFor(() => expect(api.loadSportsScores).toHaveBeenCalledTimes(1))
+    expect(api.loadSportsScores.mock.calls[0][1]).toBe('20261007')
+  })
+  it('does not turn source failure into an empty-day jump', async () => {
+    api.loadSportsScores.mockResolvedValue({ date: '20261007', competitions: [], failed: [...presetSelection] })
+    renderWidget()
+    expect(await screen.findByText('Die Ergebnisse sind gerade nicht erreichbar.')).toBeTruthy()
+    expect(api.loadSportsScores).toHaveBeenCalledTimes(1)
+    expect(screen.getByRole('button', { name: 'Erneut versuchen' })).toBeTruthy()
   })
 })

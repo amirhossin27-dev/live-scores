@@ -2915,3 +2915,11 @@ button.pp-club:focus-visible strong {
   .md-tabs button { min-height: 44px; }
   .md-side strong { overflow-wrap: anywhere; }
 }
+
+/* Refresh the results without removing their last useful state. */
+.sp-panel-actions { display: flex; flex: none; align-items: center; gap: 6px; }
+.sp-refresh-status, .sp-slow { color: var(--text-muted); font-size: 12px; }
+.sp-refresh-status { min-height: 18px; margin: 0 0 8px; }
+.sp-slow { display: block; max-width: 38em; }
+.sp-notice .sp-text-button { min-height: 44px; margin-left: 4px; }
+.is-snapshot .sp-match.is-live .sp-when, .is-snapshot .sp-match.is-live .sp-score { color: var(--text-strong); }
