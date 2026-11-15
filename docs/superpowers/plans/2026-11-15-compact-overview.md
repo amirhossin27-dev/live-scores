@@ -25,22 +25,35 @@ Standalone und beide Einbettungen, DE/EN, Automatisch/Hell/Dunkel erhalten; kein
 Files:src/App.tsx; neue src/features/overview/SportsUtilityBar.tsx; SportsWidget.tsx; SportsSearch.tsx; Tests App.test.tsx/SportsWidget.test.tsx/SportsSearch.test.tsx.
 Interfaces:SportsWidget bekommt optional appearanceControls?:ReactNode; ohne diese bleibt Zugriff auf lokale Wettbewerbseinstellungen in der Toolbar. SportsUtilityBar({status:ReactNode,children:ReactNode,onHeightChange:(height:number)=>void}) misst die eigene Höhe. SportsSearch erhält autoFocus?:boolean und onCollapse?:()=>void, ansonsten bisheriger Vertrag.
 
-- [ ] Neue Verhaltensprüfungen zuerst:fehlende große Header/Update-Aktion, untere persistierte Sprache/Themewerte, Einstellungen öffnen/schließen/Fokus; Embed ohne globale Leiste mit lokalem Zugriff.
-- [ ] Neue Suchprüfung zuerst:initial verborgen, Öffnen fokussiert, bewusstes Schließen leert Suchzustand; Reiter/Datum bleiben; vorhandene Profil-Rückkehrtests erhalten.
-- [ ] App/Widget/Leiste und Suche minimal umsetzen; nur bisher immer sichtbare Suchzugriffe in Tests explizit öffnen. Sichtbarer Titelblock entfällt, zugängliche Überschrift/Bezeichnung bleibt.
-- [ ] Gezielte Tests grün; Datenhooks/Cache bleiben unverändert.
+- [x] Neue Verhaltensprüfungen zuerst:fehlende große Header/Update-Aktion, untere persistierte Sprache/Themewerte, Einstellungen öffnen/schließen/Fokus; Embed ohne globale Leiste mit lokalem Zugriff.
+- [x] Neue Suchprüfung zuerst:initial verborgen, Öffnen fokussiert, bewusstes Schließen leert Suchzustand; Reiter/Datum bleiben; vorhandene Profil-Rückkehrtests erhalten.
+- [x] App/Widget/Leiste und Suche minimal umsetzen; nur bisher immer sichtbare Suchzugriffe in Tests explizit öffnen. Sichtbarer Titelblock entfällt, zugängliche Überschrift/Bezeichnung bleibt.
+- [x] Gezielte Tests grün; Datenhooks/Cache bleiben unverändert.
 
 ## Task2 – Kompakte Gestaltung und Geometrie
 
 Files:app.css,sports.css,sportsSearch.css; SportsSearch.tsx für verfügbaren Popupraum.
 
-- [ ] Alte Header-Styles entfernen; oben Datum/Heute/Lupe, darunter Unterstrichfilter. Embleme und Spielzeilen erhalten.
-- [ ] Untere feste Leiste folgt Inhaltsbreite und Safe Area; gemessene Höhe als Platzhalter reservieren. Sprache44px, Theme kurz Auto/Hell/Dunkel, Einstellungen44px.
-- [ ] Nur kleinen Datenstand unten; keine zusätzliche Poll-Zeile. Warnungen bei echten Fehler-/Offline-/alten Zuständen erhalten. Suche im VisualViewport begrenzen; auf Touchgeräten bei Texteingabe Werkzeuge nicht darüberlegen.
-- [ ] Browser320/393px, Querformat, Desktop, beide Embeds, Themes/DEEN, lange Liste und kontrolliert ausstehende Antwort prüfen; Screenshot sichern. Echte iOS-Tastatur bleibt Gerätecheckpoint.
+- [x] Alte Header-Styles entfernen; oben Datum/Heute/Lupe, darunter Unterstrichfilter. Embleme und Spielzeilen erhalten.
+- [x] Untere feste Leiste folgt Inhaltsbreite und Safe Area; gemessene Höhe als Platzhalter reservieren. Sprache44px, Theme kurz Auto/Hell/Dunkel, Einstellungen44px.
+- [x] Nur kleinen Datenstand unten; keine zusätzliche Poll-Zeile. Warnungen bei echten Fehler-/Offline-/alten Zuständen erhalten. Suche im VisualViewport begrenzen; auf Touchgeräten bei Texteingabe Werkzeuge nicht darüberlegen.
+- [x] Browser320/393px, Querformat, Desktop, beide Embeds, Themes/DEEN, lange Liste und kontrolliert ausstehende Antwort prüfen; Screenshot sichern. Echte iOS-Tastatur bleibt Gerätecheckpoint.
 
 ## Task3 – Abschluss
 
-- [ ] npm test; npm run build; dotnet build backend/App.Api; git diff --check.
-- [ ] Gesamten Diff unabhängig prüfen lassen, wesentliche Befunde beheben; keine unnötige weitere Reviewrunde.
-- [ ] Spec/Plan/Checkpoint und lokale Commits sichern; konkrete Vorschau zur Veröffentlichung vorlegen. Kein Push/Deploy vor Freigabe.
+- [x] npm test; npm run build; dotnet build backend/App.Api; git diff --check.
+- [x] Gesamten Diff unabhängig prüfen lassen, wesentliche Befunde beheben; keine unnötige weitere Reviewrunde.
+- [x] Spec/Plan/Checkpoint und lokale Commits sichern; konkrete Vorschau zur Veröffentlichung vorlegen. Kein Push/Deploy vor Freigabe.
+
+## Lokaler Checkpoint – 15.11.2026
+
+- Schriftlicher Entwurf durch „mach weiter ja“ freigegeben; lokal vollständig umgesetzt. Branch feat/compact-overview, Basis c392cf1, Layout01b02e2; Suchfilterkorrektur siehe letzten fix-Commit. Noch nicht gepusht/veröffentlicht. Live bleibt b130cf6.
+- Oben nur Datum/Kalender/Lupe und gemeinsame Unterstrichfilter. Sichtbare Titelblöcke/normaler Refresh entfallen. Suche explizit einklappbar; vorhandene Profilrückwege erhalten.
+- Unten persistierte Sprache/Darstellung sowie Wettbewerbseinstellungen; tatsächliche Leistenhöhe inklusive Safe Area reserviert. Nachweis lange Liste: letzte Zeile endet783px, Leiste beginnt795px. Körper-Mindestbreite in beiden Stylesheets entfernt:320px Browser/308px verfügbar nun308px Scrollbreite.
+- Browserprüfung320/393px,852x393 und1280px; beide Einbettungen ohne globale Leiste mit lokalem Einstellungszugang. DE/EN, Hell/Dunkel; Auto über native gespeicherte Auswahl/System-CSS erhalten. Kalender/Datum, Fokus nach Fertig/Detailausgang, gesperrter Hintergrund, gespeicherte Sofortanzeige bei35s ausstehender Antwort und Fehler mit Retry geprüft. Echte API-Daten im normalen Einstieg geladen.
+- Unabhängige Abschlussprüfung: ein wesentlicher Befund. Bei geringer Höhe war der weiterwirkende Suchtyp ausgeblendet. Jetzt native44px Auswahl und scrollbar bleibendes Popup; Regression bei VisualViewport-Verkleinerung zuerst fehlgeschlagen, danach bestanden. Kurzes Querformat852x320 im Browser mit Wechsel Vereine→Alle bestätigt. Keine Critical-/Minor-Befunde. Keine zweite Reviewrunde.
+- Finale Nachweise: npm test417 bestanden (412 Vitest in16 Dateien +5 Runtime); npm run build erfolgreich (70 Module, index-DQUnLPAW.js/index-OMhM-wsu.css); dotnet build backend/App.Api erfolgreich,0 Warnungen/Fehler; git diff --check sauber. config.js bleibt absichtlich extern.
+- Entscheidungen: tatsächliche Leistenhöhe messen statt feste Annahme (zusätzliche kleine ResizeObserver-Komponente); Datenhooks/API/Cache bleiben unverändert (erster Abruf ohne Snapshot bleibt netzabhängig). Zugängliche Überschriften bleiben ohne sichtbaren Titelblock.
+- Vorschau mit echten API-Daten: C:/Users/amirh/Documents/ChatGPT/Live Scores/compact-overview-preview.jpg. Lokale App: http://localhost:5190/ . QA/Protokolle für Wiederaufnahme: app/.superpowers/sdd/2026-11-15-compact-overview/ . Diese bewusst behalten, weil Nutzer fortsetzbare Checkpoints wünscht.
+- Offener Gerätecheckpoint nach Veröffentlichung: Home-Bildschirm-App auf iPhone15 starten, Sprache/Theme unten, letzte Zeile, Kalender, Suche→Profil→Zurück und Suchkategorien bei offener Tastatur testen. Hoch-/Querformat, native Safe Areas und größere Schrift noch nicht real auf iOS abgenommen.
+- Genau nächster Schritt: konkrete Vorschau zur Veröffentlichung freigeben lassen. Danach normaler Fast-Forward-Push ohne Force nach main, Actions/Live-Assets/Worker nachweisen und iPhone-Abnahme durchführen. Keine Backend-/Tarif-/Hostingänderung.

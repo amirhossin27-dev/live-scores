@@ -46,4 +46,4 @@ Die ausgewählte Vorschau steht unter C:/Users/amirh/Documents/ChatGPT/Live Scor
 - Gespeicherte Ergebnisse, automatische Updates, Offline-/Teilfehlerhinweise und Rückwege bleiben funktionsfähig.
 - 320/393 px, iPhone-Querformat, Desktop, beide Einbettungen, DE/EN und alle Darstellungsoptionen werden geprüft; echte iPhone-Systemränder/Tastatur bleiben ein Gerätecheckpoint.
 
-**Nächster Schritt:** Freigegebenen Entwurf nach dem Umsetzungsplan lokal umsetzen und prüfen. Veröffentlichung bleibt ein eigener Checkpoint nach konkreter Vorschau und Prüfung.
+**Nächster Schritt:** Lokal umgesetzt und geprüft; siehe Checkpoint im Umsetzungsplan. Konkrete Vorschau zur Veröffentlichung vorlegen, anschließend echte iPhone-Abnahme.

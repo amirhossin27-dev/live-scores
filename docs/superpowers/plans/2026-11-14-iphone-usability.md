@@ -309,3 +309,11 @@ Nutzer hat am15.11.2026 die kompakte Richtung mit konkreten Ergänzungen freigeg
 - Nächster Gerätecheckpoint:App vollständig schließen und vom Home-Bildschirm neu öffnen; einmal erfolgreiche Ergebnisse abwarten. Danach vollständig schließen/öffnen:passender gespeicherter Stand mit ursprünglichem Zeitstempel muss sofort erscheinen und im Hintergrund aktualisiert werden. Erster Abruf ohne passenden Snapshot kann weiterhin warten.
 - CP4 und erweiterte reale iOS-Fälle bleiben bis zur Nutzerbestätigung offen. Alle vier Etappen sind implementiert/veröffentlicht; kein weiteres automatisches Featurepaket beauftragt.
 - Rückfallpunkt vor Cache:Etappe3,21ea9182a47057173797c6da00d5ef8aad74a363. Bei weiterem Feedback zuerst diesen Plan und den aktuellen Git-Stand lesen.
+
+## Ergänzung – kompakte Übersicht, 15.11.2026
+
+- Nutzer wählt „1 Kompakt“ und gibt den schriftlichen Entwurf mit „mach weiter ja“ frei. Lokal umgesetzt auf feat/compact-overview, Layout01b02e2 plus Korrektur für Suchkategorien bei wenig Höhe. Live bleibt b130cf6, Veröffentlichung separat offen.
+- Große Header entfernt; Datum/Filter kompakt, Suche ausklappbar. Sprache/Darstellung/Einstellungen in gemessener unterer Leiste. Kein normaler manueller Update-Button, Cache/Automatik und Fehler-Retry erhalten.
+-417 Tests sowie Frontend-/Backend-Build bestanden. Unabhängige Prüfung: ein wesentlicher Befund zur Suchfilter-Erreichbarkeit behoben und RED→GREEN abgesichert; keine offenen Minor-Befunde. Browser320/393px/Querformat/Desktop/beide Embeds geprüft.
+- Fortsetzen bei docs/superpowers/plans/2026-11-15-compact-overview.md, dort alle Nachweise, Commits und Checkpoints. Vorschau: C:/Users/amirh/Documents/ChatGPT/Live Scores/compact-overview-preview.jpg.
+- Nächster Schritt: Veröffentlichung der konkreten Vorschau freigeben, dann Actions/Live prüfen und auf echter iPhone-Home-Bildschirm-App Tastatur/Systemränder/größere Schrift abnehmen.
