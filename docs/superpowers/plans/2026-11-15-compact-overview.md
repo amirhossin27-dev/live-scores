@@ -65,3 +65,7 @@ Files:app.css,sports.css,sportsSearch.css; SportsSearch.tsx für verfügbaren Po
 - Live-App:https://amirhossin27-dev.github.io/live-scores/ – HTTP200. HTML referenziert index-DQUnLPAW.js und index-OMhM-wsu.css; beide HTTP200 und identisch zum geprüften lokalen Build. sw.js HTTP200; CACHE exakt live-scores-2d375660ce8820e16ef7cab0082c57f654af734f.
 - Keine Backend-/Tarif-/Hostingänderung. Rückfallpunkt vor Kompaktlayout: veröffentlichte Cache-Version b130cf6e77cb1a3d7a967100d79237c0b77abee7.
 - Genau nächster Schritt / Gerätecheckpoint: App auf dem iPhone vollständig schließen und online vom Home-Bildschirm öffnen. Falls zunächst die vorige Oberfläche erscheint, nach kurzem Online-Start nochmals schließen/öffnen; keine Neuinstallation nötig. Datum/Filter, Suchöffnung und Suchkategorien bei Tastatur, Profil→Zurück, untere Werkzeuge und letzte Spielzeile in Hoch-/Querformat prüfen. Systemränder und größere Schrift bleiben echte Geräteabnahme; Veröffentlichung allein ist keine Nutzerabnahme.
+
+## Nachfolgende Designkorrektur
+
+Nutzer beanstandet am15.11.2026 den visuellen Abstand zur gewählten Vorlage. Lokale Korrektur/ursächliche Analyse und direkter Originalvergleich unter docs/superpowers/plans/2026-11-15-compact-design-fidelity.md. Codeaead97a;419 Tests und Builds bestanden, unabhängiger Bild-/Codeabgleich ohne wesentliche Befunde. Noch nicht veröffentlicht. Dies ist der aktuell nächste Checkpoint vor weiterer iPhone-Abnahme.

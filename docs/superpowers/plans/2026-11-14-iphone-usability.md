@@ -21,7 +21,7 @@
 | CP3 – Mobile Bedienung | Veröffentlicht; Nutzer bestätigt „viel besser“ | Erweiterte iOS-Fälle wie VoiceOver/große Schrift weiter offen |
 | CP4 – Datenzustände und Veröffentlichung | Veröffentlicht; Geräteabnahme offen | Sofortige gespeicherte Ergebnisse und Hintergrundaktualisierung erhalten; kompakte Live-Version2d37566 |
 
-**Aktueller nächster Schritt:** Kompakte Oberfläche auf dem iPhone vom Home-Bildschirm starten und Datum/Filter, Suche mit Tastatur, Rückwege, untere Werkzeuge und letzte Spielzeile in Hoch-/Querformat abnehmen. Erweiterte Systemränder/größere Schrift sowie Cache-Verhalten gemeinsam prüfen.
+**Aktueller nächster Schritt:** Designkorrektur anhand des direkten Originalvergleichs beurteilen; Details in docs/superpowers/plans/2026-11-15-compact-design-fidelity.md. Nutzer beanstandet aktuelle Live-Gestaltung. Lokale Korrektur aead97a besteht419 Tests/Builds und unabhängigen Bildabgleich, noch nicht veröffentlicht.
 **Fortsetzungsauftrag:** „Lies diesen Etappenplan, prüfe den aktuellen Repository-Stand und fahre mit dem ersten freigegebenen, offenen Checkpoint fort.“
 **Arbeitsverzeichnis:** C:/Users/amirh/Documents/ChatGPT/Live Scores
 **Lokaler Stand:** Checkout unter app/, Branch feat/compact-overview. Veröffentlicht2d375660ce8820e16ef7cab0082c57f654af734f; Layout01b02e2, Suchfilterkorrektur358414f. Release-Nachweis lokal zusätzlich dokumentiert. Alle Prüfungen/Deployment erfolgreich, Details im Kompaktplan.
@@ -326,3 +326,8 @@ Nutzer hat am15.11.2026 die kompakte Richtung mit konkreten Ergänzungen freigeg
 - Live-App:https://amirhossin27-dev.github.io/live-scores/ – HTTP200. HTML referenziert index-DQUnLPAW.js und index-OMhM-wsu.css; beide HTTP200 und identisch zum geprüften lokalen Build. sw.js HTTP200; CACHE exakt live-scores-2d375660ce8820e16ef7cab0082c57f654af734f.
 - Keine Backend-/Tarif-/Hostingänderung. Rückfallpunkt vor Kompaktlayout: veröffentlichte Cache-Version b130cf6e77cb1a3d7a967100d79237c0b77abee7.
 - Genau nächster Schritt / Gerätecheckpoint: App auf dem iPhone vollständig schließen und online vom Home-Bildschirm öffnen. Falls zunächst die vorige Oberfläche erscheint, nach kurzem Online-Start nochmals schließen/öffnen; keine Neuinstallation nötig. Datum/Filter, Suchöffnung und Suchkategorien bei Tastatur, Profil→Zurück, untere Werkzeuge und letzte Spielzeile in Hoch-/Querformat prüfen. Systemränder und größere Schrift bleiben echte Geräteabnahme; Veröffentlichung allein ist keine Nutzerabnahme.
+## Designabweichung und lokale Korrektur
+
+- Nutzer kritisiert die veröffentlichte Umsetzung als sichtbar abweichend von „1 Kompakt“ und beauftragt Fortsetzung. Bestehende globale Styles waren zu weit erhalten geblieben, visueller Referenzabgleich fehlte.
+- Korrigiert auf Branch fix/compact-design-fidelity, Codeaead97a. Direkter Originalvergleich: C:/Users/amirh/Documents/ChatGPT/Live Scores/compact-design-comparison.jpg. Echte API-Vorschau:compact-design-actual.jpg.
+-419 Tests, Frontend-/Backend-Build bestanden. Unabhängiger tatsächlicher Bild-/Codeabgleich ohne Critical/Important. Live bleibt2d37566, kein neuer Push. Fortsetzen beim vollständigen Korrekturplan docs/superpowers/plans/2026-11-15-compact-design-fidelity.md und dem direkten visuellen Checkpoint.
