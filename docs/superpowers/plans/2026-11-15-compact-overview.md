@@ -57,3 +57,11 @@ Files:app.css,sports.css,sportsSearch.css; SportsSearch.tsx für verfügbaren Po
 - Vorschau mit echten API-Daten: C:/Users/amirh/Documents/ChatGPT/Live Scores/compact-overview-preview.jpg. Lokale App: http://localhost:5190/ . QA/Protokolle für Wiederaufnahme: app/.superpowers/sdd/2026-11-15-compact-overview/ . Diese bewusst behalten, weil Nutzer fortsetzbare Checkpoints wünscht.
 - Offener Gerätecheckpoint nach Veröffentlichung: Home-Bildschirm-App auf iPhone15 starten, Sprache/Theme unten, letzte Zeile, Kalender, Suche→Profil→Zurück und Suchkategorien bei offener Tastatur testen. Hoch-/Querformat, native Safe Areas und größere Schrift noch nicht real auf iOS abgenommen.
 - Genau nächster Schritt: konkrete Vorschau zur Veröffentlichung freigeben lassen. Danach normaler Fast-Forward-Push ohne Force nach main, Actions/Live-Assets/Worker nachweisen und iPhone-Abnahme durchführen. Keine Backend-/Tarif-/Hostingänderung.
+## Veröffentlichung – 15.11.2026
+
+- Nutzerfreigabe: „ja“ auf die konkrete Frage zur Veröffentlichung der fertigen Kompakt-Vorschau.
+- Normaler Fast-Forward-Push ohne Force nach main. Veröffentlichter Commit:2d375660ce8820e16ef7cab0082c57f654af734f (Layout01b02e2, Suchfilterkorrektur358414f, Prüfdokumentation2d37566).
+- GitHub Actions:https://github.com/amirhossin27-dev/live-scores/actions/runs/43730946637 – completed/success. Tests, Backend-Release-Build, Frontend-Build und Pages-Deployment erfolgreich.
+- Live-App:https://amirhossin27-dev.github.io/live-scores/ – HTTP200. HTML referenziert index-DQUnLPAW.js und index-OMhM-wsu.css; beide HTTP200 und identisch zum geprüften lokalen Build. sw.js HTTP200; CACHE exakt live-scores-2d375660ce8820e16ef7cab0082c57f654af734f.
+- Keine Backend-/Tarif-/Hostingänderung. Rückfallpunkt vor Kompaktlayout: veröffentlichte Cache-Version b130cf6e77cb1a3d7a967100d79237c0b77abee7.
+- Genau nächster Schritt / Gerätecheckpoint: App auf dem iPhone vollständig schließen und online vom Home-Bildschirm öffnen. Falls zunächst die vorige Oberfläche erscheint, nach kurzem Online-Start nochmals schließen/öffnen; keine Neuinstallation nötig. Datum/Filter, Suchöffnung und Suchkategorien bei Tastatur, Profil→Zurück, untere Werkzeuge und letzte Spielzeile in Hoch-/Querformat prüfen. Systemränder und größere Schrift bleiben echte Geräteabnahme; Veröffentlichung allein ist keine Nutzerabnahme.

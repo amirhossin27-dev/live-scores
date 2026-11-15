@@ -6,7 +6,7 @@
 **Architecture:** React/TypeScript und die bestehende gemeinsame Oberfläche bleiben erhalten. Zuerst werden App-Rahmen und Detailfenster korrigiert; anschließend werden die bereits vorhandenen Rückwege vereinheitlicht und ihr Zustand erhalten.
 **Tech Stack:** React 19, TypeScript, Vite, Vitest/Testing Library; .NET-Backend; GitHub Pages und vorhandene Render-API.
 **Spec:** Die Abschnitte Zielbild, Grenzen und Navigation dieses Dokuments bilden den vorläufigen Entwurf. Der Nutzer hat den Plan und den Start von Etappe 1 mit „passt, go!“ freigegeben.
-**Stand:** 15.11.2026, Etappen1–3 veröffentlicht; Nutzer bestätigt deutliche Verbesserung. Etappe4 mit Ergebnisspeicher veröffentlicht und geprüft; CP4-Geräteabnahme offen.
+**Stand:** 15.11.2026, Etappen1–4 und gewählte kompakte Übersicht veröffentlicht und live geprüft. Live-Version2d37566; erweiterte iPhone-Geräteabnahme offen.
 **Repository:** https://github.com/amirhossin27-dev/live-scores
 **Analysierte Basis:** main, Commit 905999b356228f6745cdd2f55fd66d326c7d43ad.
 **Live-App:** https://amirhossin27-dev.github.io/live-scores/
@@ -19,12 +19,12 @@
 | CP1 – Sichere Ränder und Ausgänge | Veröffentlicht; Nutzer bestätigt Funktion | Zusätzliche Gerätefälle wie Tastatur/große Schrift weiter offen |
 | CP2 – Durchgängige Navigation | Veröffentlicht; Nutzer bestätigt Verbesserung | Zusatzwunsch Header/kompaktes Layout in Etappe3 aufgenommen |
 | CP3 – Mobile Bedienung | Veröffentlicht; Nutzer bestätigt „viel besser“ | Erweiterte iOS-Fälle wie VoiceOver/große Schrift weiter offen |
-| CP4 – Datenzustände und Veröffentlichung | Veröffentlicht; Geräteabnahme offen | Sofortige gespeicherte Ergebnisse, Hintergrundaktualisierung; Live-Version b130cf6 |
+| CP4 – Datenzustände und Veröffentlichung | Veröffentlicht; Geräteabnahme offen | Sofortige gespeicherte Ergebnisse und Hintergrundaktualisierung erhalten; kompakte Live-Version2d37566 |
 
-**Aktueller nächster Schritt:** Veröffentlichte Etappe4 auf dem iPhone einmal erfolgreich Daten laden lassen, App vollständig schließen/öffnen und sofort sichtbaren gespeicherten Stand plus Hintergrundaktualisierung prüfen. Danach CP4-Endabnahme festhalten.
+**Aktueller nächster Schritt:** Kompakte Oberfläche auf dem iPhone vom Home-Bildschirm starten und Datum/Filter, Suche mit Tastatur, Rückwege, untere Werkzeuge und letzte Spielzeile in Hoch-/Querformat abnehmen. Erweiterte Systemränder/größere Schrift sowie Cache-Verhalten gemeinsam prüfen.
 **Fortsetzungsauftrag:** „Lies diesen Etappenplan, prüfe den aktuellen Repository-Stand und fahre mit dem ersten freigegebenen, offenen Checkpoint fort.“
 **Arbeitsverzeichnis:** C:/Users/amirh/Documents/ChatGPT/Live Scores
-**Lokaler Stand:** Checkout unter app/, Branch fix/iphone-stage-4. Implementierungscommit793ebc1700df159cd951c9ec82de8f2e9d4fee49. Etappe4 veröffentlicht als b130cf6e77cb1a3d7a967100d79237c0b77abee7. Alle Projektprüfungen und Veröffentlichung erfolgreich, Details unten.
+**Lokaler Stand:** Checkout unter app/, Branch feat/compact-overview. Veröffentlicht2d375660ce8820e16ef7cab0082c57f654af734f; Layout01b02e2, Suchfilterkorrektur358414f. Release-Nachweis lokal zusätzlich dokumentiert. Alle Prüfungen/Deployment erfolgreich, Details im Kompaktplan.
 **Vor Fortsetzung:** Git-Status, Branch und neuen main-Stand prüfen; bestehende Änderungen bewahren. Den Plan in den künftigen Checkout übernehmen, nicht durch erneutes Klonen überschreiben.
 
 Nach jeder Etappe ergänzen:
@@ -317,3 +317,12 @@ Nutzer hat am15.11.2026 die kompakte Richtung mit konkreten Ergänzungen freigeg
 -417 Tests sowie Frontend-/Backend-Build bestanden. Unabhängige Prüfung: ein wesentlicher Befund zur Suchfilter-Erreichbarkeit behoben und RED→GREEN abgesichert; keine offenen Minor-Befunde. Browser320/393px/Querformat/Desktop/beide Embeds geprüft.
 - Fortsetzen bei docs/superpowers/plans/2026-11-15-compact-overview.md, dort alle Nachweise, Commits und Checkpoints. Vorschau: C:/Users/amirh/Documents/ChatGPT/Live Scores/compact-overview-preview.jpg.
 - Nächster Schritt: Veröffentlichung der konkreten Vorschau freigeben, dann Actions/Live prüfen und auf echter iPhone-Home-Bildschirm-App Tastatur/Systemränder/größere Schrift abnehmen.
+
+## Veröffentlichung – 15.11.2026
+
+- Nutzerfreigabe: „ja“ auf die konkrete Frage zur Veröffentlichung der fertigen Kompakt-Vorschau.
+- Normaler Fast-Forward-Push ohne Force nach main. Veröffentlichter Commit:2d375660ce8820e16ef7cab0082c57f654af734f (Layout01b02e2, Suchfilterkorrektur358414f, Prüfdokumentation2d37566).
+- GitHub Actions:https://github.com/amirhossin27-dev/live-scores/actions/runs/43730946637 – completed/success. Tests, Backend-Release-Build, Frontend-Build und Pages-Deployment erfolgreich.
+- Live-App:https://amirhossin27-dev.github.io/live-scores/ – HTTP200. HTML referenziert index-DQUnLPAW.js und index-OMhM-wsu.css; beide HTTP200 und identisch zum geprüften lokalen Build. sw.js HTTP200; CACHE exakt live-scores-2d375660ce8820e16ef7cab0082c57f654af734f.
+- Keine Backend-/Tarif-/Hostingänderung. Rückfallpunkt vor Kompaktlayout: veröffentlichte Cache-Version b130cf6e77cb1a3d7a967100d79237c0b77abee7.
+- Genau nächster Schritt / Gerätecheckpoint: App auf dem iPhone vollständig schließen und online vom Home-Bildschirm öffnen. Falls zunächst die vorige Oberfläche erscheint, nach kurzem Online-Start nochmals schließen/öffnen; keine Neuinstallation nötig. Datum/Filter, Suchöffnung und Suchkategorien bei Tastatur, Profil→Zurück, untere Werkzeuge und letzte Spielzeile in Hoch-/Querformat prüfen. Systemränder und größere Schrift bleiben echte Geräteabnahme; Veröffentlichung allein ist keine Nutzerabnahme.

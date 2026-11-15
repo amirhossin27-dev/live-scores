@@ -46,4 +46,4 @@ Die ausgewählte Vorschau steht unter C:/Users/amirh/Documents/ChatGPT/Live Scor
 - Gespeicherte Ergebnisse, automatische Updates, Offline-/Teilfehlerhinweise und Rückwege bleiben funktionsfähig.
 - 320/393 px, iPhone-Querformat, Desktop, beide Einbettungen, DE/EN und alle Darstellungsoptionen werden geprüft; echte iPhone-Systemränder/Tastatur bleiben ein Gerätecheckpoint.
 
-**Nächster Schritt:** Lokal umgesetzt und geprüft; siehe Checkpoint im Umsetzungsplan. Konkrete Vorschau zur Veröffentlichung vorlegen, anschließend echte iPhone-Abnahme.
+**Nächster Schritt:** Nach ausdrücklicher Freigabe am15.11.2026 veröffentlicht und live geprüft (2d37566); siehe Release-Checkpoint im Umsetzungsplan. Jetzt echte iPhone-Abnahme von Tastatur/Systemrändern/größerer Schrift.
