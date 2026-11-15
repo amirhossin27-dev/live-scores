@@ -66,7 +66,7 @@
 .sp-overview.is-snapshot .sp-match.is-live .sp-when { color: var(--text-muted); }
 
 .sp-utility-spacer { flex: none; }
-.sp-utility-bar { position: fixed; z-index: 20; right: 0; bottom: 0; left: 0; display: flex; justify-content: center; min-height: calc(58px + var(--app-safe-bottom, 0px)); padding: 6px calc(12px + var(--app-safe-right, 0px)) calc(6px + var(--app-safe-bottom, 0px)) calc(12px + var(--app-safe-left, 0px)); border-top: 1px solid var(--border); background: var(--panel); }
+.sp-utility-bar { position: fixed; z-index: 20; right: 0; bottom: 0; left: 0; display: flex; justify-content: center; min-height: calc(50px + var(--app-safe-bottom, 0px)); padding: 3px calc(12px + var(--app-safe-right, 0px)) calc(1px + var(--app-safe-bottom, 0px)) calc(12px + var(--app-safe-left, 0px)); border-top: 1px solid var(--border); background: var(--panel); }
 .sp-utility-inner { display: flex; justify-content: space-between; align-items: center; gap: 4px; width: 100%; max-width: 1560px; }
 .sp-utility-controls { display: flex; flex: none; align-items: center; gap: 2px; }
 .sp-utility-controls .sp-icon-button { width: 44px; height: 44px; border: 0; background: transparent; }

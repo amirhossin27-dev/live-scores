@@ -311,7 +311,8 @@
   font-style: normal;
 }
 
-.sp-match.is-live .sp-score {
+.sp-match.is-live .sp-score,
+.sp-match.is-live .sp-score i {
   color: #dc2626;
 }
 
@@ -2920,4 +2921,4 @@ button.pp-club:focus-visible strong {
 .sp-slow { color: var(--text-muted); font-size: 12px; }
 .sp-slow { display: block; max-width: 38em; }
 .sp-notice .sp-text-button { min-height: 44px; margin-left: 4px; }
-.is-snapshot .sp-match.is-live .sp-when, .is-snapshot .sp-match.is-live .sp-score { color: var(--text-strong); }
+.is-snapshot .sp-match.is-live .sp-when, .is-snapshot .sp-match.is-live .sp-score, .is-snapshot .sp-match.is-live .sp-score i { color: var(--text-strong); }
