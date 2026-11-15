@@ -6,7 +6,7 @@
 **Architecture:** React/TypeScript und die bestehende gemeinsame Oberfläche bleiben erhalten. Zuerst werden App-Rahmen und Detailfenster korrigiert; anschließend werden die bereits vorhandenen Rückwege vereinheitlicht und ihr Zustand erhalten.
 **Tech Stack:** React 19, TypeScript, Vite, Vitest/Testing Library; .NET-Backend; GitHub Pages und vorhandene Render-API.
 **Spec:** Die Abschnitte Zielbild, Grenzen und Navigation dieses Dokuments bilden den vorläufigen Entwurf. Der Nutzer hat den Plan und den Start von Etappe 1 mit „passt, go!“ freigegeben.
-**Stand:** 15.11.2026, Etappe 1 veröffentlicht und vom Nutzer bestätigt. Etappe 2 lokal umgesetzt, getestet und geprüft; Veröffentlichung und iPhone-Abnahme CP2 offen.
+**Stand:** 15.11.2026, Etappe 1 veröffentlicht und vom Nutzer bestätigt. Etappe 2 veröffentlicht, getestet und geprüft; iPhone-Abnahme CP2 offen.
 **Repository:** https://github.com/amirhossin27-dev/live-scores
 **Analysierte Basis:** main, Commit 905999b356228f6745cdd2f55fd66d326c7d43ad.
 **Live-App:** https://amirhossin27-dev.github.io/live-scores/
@@ -17,11 +17,11 @@
 | --- | --- | --- |
 | CP0 – Bestandsaufnahme | Erledigt, iOS-Reproduktion offen | Quellcode und veröffentlichte App bei 393 × 852 geprüft |
 | CP1 – Sichere Ränder und Ausgänge | Veröffentlicht; Nutzer bestätigt Funktion | Zusätzliche Gerätefälle wie Tastatur/große Schrift weiter offen |
-| CP2 – Durchgängige Navigation | Lokal technisch geprüft; Geräteabnahme offen | Besuchspfad und Zustand bleiben erhalten; Veröffentlichung noch freizugeben |
+| CP2 – Durchgängige Navigation | Veröffentlicht; Geräteabnahme offen | Besuchspfad und Zustand bleiben erhalten; Live-Version 6622942 |
 | CP3 – Mobile Bedienung | Vorschlag | Größere Ziele, übersichtliche Werkzeuge, klare Einstellungen |
 | CP4 – Datenzustände und Veröffentlichung | Geplant | Verlässliche Rückmeldungen und dokumentierte iPhone-Abnahme |
 
-**Aktueller nächster Schritt:** Geprüfte Etappe 2 zur Veröffentlichung und anschließendem iPhone-Test vorlegen. Etappe 3 beginnt erst nach CP2 und ihrer vereinbarten Vorschau.
+**Aktueller nächster Schritt:** Veröffentlichte Etappe 2 in der Home-Bildschirm-App auf dem iPhone 15 testen (Prüffolge am Dokumentende). Etappe 3 beginnt erst nach CP2 und ihrer vereinbarten Vorschau.
 **Fortsetzungsauftrag:** „Lies diesen Etappenplan, prüfe den aktuellen Repository-Stand und fahre mit dem ersten freigegebenen, offenen Checkpoint fort.“
 **Arbeitsverzeichnis:** C:/Users/amirh/Documents/ChatGPT/Live Scores
 **Lokaler Stand:** Checkout unter app/, Branch fix/iphone-stage-2. Implementierung Etappe 2: 5ca09f6f831f4b106d0b9d56d482f21fdd338cd9. Alle Projektprüfungen erfolgreich; Details unten.
@@ -227,7 +227,7 @@ Vor der Umsetzung dieser Etappe eine kompakte Vorher-/Nachher-Vorschau zur gemei
 - Unabhängige Code- und Planprüfung abgeschlossen. Ein Befund zur möglichen Wiederöffnung der Tabellenform bei Fokusrückgabe wurde abgesichert und nachgeprüft; keine wesentlichen offenen Befunde. Die zusätzlichen Fokus-Tests bestanden auch vor dieser defensiven Absicherung: dafür wird kein reproduzierter Vorher-Fehlschlag behauptet.
 - Browser mit echten API-Daten bei 393×852: Spanien–England → Spanien/Kader → David Raya/Karriere → Arsenal → zurück zu David Raya/Karriere → Spanien/Kader → Spiel → Übersicht. Reiter bleiben erhalten und Fokus kehrt zum ursprünglichen Spiel zurück. Kalender-Abbrechen und Einstellungen-Fertig geprüft.
 - Vorschau: C:/Users/amirh/Documents/ChatGPT/Live Scores/stage2-preview.jpg. Ausführlicher Bericht/Protokolle lokal unter app/.superpowers/sdd/2026-11-14-iphone-usability/.
-- Keine Veröffentlichung, kein Push oder Merge von Etappe 2. Keine Änderung an Backend, API-Konfiguration oder Service-Worker-Datenstrategie. Rückfallpunkt bleibt veröffentlichte Etappe 1 a5c44ec.
+- Etappe 2 nach Nutzerfreigabe „mach das“ am 15.11.2026 veröffentlicht, Details unten. Keine Änderung an Backend, API-Konfiguration oder Service-Worker-Datenstrategie. Rückfallpunkt bleibt veröffentlichte Etappe 1 a5c44ec.
 - Entscheidung: besuchte Komponenten bis zum Rückschritt oder Gesamtausstieg gemountet lassen; etwas mehr Speicher während langer Detailketten. Browser-History/Swipe bleibt ausdrücklich außerhalb des Umfangs.
 
 ### Zuordnung der Navigationsprüfliste
@@ -250,6 +250,15 @@ Vor der Umsetzung dieser Etappe eine kompakte Vorher-/Nachher-Vorschau zur gemei
 | Lade-/Fehler-/Leerzustände | Fester Detailkopf unabhängig vom Dateninhalt; wiederholtes Öffnen/Schließen und verspätete Antworten getestet |
 | Externe Nachrichten/Übertragung | Nachrichten bleiben separate Links mit noopener; Übertragungen enthalten aktuell nur Sendertext |
 
-**CP2 bleibt offen:** Nach freigegebener Veröffentlichung vom Home-Bildschirm auf dem iPhone 15 testen: Spiel → Team → Spieler → Verein und schrittweise zurück, Suche → Trainer → Verein → Suche, Kalender abbrechen, Einstellungen verlassen. Reiter, Datum, Suchbegriff und Scrollposition müssen erhalten bleiben. Hoch-/Querformat, Bildschirmtastatur und größere Schrift auf echtem iOS sind durch den Browsernachweis nicht abgedeckt.
+**CP2 bleibt offen:** Die jetzt veröffentlichte App vom Home-Bildschirm auf dem iPhone 15 testen: Spiel → Team → Spieler → Verein und schrittweise zurück, Suche → Trainer → Verein → Suche, Kalender abbrechen, Einstellungen verlassen. Reiter, Datum, Suchbegriff und Scrollposition müssen erhalten bleiben. Hoch-/Querformat, Bildschirmtastatur und größere Schrift auf echtem iOS sind durch den Browsernachweis nicht abgedeckt.
 
-**Genau ein nächster Arbeitsschritt:** Veröffentlichung der geprüften Etappe 2 mit dem Nutzer abstimmen, danach den obigen Geräte-Checkpoint durchführen. Erst nach Rückmeldung die Vorschau für Etappe 3 erstellen.
+**Genau ein nächster Arbeitsschritt:** Den obigen Geräte-Checkpoint auf dem iPhone durchführen und Rückmeldung festhalten. Erst nach Rückmeldung die Vorschau für Etappe 3 erstellen.
+
+## Veröffentlichung Etappe 2 – 15.11.2026
+
+- Nutzerfreigabe: „mach das“ auf die konkrete Frage nach Veröffentlichung der geprüften Etappe 2.
+- Normaler Fast-Forward-Push nach main; kein Force-Push. Veröffentlichter Commit: 6622942aa3b2587e6c4fe2b497452bf15e7abbfa (Implementierung 5ca09f6 plus Checkpoint-Dokumentation).
+- GitHub Actions: https://github.com/amirhossin27-dev/live-scores/actions/runs/43696597809 – completed/success. Erneute npm-Tests, Frontend-Build und Backend-Release-Build sowie Pages-Deployment erfolgreich.
+- Live geprüft: https://amirhossin27-dev.github.io/live-scores/ liefert HTTP 200 und referenziert index-DwFDAKPG.js / index-Ls9oaT_0.css. Beide Assets liefern HTTP 200. sw.js liefert HTTP 200, CACHE entspricht live-scores-6622942aa3b2587e6c4fe2b497452bf15e7abbfa.
+- Die neue Version ist ausgeliefert; damit ist noch keine Geräteabnahme behauptet. App auf dem iPhone vollständig schließen und vom Home-Bildschirm erneut öffnen. Bei zunächst alter Ansicht nach kurzem Online-Start nochmals schließen/öffnen, damit der aktualisierte Service Worker greifen kann. Keine Neuinstallation erforderlich.
+- Weiter bei CP2: tiefen Besuchspfad, Suche, Kalender und Einstellungen auf dem iPhone prüfen. Rückmeldung ausstehend; Etappe 3 bleibt bis dahin offen.
