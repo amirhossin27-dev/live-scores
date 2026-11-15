@@ -50,3 +50,12 @@ Die ausgewählte Vorschau steht unter C:/Users/amirh/Documents/ChatGPT/Live Scor
 
 
 **Aktueller Release-Checkpoint:** Nach beanstandeter Designabweichung wurde die tatsächliche Originalvorlage direkt mit der App verglichen und korrigiert. Vom Nutzer freigegebene Designkorrektur d885e05 am15.11.2026 veröffentlicht und öffentlich visuell geprüft; nächster Schritt echte iPhone-Abnahme. Details:docs/superpowers/plans/2026-11-15-compact-design-fidelity.md.
+
+
+## Nutzerabnahme – 15.11.2026
+
+- Nutzer bestätigt nach Veröffentlichung und Aufforderung zum Vergleich auf dem iPhone: „passt alles“.
+- Aktuelle veröffentlichte Version:d885e055ee22d47fc5c1b949f9d13657b9b7c52e. Die beauftragte Verbesserungsrunde einschließlich korrigierter Gestaltung „1 Kompakt“ ist damit praktisch abgenommen und abgeschlossen.
+- Keine weitere App-Änderung oder Veröffentlichung aus dieser Rückmeldung abgeleitet. Abnahme ausschließlich lokal dokumentiert.
+- Die pauschale Nutzerbestätigung ist keine Messdokumentation für jede Kombination von iOS-Version, VoiceOver, Systemschriftgröße oder Bildschirmorientierung. Solche vertieften Prüfungen bleiben bei Bedarf möglich und blockieren diesen Abschluss nicht.
+- Nächster sinnvoller Schritt: App im Alltag nutzen; nur bei neuem konkretem Feedback eine gezielte weitere Änderung beauftragen. Für Fortsetzung aktuelle Abnahme und Live-Version lesen, keine erledigten Etappen erneut starten.

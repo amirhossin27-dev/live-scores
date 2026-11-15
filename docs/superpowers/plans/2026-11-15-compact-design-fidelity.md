@@ -45,3 +45,12 @@ Die vorige Umsetzung übernahm Anordnung/Funktionen, ließ aber wesentliche alte
 - Zusätzlich tatsächliche öffentliche Mobilansicht393×852 im Browser visuell geprüft, echte Ergebnisse geladen: transparenter Datumshintergrund, Teamnamen Gewicht400, Ligakopf12px, erste Spielzeile y175/Höhe60px, untere Leiste58px, keine horizontale Überschreitung393/393. Screenshot:C:/Users/amirh/Documents/ChatGPT/Live Scores/compact-design-published.jpg. Keine echte iOS-Geräteabnahme behauptet.
 - Nächster Gerätecheckpoint: App auf dem iPhone vollständig schließen und online vom Home-Bildschirm öffnen. Falls noch die vorherige Darstellung erscheint, nach kurzem Online-Start nochmals schließen/öffnen; keine Neuinstallation nötig. Gestaltung gegen gewählte Vorlage, Suche mit Tastatur/Profilrückweg, untere Werkzeuge und letzte Spielzeile in Hoch-/Querformat prüfen. Größere Systemschrift/native Safe Areas weiter offen.
 - Rückfallpunkt:dokumentierte vorige Veröffentlichung2d37566. Keine Backend-/Hosting-/Tarif- oder Datenstrategieänderung.
+
+
+## Nutzerabnahme – 15.11.2026
+
+- Nutzer bestätigt nach Veröffentlichung und Aufforderung zum Vergleich auf dem iPhone: „passt alles“.
+- Aktuelle veröffentlichte Version:d885e055ee22d47fc5c1b949f9d13657b9b7c52e. Die beauftragte Verbesserungsrunde einschließlich korrigierter Gestaltung „1 Kompakt“ ist damit praktisch abgenommen und abgeschlossen.
+- Keine weitere App-Änderung oder Veröffentlichung aus dieser Rückmeldung abgeleitet. Abnahme ausschließlich lokal dokumentiert.
+- Die pauschale Nutzerbestätigung ist keine Messdokumentation für jede Kombination von iOS-Version, VoiceOver, Systemschriftgröße oder Bildschirmorientierung. Solche vertieften Prüfungen bleiben bei Bedarf möglich und blockieren diesen Abschluss nicht.
+- Nächster sinnvoller Schritt: App im Alltag nutzen; nur bei neuem konkretem Feedback eine gezielte weitere Änderung beauftragen. Für Fortsetzung aktuelle Abnahme und Live-Version lesen, keine erledigten Etappen erneut starten.
