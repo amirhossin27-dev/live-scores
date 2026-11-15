@@ -57,35 +57,13 @@ describe('top scorer table', () => {
     expect(names()).toEqual(['Historical Leader'])
   })
 
-  it('opens the nationality flag in the national team profile and returns to the ranking', async () => {
-    render(<TopScorers {...props} />)
+  it('shows no nationality flag behind the player names', async () => {
+    const { container } = render(<TopScorers {...props} />)
     await tick()
-    expect(screen.queryByText(/Scorerpunkte =/)).toBeNull()
-    expect(screen.queryByText(/Automatische Aktualisierung/)).toBeNull()
-    fetchJson.mockResolvedValueOnce({ id: '8570', name: 'Germany' })
-    fireEvent.click(screen.getByRole('button', { name: 'Nationalmannschaft von Deutschland öffnen' }))
-    await tick()
-    expect(fetchJson).toHaveBeenCalledWith('/api/sports/national-team?code=GER', expect.objectContaining({ signal: expect.any(AbortSignal) }))
-    expect(screen.getByTestId('team-profile').textContent).toContain('8570')
-    fireEvent.click(screen.getByRole('button', { name: 'Back' }))
     expect(names()[0]).toBe('Goal Leader')
+    expect(container.querySelector('.scorer-player-cell img, .scorer-player-cell .sp-country-flag, .scorer-country-link')).toBeNull()
   })
 
-  it('offers retry on failed nationality lookup and aborts when returning', async () => {
-    render(<TopScorers {...props} />)
-    await tick()
-    fetchJson.mockRejectedValueOnce(new Error('unavailable'))
-    fireEvent.click(screen.getByRole('button', { name: 'Nationalmannschaft von Deutschland öffnen' }))
-    await tick()
-    expect(screen.getByRole('status').textContent).toContain('nicht verfügbar')
-    fetchJson.mockImplementationOnce(() => new Promise(() => {}))
-    fireEvent.click(screen.getByRole('button', { name: 'Erneut versuchen' }))
-    await tick()
-    const signal = fetchJson.mock.calls.at(-1)![1].signal as AbortSignal
-    fireEvent.click(screen.getByRole('button', { name: '‹ Zurück zu Top Scorers' }))
-    expect(signal.aborted).toBe(true)
-    expect(names()[0]).toBe('Goal Leader')
-  })
 
   it('opens player and badge profiles and preserves sorting when returning', async () => {
     render(<TopScorers {...props} />)

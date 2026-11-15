@@ -286,7 +286,7 @@ function Moments({ events, t, details, onOpenPlayer }: MomentsProps) {
   return <ol className="md-moments">{items}</ol>
 }
 
-/** Referee (with his nationality) and stadium (with the flag of its country) at the top of the timeline. */
+/** Referee (with his nationality) and stadium (with the flag of its country) at the bottom of the timeline, one compact line. */
 function MatchFacts({ details, t, language }: { details: SportsMatchDetails; t: Copy; language: Language }) {
   const place = [details.venue, details.city].filter(Boolean).join(', ')
   if (!details.referee && !place) return null
@@ -387,7 +387,7 @@ function MatchContent({ competition, competitionLabel, match, language, onBack, 
       </ul>
     )
   } else if (tab === 'moments') {
-    body = <><MatchFacts details={details} t={t} language={language} /><Moments events={details.events} t={t} details={details} onOpenPlayer={openPlayer} /></>
+    body = <><Moments events={details.events} t={t} details={details} onOpenPlayer={openPlayer} /><MatchFacts details={details} t={t} language={language} /></>
   } else {
     body = <>
       <LineupPitch lineups={details.lineups} events={details.events} homeName={homeName} awayName={awayName} language={language} locale={locale} onOpenPlayer={openPlayer} onOpenCountry={openCountry} />

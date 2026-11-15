@@ -1,5 +1,4 @@
 import { DetailBoundary, useDetailNavigation } from '../../components/DetailNavigation'
-import { NationalTeamProfile } from './NationalTeamProfile'
 import { useState } from 'react'
 import type { Language } from '../../types/platform'
 import { localeFor } from './overviewCopy'
@@ -9,8 +8,6 @@ import type { ScorerDirection, ScorerMetric } from './sportsScorers'
 import './sportsScorers.css'
 import { PlayerProfile } from './PlayerProfile'
 import { TeamProfile } from './TeamProfile'
-import { CountryFlag } from './CountryFlag'
-import { countryName } from './sportsCountries'
 import { SportsSeasonSelect } from './SportsSeasonSelect'
 import { normalizeSportsSeason, sportsSeasonOptions } from './sportsSeasons'
 
@@ -100,7 +97,7 @@ function ScorerTable({ competition, season, language }: Props) {
               </tr></thead>
               <tbody>{players.slice(0, count).map((player) => <tr key={player.id}>
                 <td className="scorer-number">{player[metric] === null ? '–' : rankOf.get(player[metric]!)}</td>
-                <th scope="row"><div className="scorer-player-cell">{player.hasProfile !== false ? <button type="button" className="scorer-player-link" title={player.name} onClick={() => openPlayer(player.id, player.name)}>{player.name}</button> : <span className="scorer-player-link" title={player.name}>{player.name}</span>}{player.country && (player.country.code ? <button type="button" className="scorer-country-link" aria-label={language === 'de' ? `Nationalmannschaft von ${countryName(player.country, language)} öffnen` : `Open ${countryName(player.country, language)} national team`} title={countryName(player.country, language)} onClick={() => navigation.push({ backLabel, content: <NationalTeamProfile country={player.country!} language={language} backLabel={backLabel} /> })}><CountryFlag country={player.country} language={language} rectangular /></button> : <CountryFlag country={player.country} language={language} rectangular />)}</div></th>
+                <th scope="row"><div className="scorer-player-cell">{player.hasProfile !== false ? <button type="button" className="scorer-player-link" title={player.name} onClick={() => openPlayer(player.id, player.name)}>{player.name}</button> : <span className="scorer-player-link" title={player.name}>{player.name}</span>}</div></th>
                 <td className="scorer-team">{player.teamId ? <button type="button" className="scorer-team-link" aria-label={player.team ? teamName(player.team, language) : t.team} title={player.team ? teamName(player.team, language) : t.team} onClick={() => openTeam(player.teamId!)}><ScorerBadge key={player.teamId} id={player.teamId} /></button> : player.teamLogo ? <span title={player.team ? teamName(player.team, language) : t.team}><ScorerBadge key={player.teamLogo} src={player.teamLogo} /></span> : '–'}</td>
                 {metrics.map((item) => <td key={item} className={`scorer-number${item === metric ? ' is-sorted' : ''}`} title={player[item] === null ? t.unknown : undefined}>{player[item] ?? '–'}</td>)}
               </tr>)}</tbody>
