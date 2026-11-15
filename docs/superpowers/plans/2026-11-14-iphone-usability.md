@@ -6,7 +6,7 @@
 **Architecture:** React/TypeScript und die bestehende gemeinsame Oberfläche bleiben erhalten. Zuerst werden App-Rahmen und Detailfenster korrigiert; anschließend werden die bereits vorhandenen Rückwege vereinheitlicht und ihr Zustand erhalten.
 **Tech Stack:** React 19, TypeScript, Vite, Vitest/Testing Library; .NET-Backend; GitHub Pages und vorhandene Render-API.
 **Spec:** Die Abschnitte Zielbild, Grenzen und Navigation dieses Dokuments bilden den vorläufigen Entwurf. Der Nutzer hat den Plan und den Start von Etappe 1 mit „passt, go!“ freigegeben.
-**Stand:** 14.11.2026, Etappe 1 lokal umgesetzt und technisch geprüft; iPhone-Abnahme offen.
+**Stand:** 15.11.2026, Etappe 1 veröffentlicht und vom Nutzer bestätigt. Etappe 2 lokal umgesetzt, getestet und geprüft; Veröffentlichung und iPhone-Abnahme CP2 offen.
 **Repository:** https://github.com/amirhossin27-dev/live-scores
 **Analysierte Basis:** main, Commit 905999b356228f6745cdd2f55fd66d326c7d43ad.
 **Live-App:** https://amirhossin27-dev.github.io/live-scores/
@@ -16,15 +16,15 @@
 | Checkpoint | Stand | Ergebnis |
 | --- | --- | --- |
 | CP0 – Bestandsaufnahme | Erledigt, iOS-Reproduktion offen | Quellcode und veröffentlichte App bei 393 × 852 geprüft |
-| CP1 – Sichere Ränder und Ausgänge | Technisch geprüft; iPhone-Abnahme offen | Kopf und Schließen/Zurück auf dem iPhone erreichbar |
-| CP2 – Durchgängige Navigation | Geplant | Jeder Weg führt kontrolliert eine Ebene zurück |
+| CP1 – Sichere Ränder und Ausgänge | Veröffentlicht; Nutzer bestätigt Funktion | Zusätzliche Gerätefälle wie Tastatur/große Schrift weiter offen |
+| CP2 – Durchgängige Navigation | Lokal technisch geprüft; Geräteabnahme offen | Besuchspfad und Zustand bleiben erhalten; Veröffentlichung noch freizugeben |
 | CP3 – Mobile Bedienung | Vorschlag | Größere Ziele, übersichtliche Werkzeuge, klare Einstellungen |
 | CP4 – Datenzustände und Veröffentlichung | Geplant | Verlässliche Rückmeldungen und dokumentierte iPhone-Abnahme |
 
-**Aktueller nächster Schritt:** Etappe 1 zur Veröffentlichung abstimmen, danach auf dem iPhone 15 testen. Anschließend Etappe 2.
+**Aktueller nächster Schritt:** Geprüfte Etappe 2 zur Veröffentlichung und anschließendem iPhone-Test vorlegen. Etappe 3 beginnt erst nach CP2 und ihrer vereinbarten Vorschau.
 **Fortsetzungsauftrag:** „Lies diesen Etappenplan, prüfe den aktuellen Repository-Stand und fahre mit dem ersten freigegebenen, offenen Checkpoint fort.“
 **Arbeitsverzeichnis:** C:/Users/amirh/Documents/ChatGPT/Live Scores
-**Lokaler Stand:** Das Arbeitsverzeichnis war bei der Analyse leer. Noch kein Checkout, keine Codeänderungen, keine Builds oder Tests ausgeführt.
+**Lokaler Stand:** Checkout unter app/, Branch fix/iphone-stage-2. Implementierung Etappe 2: 5ca09f6f831f4b106d0b9d56d482f21fdd338cd9. Alle Projektprüfungen erfolgreich; Details unten.
 **Vor Fortsetzung:** Git-Status, Branch und neuen main-Stand prüfen; bestehende Änderungen bewahren. Den Plan in den künftigen Checkout übernehmen, nicht durch erneutes Klonen überschreiben.
 
 Nach jeder Etappe ergänzen:
@@ -122,23 +122,23 @@ Der Nutzer hat das etappenweise Vorgehen bestätigt.
 - [ ] Echte Safe Areas, Tastatur und größere Schrift auf dem iPhone prüfen.
 
 **CP1 – Gemeinsame Abnahme:** Vom Home-Bildschirm starten, Spiel und Liga öffnen, lange Inhalte scrollen, zurückkehren; Hoch-/Querformat. Kopf und Ausgänge sind erreichbar, keine Überdeckung oder horizontales Scrollen der gesamten Seite.
-**Nächster Schritt:** Erst nach Rückmeldung zu Abstand und Erreichbarkeit Etappe 2 abschließen.
+**Rückmeldung:** Nutzer bestätigte Etappe 1 und gab Etappe 2 frei. Spezifische iOS-Fälle für Tastatur und große Schrift bleiben Teil der weiteren Geräteabnahme.
 
 ## Etappe 2 – Einheitliche Rückwege in jeder Tiefe
 
 **Zweck:** Verlässliche Navigation durch die gesamte App, einschließlich seltener Pfade.
 **Betroffene Dateien:** SideDrawer.tsx; MatchDetails.tsx / MatchLayers; TeamProfile.tsx; PlayerProfile.tsx; CompetitionPanel.tsx; SportsSearch.tsx; Standings.tsx, TopScorers.tsx und TableForm.tsx als Navigationsaufrufer; DatePicker.tsx; SportsWidget.tsx; bei Bedarf eine kleine gemeinsame Navigationskomponente im bestehenden Komponentenbereich.
 
-- [ ] Die Prüfliste oben vollständig auf konkrete Aufrufer abbilden.
-- [ ] Einheitlichen Vertrag zwischen aktiver Detailansicht und Kopf umsetzen: Zielbeschriftung, eine Ebene zurück, gesamte Kette schließen. Die aktuelle Ansicht bestimmt den Rückschritt; keine Suche nach „irgendeinem“ Zurück-Button im DOM.
-- [ ] Bestehendes MatchLayers-Verhalten und lokale Historien zusammenführen oder anschließen; Zustände unterliegender Ansichten erhalten. Technische Wahl anhand der vollständigen Aufruferliste treffen, ohne einen Frameworkwechsel einzuführen.
-- [ ] Beim Öffnen aktuelle Scrollposition sichern, neue Ansicht oben beginnen lassen; bei Zurück Position und gewählten Reiter wiederherstellen.
-- [ ] Fokus ins aktive Fenster setzen, Fokus im modalen Fenster halten, Hintergrundbedienung sperren; nach Schließen Fokus zum Auslöser zurückgeben.
-- [ ] Einstellungen und Kalender mit ausdrücklich erreichbarem Ausgang ergänzen; Installationshilfe einbeziehen.
-- [ ] Späte Datenantworten dürfen geschlossene Ansichten nicht erneut öffnen. Rückwege auch bei ausstehender/fehlgeschlagener Anfrage testen.
-- [ ] Navigationstests mit kontrollierten Daten ergänzen: Spiel → Team → Spieler → Zurück → Team → Zurück → Spiel → Übersicht; Wettbewerb → Team → Spiel; Suche → Profil → Team → zurück zur Suche; Kalender abbrechen; Einstellungen verlassen.
-- [ ] Wiederholtes Öffnen/Schließen, schnelle Rückschritte, unbekannte Teams/Spieler und keine Ergebnisse prüfen.
-- [ ] Projektprüfungen und mobile Sichtprüfung ausführen.
+- [x] Die Prüfliste oben vollständig auf konkrete Aufrufer abbilden.
+- [x] Einheitlichen Vertrag zwischen aktiver Detailansicht und Kopf umsetzen: Zielbeschriftung, eine Ebene zurück, gesamte Kette schließen. Die aktuelle Ansicht bestimmt den Rückschritt; keine Suche nach „irgendeinem“ Zurück-Button im DOM.
+- [x] Bestehendes MatchLayers-Verhalten und lokale Historien zusammenführen oder anschließen; Zustände unterliegender Ansichten erhalten. Technische Wahl anhand der vollständigen Aufruferliste treffen, ohne einen Frameworkwechsel einzuführen.
+- [x] Beim Öffnen aktuelle Scrollposition sichern, neue Ansicht oben beginnen lassen; bei Zurück Position und gewählten Reiter wiederherstellen.
+- [x] Fokus ins aktive Fenster setzen, Fokus im modalen Fenster halten, Hintergrundbedienung sperren; nach Schließen Fokus zum Auslöser zurückgeben.
+- [x] Einstellungen und Kalender mit ausdrücklich erreichbarem Ausgang ergänzen; Installationshilfe einbeziehen.
+- [x] Späte Datenantworten dürfen geschlossene Ansichten nicht erneut öffnen. Rückwege auch bei ausstehender/fehlgeschlagener Anfrage testen.
+- [x] Navigationstests mit kontrollierten Daten ergänzen: Spiel → Team → Spieler → Zurück → Team → Zurück → Spiel → Übersicht; Wettbewerb → Team → Spiel; Suche → Profil → Team → zurück zur Suche; Kalender abbrechen; Einstellungen verlassen.
+- [x] Wiederholtes Öffnen/Schließen, schnelle Rückschritte, unbekannte Teams/Spieler und keine Ergebnisse prüfen.
+- [x] Projektprüfungen und mobile Sichtprüfung ausführen.
 
 **CP2 – Gemeinsame Abnahme:** Alle Pfade der Navigationsliste funktionieren ohne App-Neustart. Zurück springt nie unbeabsichtigt mehrere Ebenen; Filter, Datum, Suchtext und Position bleiben erhalten.
 **Abgrenzung:** Ein eigener In-App-Rückweg ist verbindlich. Browser-History/Swipe-Gesten sind keine Voraussetzung und dürfen diesen nicht ersetzen. Falls History-Anbindung später ergänzt wird, muss sie getrennt gegen Verlassen der App und doppelte Rückschritte getestet werden.
@@ -212,4 +212,44 @@ Vor der Umsetzung dieser Etappe eine kompakte Vorher-/Nachher-Vorschau zur gemei
 - Kein echtes iOS-Gerät verfügbar: Safe-Area-Wirkung, Bildschirmtastatur und vergrößerte Schrift noch abnehmen.
 - Separate Review wegen Nutzungslimit ausgefallen; eigener Diff-Review erfolgt. Keine unabhängige Review behaupten.
 - Entscheidung: frischer separater Checkout statt zusätzlichem Worktree; gesamte Detailkette ausdrücklich „Zur Übersicht“/„Zu den Suchergebnissen“, Einzelschritte erst Etappe 2.
-- Noch nicht veröffentlicht. Nächster Schritt: Veröffentlichung dieser Etappe vereinbaren, dann iPhone-Abnahme CP1.
+- Veröffentlicht am 14.11.2026 nach ausdrücklicher Nutzerfreigabe. Commit a5c44ec28c568e10f4d66c9b0aba7965d09d1927; GitHub Actions Run 43626340358 erfolgreich. Live-HTML referenziert die geprüften Assets, Service-Worker-Kennung entspricht diesem Commit. Nächster Schritt: iPhone-Abnahme CP1.
+
+## Arbeitsstand Etappe 2 – 15.11.2026
+
+- Nutzer hat Etappe 1 bestätigt und Etappe 2 mit „passt macht weiter mit etappe 2“ freigegeben.
+- Branch: fix/iphone-stage-2. Basis: a5c44ec28c568e10f4d66c9b0aba7965d09d1927. Implementierungscommit: 5ca09f6f831f4b106d0b9d56d482f21fdd338cd9.
+- Ein gemeinsamer DetailStack erhält besuchte Ansichten, Reiter, Saison, Turnierrunde und Scrollposition. Jeder Rückschritt folgt dem tatsächlichen Besuchspfad. Der feste Kopf bietet zusätzlich den vollständigen Ausgang.
+- Geänderte Bereiche: neue DetailNavigation/useModal/NationalTeamProfile; SideDrawer, MatchDetails, TeamProfile, PlayerProfile, CompetitionPanel, SportsSearch, TopScorers und sportsMatchNav; TableForm/DatePicker; Einstellungen/Installationshilfe in SportsWidget/App; zugehörige Styles und Regressionstests.
+- Fokus bleibt im aktiven Fenster; der Hintergrund ist gesperrt. Nach Schließen geht der Fokus zum Auslöser zurück. Verschachtelte Kalender-/Form-Portale gehören zum selben Modalmodell. Portal-Köpfe übernehmen die Safe-Area-Werte des Ursprungs einschließlich 0px in Einbettungen.
+- Späte Antworten aus geschlossenen oder verdeckten Ansichten können keine neue aktive Detailansicht öffnen. Match- und Nationalteamauflösung werden beim Verlassen abgebrochen.
+- Finale Prüfung nach letzter Codeänderung am 15.11.2026, 00:38:54: npm test erfolgreich, 385 Vitest + 5 Runtime = 390 Tests in 13 Vitest-Dateien. Etappe-1-Basis 374, somit 16 zusätzliche Tests.
+- npm run build erfolgreich; index-DwFDAKPG.js, index-Ls9oaT_0.css. Bekannter Hinweis zum absichtlich externen config.js unverändert. dotnet build backend/App.Api erfolgreich, 0 Warnungen/Fehler. git diff --check sauber.
+- Unabhängige Code- und Planprüfung abgeschlossen. Ein Befund zur möglichen Wiederöffnung der Tabellenform bei Fokusrückgabe wurde abgesichert und nachgeprüft; keine wesentlichen offenen Befunde. Die zusätzlichen Fokus-Tests bestanden auch vor dieser defensiven Absicherung: dafür wird kein reproduzierter Vorher-Fehlschlag behauptet.
+- Browser mit echten API-Daten bei 393×852: Spanien–England → Spanien/Kader → David Raya/Karriere → Arsenal → zurück zu David Raya/Karriere → Spanien/Kader → Spiel → Übersicht. Reiter bleiben erhalten und Fokus kehrt zum ursprünglichen Spiel zurück. Kalender-Abbrechen und Einstellungen-Fertig geprüft.
+- Vorschau: C:/Users/amirh/Documents/ChatGPT/Live Scores/stage2-preview.jpg. Ausführlicher Bericht/Protokolle lokal unter app/.superpowers/sdd/2026-11-14-iphone-usability/.
+- Keine Veröffentlichung, kein Push oder Merge von Etappe 2. Keine Änderung an Backend, API-Konfiguration oder Service-Worker-Datenstrategie. Rückfallpunkt bleibt veröffentlichte Etappe 1 a5c44ec.
+- Entscheidung: besuchte Komponenten bis zum Rückschritt oder Gesamtausstieg gemountet lassen; etwas mehr Speicher während langer Detailketten. Browser-History/Swipe bleibt ausdrücklich außerhalb des Umfangs.
+
+### Zuordnung der Navigationsprüfliste
+
+| Pfad | Konkreter Aufrufer / Umsetzung |
+| --- | --- |
+| Übersicht → Spiel/Wettbewerb | SportsWidget → MatchDetails/CompetitionPanel → gemeinsamer DetailStack; ursprüngliche Übersicht bleibt bestehen |
+| Spiel → Team/Spieler/Trainer | MatchContent, LineupPitch und Ereignisse öffnen TeamProfile/PlayerProfile im gleichen Besuchspfad |
+| Nationalteamauflösung | NationalTeamProfile ist eine eigene verlassbare Ansicht einschließlich Laden/Fehler; Abbruch beim Zurückgehen |
+| Tabelle/Turnierbaum → Team | Standings-Callbacks in MatchContent/CompetitionContent; Saison, Runde und Tabelle bleiben gemountet |
+| Top Scorers → Team/Spieler/Nation | ScorerTable nutzt den aktuellen Navigationskontext; Saison und Sortierung bleiben erhalten |
+| Team → anderes Team/Transfers/Kader | TeamContent, Transfers und Squad öffnen Profile über denselben Stack |
+| Spieler/Trainer → Verein/Nation | PlayerProfile öffnet mit dem eigenen aktiven Kontext; Karriere/Titel und Gegnerlinks führen tatsächlich zum Profil zurück |
+| Team/Spieler/Tabellenform → Spiel | useOpenMatch bindet die Spielöffnung an den besuchten Ursprung; ResolvedMatch lädt innerhalb seiner eigenen Lebensdauer |
+| Suche → alle vier Profilarten | SearchRoot mit gleichem DetailStack; Gesamtausstieg erhält Suchtext/Ergebnisfilter und stellt Fokus wieder her |
+| Einstellungen | SportsSettings: beschriftetes, oben erreichbares Fertig |
+| Kalender | DatePicker: Abbrechen ohne Datumsänderung und Rückgabe des Fokus |
+| Installationshilfe | App: ausdrücklich erreichbares Schließen/Close |
+| Tabellenform | FormCell: Schließen und eigener Escape-/Fokuszyklus; darunterliegendes Fenster bleibt geöffnet |
+| Lade-/Fehler-/Leerzustände | Fester Detailkopf unabhängig vom Dateninhalt; wiederholtes Öffnen/Schließen und verspätete Antworten getestet |
+| Externe Nachrichten/Übertragung | Nachrichten bleiben separate Links mit noopener; Übertragungen enthalten aktuell nur Sendertext |
+
+**CP2 bleibt offen:** Nach freigegebener Veröffentlichung vom Home-Bildschirm auf dem iPhone 15 testen: Spiel → Team → Spieler → Verein und schrittweise zurück, Suche → Trainer → Verein → Suche, Kalender abbrechen, Einstellungen verlassen. Reiter, Datum, Suchbegriff und Scrollposition müssen erhalten bleiben. Hoch-/Querformat, Bildschirmtastatur und größere Schrift auf echtem iOS sind durch den Browsernachweis nicht abgedeckt.
+
+**Genau ein nächster Arbeitsschritt:** Veröffentlichung der geprüften Etappe 2 mit dem Nutzer abstimmen, danach den obigen Geräte-Checkpoint durchführen. Erst nach Rückmeldung die Vorschau für Etappe 3 erstellen.
