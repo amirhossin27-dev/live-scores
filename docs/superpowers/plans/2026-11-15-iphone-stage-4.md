@@ -39,7 +39,8 @@ Aktuell nur Komponenten-State, daher nach Neustart leer. Backend cached bereits,
 
 - [x] npm test, npm run build, dotnet build backend/App.Api; git diff --check.
 - [x] Unabhängige Prüfung, Snapshot-Vorschau, Commit/Release-Checkpoint und Hauptplan aktualisieren.
-- [ ] Nach konkreter Freigabe veröffentlichen und Live-Version prüfen; danach iPhone-Abnahme und ursprüngliche Probleme abschließend bestätigen.
+- [x] Nach konkreter Nutzerfreigabe veröffentlicht und Live-Version erfolgreich geprüft.
+- [ ] iPhone-Abnahme und ursprüngliche Probleme abschließend bestätigen.
 
 ## Technischer Stand / Prüfnachweise
 
@@ -51,6 +52,10 @@ Aktuell nur Komponenten-State, daher nach Neustart leer. Backend cached bereits,
 - Unabhängige Codeprüfung durch verfügbares Ausweichmodell erfolgreich, keine wesentlichen Befunde. Der erste Reviewer konnte wegen Nutzungslimit nicht prüfen; diese fehlgeschlagene Prüfung wird nicht als Nachweis gezählt.
 - Grenze: Eine neue Version kann frühere ungespeicherte Abrufe nicht rückwirkend speichern. Der erste erfolgreiche Abruf füllt den Speicher; erster Start ohne passenden Snapshot kann weiterhin auf die API warten. Andere Detailprofile bleiben bei ihren bestehenden Abrufen.
 - Entscheidungen: maximal48h alte öffentliche Ergebnisse, konservativer ältester Zeitstempel bei gemischten Antworten; erfolgreicher leerer Wettbewerb ersetzt alte Spiele. Ein Speicherproblem beeinträchtigt nur die Persistenz, nicht aktuelle Ergebnisse oder Einstellungen.
-- Nächster Schritt: konkrete Vorschau zur Veröffentlichung vorlegen; nach Freigabe live prüfen und iPhone-CP4 durchführen. Keine Veröffentlichung bisher.
+- Nächster Schritt:iPhone-CP4 durchführen. Etappe4 nach ausdrücklicher Freigabe erfolgreich veröffentlicht.
 
-Lokaler Implementierungscommit:793ebc1700df159cd951c9ec82de8f2e9d4fee49. Vorschau:C:/Users/amirh/Documents/ChatGPT/Live Scores/stage4-cache-preview.jpg. Fehlerzustand:stage4-error-preview.jpg. Release noch nicht freigegeben; iPhone-Endabnahme weiter offen.
+Lokaler Implementierungscommit:793ebc1700df159cd951c9ec82de8f2e9d4fee49. Vorschau:C:/Users/amirh/Documents/ChatGPT/Live Scores/stage4-cache-preview.jpg. Fehlerzustand:stage4-error-preview.jpg. Release freigegeben und veröffentlicht; iPhone-Endabnahme weiter offen.
+
+## Release
+
+Am15.11.2026 nach Nutzerfreigabe „ja“ veröffentlicht:b130cf6e77cb1a3d7a967100d79237c0b77abee7. Actions-Run43723774486 completed/success: https://github.com/amirhossin27-dev/live-scores/actions/runs/43723774486 . Live-HTML,Worker und Assets200; Workerkennung entspricht Release. Reale API-Antwort mit3 Wettbewerben/8 Spielen durch tatsächliche Cachefunktionen im Testspeicher vollständig wiederhergestellt. CP4-Geräteabnahme offen, Prüffolge im Hauptplan.
