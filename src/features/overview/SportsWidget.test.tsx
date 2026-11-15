@@ -104,7 +104,7 @@ describe('SportsWidget', () => {
     const scheduled = bundesliga.getByText('RB Leipzig').closest('li') as HTMLElement
     expect(scheduled.textContent).toContain('18:30')
     // the source reports 0 : 0 before the kick-off: that is not a score
-    expect(scheduled.textContent).toContain('vs')
+    expect(scheduled.textContent).toContain('–:–')
     expect(scheduled.textContent).not.toContain('0:0')
 
     const liga = within(screen.getByRole('region', { name: 'Spanien LaLiga' }))
@@ -162,12 +162,12 @@ describe('SportsWidget', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Nächster Tag' }))
     await waitFor(() => expect(api.loadSportsScores).toHaveBeenLastCalledWith(expect.any(Array), '20261008', expect.anything()))
-    expect(screen.getByText('Morgen')).toBeTruthy()
+    expect(screen.getByText('8. Okt.')).toBeTruthy()
 
     fireEvent.click(screen.getByRole('button', { name: 'Vorheriger Tag' }))
     fireEvent.click(screen.getByRole('button', { name: 'Vorheriger Tag' }))
     await waitFor(() => expect(api.loadSportsScores).toHaveBeenLastCalledWith(expect.any(Array), '20261006', expect.anything()))
-    expect(screen.getByText('Gestern')).toBeTruthy()
+    expect(screen.getByText('6. Okt.')).toBeTruthy()
 
     // the day opens a small calendar with the shown day marked; any day of it can be picked
     fireEvent.click(screen.getByRole('button', { name: 'Tag im Kalender wählen' }))
@@ -668,7 +668,7 @@ describe('SportsWidget favourites', () => {
     // "Alle" lists the match once, in its competition: the favourites are not repeated on top
     expect(screen.queryByRole('region', { name: 'Favoriten' })).toBeNull()
     expect(screen.getAllByText('RB Leipzig')).toHaveLength(1)
-    expect(screen.getByRole('button', { name: 'Favoriten' }).textContent).toBe('★ Favoriten 1')
+    expect(screen.getByRole('button', { name: 'Favoriten' }).textContent).toBe('Favoriten 1')
     expect(JSON.parse(window.localStorage.getItem('dwh.sports.favorites.v1') ?? '[]')).toEqual([{ competition: 'soccer/ger.1', id: '2', start: scores.competitions[1].matches[1].start }])
 
     fireEvent.click(screen.getByRole('button', { name: 'Favoriten' }))
@@ -698,7 +698,7 @@ describe('SportsWidget favourites', () => {
     expect(JSON.parse(window.localStorage.getItem('dwh.sports.favoriteCompetitions.v1') ?? '[]')).toEqual(['soccer/ger.1', 'soccer/esp.1'])
     // a single match of another competition joins them
     fireEvent.click(screen.getByRole('button', { name: 'Fighter One – Fighter Two als Favorit merken' }))
-    expect(screen.getByRole('button', { name: 'Favoriten' }).textContent).toBe('★ Favoriten 5')
+    expect(screen.getByRole('button', { name: 'Favoriten' }).textContent).toBe('Favoriten 5')
 
     fireEvent.click(screen.getByRole('button', { name: 'Favoriten' }))
     expect(screen.getByRole('region', { name: 'Deutschland Bundesliga' })).toBeTruthy()
@@ -708,7 +708,7 @@ describe('SportsWidget favourites', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Deutschland · Bundesliga aus den Favoriten nehmen' }))
     expect(screen.queryByText('RB Leipzig')).toBeNull()
-    expect(screen.getByRole('button', { name: 'Favoriten' }).textContent).toBe('★ Favoriten 2')
+    expect(screen.getByRole('button', { name: 'Favoriten' }).textContent).toBe('Favoriten 2')
   })
 
   it('shows red cards and second yellows next to the team', async () => {
@@ -1534,4 +1534,24 @@ describe('compact search controls', () => {
     expect(screen.getByRole('button', { name: /^Live/ }).getAttribute('aria-pressed')).toBe('true')
     expect(api.loadSportsScores.mock.calls.at(-1)?.[1]).toBe('20261008')
   })
+})
+
+it('uses the chosen compact design date label', async () => {
+  const result = render(<SportsWidget language="de" now={new Date(2026, 10, 20, 12)} />)
+  await screen.findByText('Bayern München')
+  const date = screen.getByRole('button', { name: 'Tag im Kalender wählen' })
+  expect(date.textContent?.trim()).toBe('Heute')
+  fireEvent.click(screen.getByRole('button', { name: 'Nächster Tag' }))
+  await waitFor(() => expect(date.textContent?.trim()).toBe('Sa., 21. Nov.'))
+  result.unmount()
+})
+
+
+it('shows two neutral placeholders instead of a vs label or source zeros before kickoff', async () => {
+  renderWidget()
+  await screen.findByText('RB Leipzig')
+  const row = screen.getByText('RB Leipzig').closest('li')!
+  expect(Array.from(row.querySelectorAll('.sp-score b')).map(el => el.textContent)).toEqual(['–', '–'])
+  expect(row.textContent).not.toContain('vs')
+  expect(row.textContent).not.toContain('0:0')
 })

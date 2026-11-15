@@ -1,0 +1,103 @@
+/* Visual contract: approved “Kompakt” in design-proposals/compact-scores.html. */
+.sp-overview {
+  --sp-utility-obstruction: var(--sp-utility-height, 0px);
+  --accent: light-dark(#1264c4, #53c9f4);
+  --accent-strong: var(--accent);
+  --accent-soft: light-dark(#e2edfc, #183346);
+  --panel: light-dark(#fff, #101827);
+  --border: light-dark(#dae1eb, #293448);
+  --text-strong: light-dark(#142034, #f2f5fa);
+  --text-muted: light-dark(#596a80, #9aa9be);
+  --text: var(--text-muted);
+  --sp-control: light-dark(#edf1f7, #151e2d);
+  color: var(--text-strong);
+  line-height: 1.35;
+}
+.standalone:not(.is-embedded) .sp-overview { padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; overflow: visible; }
+.start-sports.sp-overview .sp-toolbar-compact { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; max-width: 640px; margin-bottom: 8px; }
+.sp-overview .sp-date-row { display: flex; align-items: center; gap: 2px; min-width: 0; grid-column: 1 / -1; grid-row: 1; }
+.sp-overview .sp-toolbar-compact .sp-days { display: flex; flex: 1; min-width: 0; max-width: none; border: 0; border-radius: 0; background: transparent; overflow: visible; }
+.sp-overview .sp-toolbar-compact .sp-days button { min-height: 44px; background: transparent; color: var(--text-strong); font-weight: 550; border: 0; border-radius: 9px; }
+.sp-overview .sp-toolbar-compact .sp-days .sp-day { flex: 1; min-width: 0; width: auto; padding: 0 2px; gap: 6px; align-items: center; justify-content: center; flex-wrap: nowrap; font-size: 13px; }
+.sp-overview .sp-date-label { min-width: 0; white-space: nowrap; }
+.sp-overview .sp-day .date-picker-icon { order: -1; width: 17px; height: 17px; stroke: currentColor; }
+.sp-overview .sp-toolbar-compact .sp-step { display: grid; place-items: center; flex: 0 0 44px; width: 44px; padding: 0; }
+.sp-overview .sp-step svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.sp-overview .sp-toolbar-compact .sp-today { flex: none; min-height: 44px; min-width: 44px; padding: 0 8px; border: 0; background: transparent; color: var(--accent); font-size: 12px; font-weight: 550; }
+.sp-overview .sp-toolbar-compact .sp-icon-button { width: 44px; height: 44px; flex: none; border-radius: 9px; background: transparent; }
+.sp-overview .sp-toolbar-compact .sp-search-toggle { border: 1px solid var(--border); color: var(--text-strong); }
+.sp-overview .sp-search-toggle[aria-expanded='true'] { color: var(--accent); background: var(--accent-soft); }
+.sp-overview .sp-date-row button:hover:not(:disabled) { background: var(--sp-control); transform: none; }
+.start-sports.sp-overview .sp-toolbar-compact > .sp-search { grid-column: 1 / -1; grid-row: 2; width: 100%; max-width: none; min-width: 0; margin: 8px 0 4px; position: relative; }
+.sp-overview .sp-toolbar-compact .sp-filter { grid-column: 1 / -1; grid-row: 3; display: flex; gap: 4px; margin-top: 6px; border-bottom: 1px solid var(--border); }
+.sp-overview .sp-toolbar-compact .sp-filter button { flex: 1; min-width: 0; min-height: 44px; padding: 0 4px; border: 0; border-bottom: 2px solid transparent; border-radius: 0; font-size: 13px; font-weight: 550; line-height: 1.35; background: transparent; color: var(--text-muted); }
+.sp-overview .sp-toolbar-compact .sp-filter button.active { border-bottom-color: var(--accent); background: transparent; color: var(--accent); }
+.sp-overview .sp-toolbar-compact .sp-filter button b { margin-left: 4px; color: inherit; font-size: 11px; font-weight: 500; opacity: .85; }
+.sp-overview .sp-search-field { background: var(--sp-control); border-color: var(--border); border-radius: 11px; }
+.sp-overview .sp-search-field input { font-weight: 400; }
+
+/* The visible league band stays 30px; its controls include the clear space above for 44px targets. */
+.start-sports.sp-overview .sp-list { margin: 0; padding: 4px 0 10px; gap: 14px; }
+.sp-overview .sp-comp:first-child { padding-top: 10px; }
+.sp-overview .sp-comp-title { height: 30px; min-height: 30px; padding: 0 6px; margin: 0; gap: 8px; border-radius: 6px; background: var(--panel); font-size: 12px; font-weight: 650; }
+.sp-overview .sp-comp-title.is-button { padding: 0; }
+.start-sports.sp-overview .sp-comp-open { height: 44px; min-height: 44px; margin-top: -14px; padding: 14px 6px 0; gap: 0; font-weight: 650; border-radius: 6px; }
+.sp-overview .sp-comp-open .sp-flag { margin-right: 8px; }
+.sp-overview .sp-comp-country { color: var(--text-strong); font-size: inherit; font-weight: inherit; text-transform: none; letter-spacing: 0; white-space: nowrap; }
+.sp-overview .sp-comp-country::after { content: ' · '; white-space: pre; }
+.sp-overview .sp-comp-title b { font-weight: inherit; }
+.sp-overview .sp-flag { width: 18px; height: 12px; border-radius: 2px; box-shadow: none; }
+.sp-overview .sp-count { font-size: 10px; font-weight: 500; }
+.sp-overview .sp-comp-chevron { width: 12px; height: 12px; margin-left: 3px; stroke-width: 1.8; }
+.start-sports.sp-overview .sp-comp-title .sp-star { flex: none; width: 44px; height: 44px; margin: -14px 0 0; padding: 14px 0 0; }
+.start-sports.sp-overview .sp-team { gap: 7px; font-weight: 400; }
+.sp-overview .sp-team.is-winner .sp-name { font-weight: 650; }
+.sp-overview .sp-logo.is-empty { display: grid; place-items: center; border-radius: 5px; background: var(--sp-control); color: var(--text-muted); font-size: 11px; font-weight: 650; }
+.sp-overview .sp-when { font-weight: 400; }
+.sp-overview .sp-match.is-live .sp-when { color: var(--accent); }
+.start-sports.sp-overview .sp-score, .sp-overview .sp-match.is-live .sp-score { color: var(--text-strong); font-weight: 650; }
+.sp-overview .sp-score b { font-weight: 650; }
+.sp-overview .sp-match { border-bottom: 1px solid var(--border); border-radius: 0; }
+.sp-overview .sp-match:last-child { border-bottom: 1px solid var(--border); }
+.sp-overview .sp-star { color: var(--text-muted); opacity: 1; }
+.sp-overview .sp-star.is-on { color: var(--accent); }
+.sp-overview .sp-star svg { width: 17px; height: 17px; stroke-width: 1.8; }
+.sp-overview .sp-star.is-on svg { fill: var(--accent-soft); }
+.sp-overview.is-snapshot .sp-match.is-live .sp-when { color: var(--text-muted); }
+
+.sp-utility-spacer { flex: none; }
+.sp-utility-bar { position: fixed; z-index: 20; right: 0; bottom: 0; left: 0; display: flex; justify-content: center; min-height: calc(58px + var(--app-safe-bottom, 0px)); padding: 6px calc(12px + var(--app-safe-right, 0px)) calc(6px + var(--app-safe-bottom, 0px)) calc(12px + var(--app-safe-left, 0px)); border-top: 1px solid var(--border); background: var(--panel); }
+.sp-utility-inner { display: flex; justify-content: space-between; align-items: center; gap: 4px; width: 100%; max-width: 1560px; }
+.sp-utility-controls { display: flex; flex: none; align-items: center; gap: 2px; }
+.sp-utility-controls .sp-icon-button { width: 44px; height: 44px; border: 0; background: transparent; }
+.sp-utility-controls .sp-icon-button svg { stroke-width: 1.8; }
+.sp-utility-controls .sp-icon-button.active { background: var(--accent-soft); }
+.sp-utility-status { display: flex; flex: 1; align-items: center; gap: 5px; min-width: 0; font-size: 11px; line-height: 1.35; color: var(--text-muted); }
+.sp-utility-status > span:not(.sp-dot) { min-width: 0; overflow-wrap: anywhere; }
+.sp-utility-status .sp-dot, .sp-utility-status .sp-dot.is-live { flex: none; width: 5px; height: 5px; background: var(--accent); animation: none; }
+.sp-utility-status.is-stale .sp-dot { background: var(--warning); }
+.sp-inline-status { margin-top: 8px; }
+.sp-overview .app-tools { gap: 2px; }
+.sp-overview .app-tools > button { width: 44px; padding: 0; font-size: 12px; font-weight: 550; color: var(--text-strong); }
+.app-theme { position: relative; display: flex; align-items: center; gap: 4px; min-height: 44px; padding-left: 6px; }
+.app-theme-icon { width: 15px; height: 15px; fill: none; stroke: var(--text-muted); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.app-theme-value { display: flex; align-items: center; justify-content: space-between; gap: 6px; min-width: 72px; padding: 0 2px; font-size: 12px; color: var(--text-strong); }
+.app-theme-value svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+/* Native select stays 16px to avoid iOS focus zoom; visible value follows the approved 12px design. */
+.sp-overview .app-tools .app-theme select { position: absolute; inset: 0; width: 100%; min-height: 44px; padding: 0; opacity: 0; font-size: 16px; cursor: pointer; }
+.app-theme:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 5px; }
+@media (max-width: 900px) {
+  .standalone:not(.is-embedded) { padding-right: calc(12px + var(--app-safe-right)); padding-left: calc(12px + var(--app-safe-left)); }
+  .start-sports.sp-overview .sp-match { grid-template-columns: 32px minmax(0, 1fr) 24px 44px; gap: 0 6px; min-height: 60px; padding: 6px 0; font-size: 13px; }
+  .start-sports.sp-overview .sp-team { min-height: 0; gap: 7px; }
+  .start-sports.sp-overview .sp-logo { width: 18px; height: 18px; }
+  .start-sports.sp-overview .sp-when { font-size: 11px; text-align: center; }
+  .start-sports.sp-overview .sp-score > b { font-size: 13px; }
+  .start-sports.sp-overview .sp-match.is-single { grid-template-columns: 32px minmax(0, 1fr) 44px; }
+}
+@media (min-width: 901px) { .sp-utility-bar { padding-right: calc(20px + var(--app-safe-right, 0px)); padding-left: calc(20px + var(--app-safe-left, 0px)); } }
+@media (max-width: 380px) { .sp-overview .sp-day .date-picker-icon { display: none; } .is-embedded .sp-overview .sp-date-weekday { display: none; } }
+@media (pointer: coarse) {
+  .sp-overview:has(.sp-search-popover.is-short) { --sp-utility-obstruction: 0px; }
+  .sp-overview:has(.sp-search-popover.is-short) .sp-utility-bar { visibility: hidden; pointer-events: none; }
+}

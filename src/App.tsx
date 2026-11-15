@@ -27,9 +27,12 @@ export function App() {
  },[embedded,options.parentOrigin])
  const appearanceControls = <div className="app-tools">
    <button type="button" aria-label={de?'Sprache wechseln':'Change language'} onClick={()=>setLanguage(language==='de'?'en':'de')}>{language.toUpperCase()}</button>
+   <label className="app-theme">
+   <svg className="app-theme-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8a4 4 0 1 0 4 4M12 2v2M2 12h2M4.9 4.9l1.4 1.4M4.9 19.1l1.4-1.4M20.5 13a7 7 0 0 1-9.5-9.5A9 9 0 1 0 20.5 13Z" /></svg>
+   <span className="app-theme-value" aria-hidden="true">{theme === 'auto' ? 'Auto' : theme === 'light' ? de ? 'Hell' : 'Light' : de ? 'Dunkel' : 'Dark'}<svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6" /></svg></span>
    <select aria-label={de?'Darstellung':'Appearance'} value={theme} onChange={event=>setTheme(event.target.value as Theme)}>
      <option value="auto">Auto</option><option value="light">{de?'Hell':'Light'}</option><option value="dark">{de?'Dunkel':'Dark'}</option>
-   </select>
+   </select></label>
  </div>
  return <div className={`standalone ${embedded?'is-embedded':''} ${compact?'is-compact':''}`}>
   <h1 className="app-title">Live Scores</h1>

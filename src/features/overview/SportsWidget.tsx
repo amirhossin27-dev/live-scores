@@ -1,6 +1,7 @@
 import { useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { CSSProperties, DragEvent, ReactNode } from 'react'
 import './sports.css'
+import './compactOverview.css'
 import { DatePicker } from '../../components/DatePicker'
 import type { Language } from '../../types/platform'
 import { Flag } from './Flag'
@@ -56,7 +57,7 @@ const copy = {
     winner: 'Sieg',
     postponed: 'Verschoben',
     canceled: 'Abgesagt',
-    halftime: 'Pause',
+    halftime: 'HZ',
     ended: 'Ende',
     extraTime: 'n. V.',
     penalties: 'n. E.',
@@ -200,7 +201,7 @@ function whenLabel(match: SportsMatch, time: Intl.DateTimeFormat, t: Copy) {
 }
 
 function Logo({ side }: { side: SportsSide }) {
-  return side.logo ? <img className="sp-logo" src={side.logo} alt="" loading="lazy" referrerPolicy="no-referrer" /> : <span className="sp-logo is-empty" aria-hidden="true" />
+  return side.logo ? <img className="sp-logo" src={side.logo} alt="" loading="lazy" referrerPolicy="no-referrer" /> : <span className="sp-logo is-empty" aria-hidden="true">{side.name.charAt(0)}</span>
 }
 
 function Star({ on, name, t, onToggle, league = false }: { on: boolean; name: string; t: Copy; onToggle: () => void; league?: boolean }) {
@@ -275,7 +276,7 @@ function MatchRow({ match, time, t, language, favorite, onToggleFavorite, onOpen
         <Logo side={home} />
       </span>
       <span className="sp-score">
-        {scored ? <><b>{home.score ?? '–'}</b><i>:</i><b>{away.score ?? '–'}</b></> : <span className="sp-versus">vs</span>}
+        {scored ? <><b>{home.score ?? '–'}</b><i>:</i><b>{away.score ?? '–'}</b></> : <><b>–</b><i>:</i><b>–</b></>}
       </span>
       <span className={`sp-team is-away${away.winner ? ' is-winner' : ''}`}>
         <Logo side={away} />
@@ -468,7 +469,7 @@ export function SportsWidget({ language, now, appearanceControls }: { language: 
   const time = useMemo(() => new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' }), [locale])
   const dayFormat = useMemo(() => new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short' }), [locale])
   const savedTime = useMemo(() => new Intl.DateTimeFormat(locale, { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }), [locale])
-  const dayName = offset === 0 ? t.today : offset === -1 ? t.yesterday : offset === 1 ? t.tomorrow : null
+  const fullDayFormat = useMemo(() => new Intl.DateTimeFormat(locale, { weekday: 'short', day: 'numeric', month: 'short' }), [locale])
 
   const sections = useMemo(() => {
     const received = new Map((scores?.competitions ?? []).map((competition) => [competition.id, competition]))
@@ -650,7 +651,7 @@ export function SportsWidget({ language, now, appearanceControls }: { language: 
           <div className="sp-toolbar sp-toolbar-compact">
             <div className="sp-date-row">
             <div className="sp-days" role="group" aria-label={t.group}>
-              <button type="button" className="sp-step" disabled={offset <= -maxOffset} aria-label={t.previous} onClick={() => { setAuto(false); setOffset((value) => value - 1) }}>‹</button>
+              <button type="button" className="sp-step" disabled={offset <= -maxOffset} aria-label={t.previous} onClick={() => { setAuto(false); setOffset((value) => value - 1) }}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg></button>
               <DatePicker
                 className="sp-day"
                 label={t.pickDay}
@@ -665,10 +666,9 @@ export function SportsWidget({ language, now, appearanceControls }: { language: 
                   setOffset(Math.max(-maxOffset, Math.min(maxOffset, daysUntil(now, iso))))
                 }}
               >
-                {dayName && <strong>{dayName}</strong>}
-                <small>{dayFormat.format(day.date)}</small>
+                <span className="sp-date-label">{offset === 0 ? t.today : <><span className="sp-date-weekday">{fullDayFormat.format(day.date).replace(dayFormat.format(day.date), '')}</span><span>{dayFormat.format(day.date)}</span></>}</span>
               </DatePicker>
-              <button type="button" className="sp-step" disabled={offset >= maxOffset} aria-label={t.next} onClick={() => { setAuto(false); setOffset((value) => value + 1) }}>›</button>
+              <button type="button" className="sp-step" disabled={offset >= maxOffset} aria-label={t.next} onClick={() => { setAuto(false); setOffset((value) => value + 1) }}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg></button>
             </div>
             {offset !== 0 && <button type="button" className="sp-today" aria-label={t.backToday} onClick={() => { setAuto(false); setOffset(0) }}>{t.today}</button>}
             <button ref={searchTrigger} type="button" className="sp-icon-button sp-search-toggle" aria-label={searchExpanded ? t.closeSearch : t.openSearch} aria-expanded={searchExpanded} onClick={() => searchExpanded ? closeSearch() : setSearchExpanded(true)}>
@@ -680,7 +680,7 @@ export function SportsWidget({ language, now, appearanceControls }: { language: 
             <div className="sp-filter" role="group" aria-label={t.title}>
               <button type="button" className={filter === 'all' ? 'active' : ''} aria-pressed={filter === 'all'} onClick={() => setFilter('all')}>{t.all}</button>
               <button type="button" className={filter === 'live' ? 'active is-live' : ''} aria-pressed={filter === 'live'} onClick={() => setFilter('live')}>{t.live} <b>{liveCount}</b></button>
-              <button type="button" className={filter === 'favorites' ? 'active is-favorites' : ''} aria-pressed={filter === 'favorites'} aria-label={t.favorites} title={t.favorites} onClick={() => setFilter('favorites')}><span aria-hidden="true">★</span> {t.favorites} <b>{favoriteCount}</b></button>
+              <button type="button" className={filter === 'favorites' ? 'active is-favorites' : ''} aria-pressed={filter === 'favorites'} aria-label={t.favorites} title={t.favorites} onClick={() => setFilter('favorites')}>{t.favorites} <b>{favoriteCount}</b></button>
             </div>
           </div>
           {auto && offset > 0 && shown.length > 0 && <p className="sp-notice is-info" aria-live="polite">{t.skipped}</p>}
