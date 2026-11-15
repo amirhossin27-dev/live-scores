@@ -41,7 +41,8 @@ Prüfbreiten 320, 375, 393, 430, 768 und Desktop; Landschaft 852×393; lange Nam
 - [x] npm test, npm run build, dotnet build backend/App.Api; git diff --check.
 - [x] Ganze Änderung prüfen lassen; lokale Commits und Hauptplan aktualisieren.
 - [x] Konkrete mobile Vorschau lokal gesichert und zur Abnahme vorbereitet.
-- [ ] Veröffentlichung nach Nutzercheckpoint; anschließend iPhone-Abnahme.
+- [x] Veröffentlichung nach ausdrücklicher Nutzerfreigabe erfolgreich.
+- [ ] CP3 auf echtem iPhone abnehmen.
 
 ## Nachweise / Wiederaufnahme
 
@@ -54,4 +55,8 @@ Prüfbreiten 320, 375, 393, 430, 768 und Desktop; Landschaft 852×393; lange Nam
 - Vorschau: C:/Users/amirh/Documents/ChatGPT/Live Scores/stage3-preview.jpg (links echte Übersichtsdaten, rechts kontrollierte Aufstellungs-Testdaten). Einzelbilder stage3-overview.jpg und stage3-lineup.jpg.
 - Ruling: Mobile Regeln bis900px statt nur600px, damit iPhone-Querformat ebenfalls44px Ziele/16px Suche und den zusätzlichen oberen Abstand erhält. Kosten: Auch schmale Desktopfenster nutzen diese kompaktere Anordnung.
 - Geräteabnahme offen: echte Safe Areas, Bildschirmtastatur, VoiceOver, vergrößerte Schrift. Browserbelege ersetzen diese Prüfung nicht.
-- Noch keine Veröffentlichung von Etappe3. Nächster Schritt: konkrete Vorschau/Release-Checkpoint abnehmen, dann freigegebene Version veröffentlichen und CP3 auf dem iPhone prüfen.
+- Etappe3 am15.11.2026 nach Nutzerfreigabe veröffentlicht. Nächster Schritt: CP3 auf dem iPhone prüfen.
+
+## Release
+
+Veröffentlicht am15.11.2026 nach „ja“ des Nutzers:21ea9182a47057173797c6da00d5ef8aad74a363. Actions-Run43715149873 erfolgreich: https://github.com/amirhossin27-dev/live-scores/actions/runs/43715149873 . Live-HTML, sw.js und beide gebauten Assets HTTP200; Cache-Version entspricht dem Release-Commit. iPhone-Abnahme weiter offen. Der nächste Schritt ist CP3 im Hauptplan, anschließend Etappe4.

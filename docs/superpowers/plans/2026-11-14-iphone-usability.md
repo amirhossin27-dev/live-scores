@@ -6,7 +6,7 @@
 **Architecture:** React/TypeScript und die bestehende gemeinsame Oberfläche bleiben erhalten. Zuerst werden App-Rahmen und Detailfenster korrigiert; anschließend werden die bereits vorhandenen Rückwege vereinheitlicht und ihr Zustand erhalten.
 **Tech Stack:** React 19, TypeScript, Vite, Vitest/Testing Library; .NET-Backend; GitHub Pages und vorhandene Render-API.
 **Spec:** Die Abschnitte Zielbild, Grenzen und Navigation dieses Dokuments bilden den vorläufigen Entwurf. Der Nutzer hat den Plan und den Start von Etappe 1 mit „passt, go!“ freigegeben.
-**Stand:** 15.11.2026, Etappen1/2 veröffentlicht; Nutzer bestätigt Verbesserung. Etappe3 lokal umgesetzt und geprüft; Veröffentlichung und CP3-Geräteabnahme offen.
+**Stand:** 15.11.2026, Etappen1/2 veröffentlicht; Nutzer bestätigt Verbesserung. Etappe3 veröffentlicht und geprüft; CP3-Geräteabnahme offen.
 **Repository:** https://github.com/amirhossin27-dev/live-scores
 **Analysierte Basis:** main, Commit 905999b356228f6745cdd2f55fd66d326c7d43ad.
 **Live-App:** https://amirhossin27-dev.github.io/live-scores/
@@ -18,13 +18,13 @@
 | CP0 – Bestandsaufnahme | Erledigt, iOS-Reproduktion offen | Quellcode und veröffentlichte App bei 393 × 852 geprüft |
 | CP1 – Sichere Ränder und Ausgänge | Veröffentlicht; Nutzer bestätigt Funktion | Zusätzliche Gerätefälle wie Tastatur/große Schrift weiter offen |
 | CP2 – Durchgängige Navigation | Veröffentlicht; Nutzer bestätigt Verbesserung | Zusatzwunsch Header/kompaktes Layout in Etappe3 aufgenommen |
-| CP3 – Mobile Bedienung | Lokal technisch geprüft; Veröffentlichung/Geräteabnahme offen | Embleme, kompakte Aufstellung, größere Ziele und einfachere Werkzeuge |
+| CP3 – Mobile Bedienung | Veröffentlicht; Geräteabnahme offen | Embleme, kompakte Aufstellung, größere Ziele und einfachere Werkzeuge; Version21ea918 |
 | CP4 – Datenzustände und Veröffentlichung | Geplant | Verlässliche Rückmeldungen und dokumentierte iPhone-Abnahme |
 
-**Aktueller nächster Schritt:** Konkrete Etappe3-Vorschau zur Veröffentlichung abnehmen, danach CP3 in der Home-Bildschirm-App testen. Details im Etappe3-Arbeitsstand am Dokumentende.
+**Aktueller nächster Schritt:** Veröffentlichte Etappe3 in der Home-Bildschirm-App auf dem iPhone15 prüfen: oberer Abstand, Embleme, Aufstellung und Ersatzbank in Hoch-/Querformat. Danach Rückmeldung für CP3 und Etappe4 festhalten.
 **Fortsetzungsauftrag:** „Lies diesen Etappenplan, prüfe den aktuellen Repository-Stand und fahre mit dem ersten freigegebenen, offenen Checkpoint fort.“
 **Arbeitsverzeichnis:** C:/Users/amirh/Documents/ChatGPT/Live Scores
-**Lokaler Stand:** Checkout unter app/, Branch fix/iphone-stage-2. Implementierung Etappe 2: 5ca09f6f831f4b106d0b9d56d482f21fdd338cd9. Alle Projektprüfungen erfolgreich; Details unten.
+**Lokaler Stand:** Checkout unter app/, Branch fix/iphone-stage-3. Veröffentlichte Etappe3:21ea9182a47057173797c6da00d5ef8aad74a363. Alle Projektprüfungen und GitHub-Pages-Deployment erfolgreich; Details unten.
 **Vor Fortsetzung:** Git-Status, Branch und neuen main-Stand prüfen; bestehende Änderungen bewahren. Den Plan in den künftigen Checkout übernehmen, nicht durch erneutes Klonen überschreiben.
 
 Nach jeder Etappe ergänzen:
@@ -271,4 +271,13 @@ Nutzer hat am15.11.2026 die kompakte Richtung mit konkreten Ergänzungen freigeg
 - Suche mobil in eigener Zeile/16px Eingabeschrift, Hauptfilter sichtbar beschriftet, Heute-Rücksprung und explizite Themeauswahl; primäre Touchziele44px. Regeln bis900px berücksichtigen Querformat. Bestehende Sportarten-/Reihenfolgegruppen in Einstellungen erhalten.
 - Nachweise:392 Tests (387 Vitest+5 Runtime), Frontend-/Backend-Build erfolgreich; Backend0 Warnungen/Fehler. Unabhängige Codeprüfung ohne wesentliche Befunde. Browser320–1280px, Einbettungen, Querformat, Profil-/Nationalitätsaktionen und Einstellungen geprüft. Details und Wiederaufnahme in docs/superpowers/plans/2026-11-15-iphone-stage-3.md.
 - Vorschau: C:/Users/amirh/Documents/ChatGPT/Live Scores/stage3-preview.jpg. Linke Ansicht echte API-Daten, rechte Ansicht Aufstellungs-Testdaten mit Fünferreihen.
-- CP3 und Veröffentlichung offen. Nächster Schritt: Vorschau zur Veröffentlichung freigeben; danach die installierte iPhone-App prüfen. Echte Systemränder, Tastatur, VoiceOver und größere Schrift bleiben Geräteabnahme.
+- Etappe3 nach ausdrücklicher Freigabe veröffentlicht; CP3-Geräteabnahme offen. Nächster Schritt: installierte iPhone-App prüfen. Echte Systemränder, Tastatur, VoiceOver und größere Schrift bleiben Geräteabnahme.
+
+## Veröffentlichung Etappe3 – 15.11.2026
+
+- Nutzerfreigabe: „ja“ auf die konkrete Frage zur Veröffentlichung der gezeigten Etappe3-Vorschau.
+- Normaler Fast-Forward-Push nach main, kein Force-Push. Veröffentlichter Commit:21ea9182a47057173797c6da00d5ef8aad74a363.
+- GitHub Actions:https://github.com/amirhossin27-dev/live-scores/actions/runs/43715149873 – completed/success. Tests, Backend-Release-Build, Frontend-Build und Pages-Deployment erfolgreich.
+- Live-HTML und sw.js HTTP200. HTML referenziert index-DHgv4Yub.js und index-CJ_t62AQ.css; beide Assets HTTP200. Service-Worker-Cache exakt live-scores-21ea9182a47057173797c6da00d5ef8aad74a363.
+- Gerätecheckpoint CP3: App vollständig schließen und vom Home-Bildschirm online öffnen. Oberen Abstand, entfernten Installationsbutton/Footer, sichtbare Embleme und komplette Aufstellung/Ersatzbank in Hoch-/Querformat prüfen. Falls zunächst alte Ansicht erscheint, nach kurzem Online-Start nochmals schließen/öffnen. Keine Neuinstallation erforderlich.
+- Rückfallpunkt: Etappe2, Commit6622942aa3b2587e6c4fe2b497452bf15e7abbfa. Nutzerabnahme CP3 ausstehend; danach Etappe4 mit Datenzuständen und Gesamttest.
