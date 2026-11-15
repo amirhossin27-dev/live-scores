@@ -69,3 +69,6 @@ Files:app.css,sports.css,sportsSearch.css; SportsSearch.tsx für verfügbaren Po
 ## Nachfolgende Designkorrektur
 
 Nutzer beanstandet am15.11.2026 den visuellen Abstand zur gewählten Vorlage. Lokale Korrektur/ursächliche Analyse und direkter Originalvergleich unter docs/superpowers/plans/2026-11-15-compact-design-fidelity.md. Codeaead97a;419 Tests und Builds bestanden, unabhängiger Bild-/Codeabgleich ohne wesentliche Befunde. Noch nicht veröffentlicht. Dies ist der aktuell nächste Checkpoint vor weiterer iPhone-Abnahme.
+
+
+Die nachfolgende Designkorrektur wurde nach direktem Vergleich und Nutzerfreigabe als d885e055ee22d47fc5c1b949f9d13657b9b7c52e veröffentlicht. Actions43753428594 erfolgreich; öffentliche Mobilansicht und freigegebene Assets/Worker geprüft. Aktueller Gerätecheckpoint und Nachweise in2026-11-15-compact-design-fidelity.md.

@@ -47,3 +47,6 @@ Die ausgewählte Vorschau steht unter C:/Users/amirh/Documents/ChatGPT/Live Scor
 - 320/393 px, iPhone-Querformat, Desktop, beide Einbettungen, DE/EN und alle Darstellungsoptionen werden geprüft; echte iPhone-Systemränder/Tastatur bleiben ein Gerätecheckpoint.
 
 **Nächster Schritt:** Nach ausdrücklicher Freigabe am15.11.2026 veröffentlicht und live geprüft (2d37566); siehe Release-Checkpoint im Umsetzungsplan. Jetzt echte iPhone-Abnahme von Tastatur/Systemrändern/größerer Schrift.
+
+
+**Aktueller Release-Checkpoint:** Nach beanstandeter Designabweichung wurde die tatsächliche Originalvorlage direkt mit der App verglichen und korrigiert. Vom Nutzer freigegebene Designkorrektur d885e05 am15.11.2026 veröffentlicht und öffentlich visuell geprüft; nächster Schritt echte iPhone-Abnahme. Details:docs/superpowers/plans/2026-11-15-compact-design-fidelity.md.

@@ -6,7 +6,7 @@
 **Architecture:** React/TypeScript und die bestehende gemeinsame Oberfläche bleiben erhalten. Zuerst werden App-Rahmen und Detailfenster korrigiert; anschließend werden die bereits vorhandenen Rückwege vereinheitlicht und ihr Zustand erhalten.
 **Tech Stack:** React 19, TypeScript, Vite, Vitest/Testing Library; .NET-Backend; GitHub Pages und vorhandene Render-API.
 **Spec:** Die Abschnitte Zielbild, Grenzen und Navigation dieses Dokuments bilden den vorläufigen Entwurf. Der Nutzer hat den Plan und den Start von Etappe 1 mit „passt, go!“ freigegeben.
-**Stand:** 15.11.2026, Etappen1–4 und gewählte kompakte Übersicht veröffentlicht und live geprüft. Live-Version2d37566; erweiterte iPhone-Geräteabnahme offen.
+**Stand:** 15.11.2026, Etappen1–4 und korrigierte Gestaltung des gewählten Entwurfs „1 Kompakt“ veröffentlicht und live visuell geprüft. Live-Versiond885e05; erweiterte iPhone-Geräteabnahme offen.
 **Repository:** https://github.com/amirhossin27-dev/live-scores
 **Analysierte Basis:** main, Commit 905999b356228f6745cdd2f55fd66d326c7d43ad.
 **Live-App:** https://amirhossin27-dev.github.io/live-scores/
@@ -19,12 +19,12 @@
 | CP1 – Sichere Ränder und Ausgänge | Veröffentlicht; Nutzer bestätigt Funktion | Zusätzliche Gerätefälle wie Tastatur/große Schrift weiter offen |
 | CP2 – Durchgängige Navigation | Veröffentlicht; Nutzer bestätigt Verbesserung | Zusatzwunsch Header/kompaktes Layout in Etappe3 aufgenommen |
 | CP3 – Mobile Bedienung | Veröffentlicht; Nutzer bestätigt „viel besser“ | Erweiterte iOS-Fälle wie VoiceOver/große Schrift weiter offen |
-| CP4 – Datenzustände und Veröffentlichung | Veröffentlicht; Geräteabnahme offen | Sofortige gespeicherte Ergebnisse und Hintergrundaktualisierung erhalten; kompakte Live-Version2d37566 |
+| CP4 – Datenzustände und Veröffentlichung | Veröffentlicht; Geräteabnahme offen | Sofortige gespeicherte Ergebnisse und Hintergrundaktualisierung erhalten; korrigierte kompakte Live-Versiond885e05 |
 
-**Aktueller nächster Schritt:** Designkorrektur anhand des direkten Originalvergleichs beurteilen; Details in docs/superpowers/plans/2026-11-15-compact-design-fidelity.md. Nutzer beanstandet aktuelle Live-Gestaltung. Lokale Korrektur aead97a besteht419 Tests/Builds und unabhängigen Bildabgleich, noch nicht veröffentlicht.
+**Aktueller nächster Schritt:** Korrigierte Gestaltung in der iPhone-Home-Bildschirm-App prüfen. Veröffentlichungd885e05 nach visueller Vorschau freigegeben und öffentlich visuell bestätigt; Details in docs/superpowers/plans/2026-11-15-compact-design-fidelity.md. Tastatur/Rückwege, letzte Zeile und native Systemränder/große Schrift als Gerätecheckpoint abnehmen.
 **Fortsetzungsauftrag:** „Lies diesen Etappenplan, prüfe den aktuellen Repository-Stand und fahre mit dem ersten freigegebenen, offenen Checkpoint fort.“
 **Arbeitsverzeichnis:** C:/Users/amirh/Documents/ChatGPT/Live Scores
-**Lokaler Stand:** Checkout unter app/, Branch feat/compact-overview. Veröffentlicht2d375660ce8820e16ef7cab0082c57f654af734f; Layout01b02e2, Suchfilterkorrektur358414f. Release-Nachweis lokal zusätzlich dokumentiert. Alle Prüfungen/Deployment erfolgreich, Details im Kompaktplan.
+**Lokaler Stand:** Checkout unter app/, Branch fix/compact-design-fidelity. Veröffentlichtd885e055ee22d47fc5c1b949f9d13657b9b7c52e; Designkorrekturaead97a. Release-Nachweis lokal zusätzlich dokumentiert. Alle Prüfungen/Deployment und öffentlicher Bildabgleich erfolgreich, Details im Korrekturplan.
 **Vor Fortsetzung:** Git-Status, Branch und neuen main-Stand prüfen; bestehende Änderungen bewahren. Den Plan in den künftigen Checkout übernehmen, nicht durch erneutes Klonen überschreiben.
 
 Nach jeder Etappe ergänzen:
@@ -331,3 +331,13 @@ Nutzer hat am15.11.2026 die kompakte Richtung mit konkreten Ergänzungen freigeg
 - Nutzer kritisiert die veröffentlichte Umsetzung als sichtbar abweichend von „1 Kompakt“ und beauftragt Fortsetzung. Bestehende globale Styles waren zu weit erhalten geblieben, visueller Referenzabgleich fehlte.
 - Korrigiert auf Branch fix/compact-design-fidelity, Codeaead97a. Direkter Originalvergleich: C:/Users/amirh/Documents/ChatGPT/Live Scores/compact-design-comparison.jpg. Echte API-Vorschau:compact-design-actual.jpg.
 -419 Tests, Frontend-/Backend-Build bestanden. Unabhängiger tatsächlicher Bild-/Codeabgleich ohne Critical/Important. Live bleibt2d37566, kein neuer Push. Fortsetzen beim vollständigen Korrekturplan docs/superpowers/plans/2026-11-15-compact-design-fidelity.md und dem direkten visuellen Checkpoint.
+
+## Veröffentlichung der Designkorrektur – 15.11.2026
+
+- Nutzerfreigabe: „ja“ auf die konkrete Frage zur Veröffentlichung des rechts gezeigten korrigierten Stands im direkten Originalvergleich.
+- Normaler Fast-Forward-Push ohne Force von2d37566 auf d885e055ee22d47fc5c1b949f9d13657b9b7c52e. Enthält ausschließlich die gezeigte Korrektur aead97a und lokale Prüfdokumentation.
+- GitHub Actions:https://github.com/amirhossin27-dev/live-scores/actions/runs/43753428594 – completed/success. Tests, Backend-Release-Build, Frontend-Build und Pages-Deployment erfolgreich.
+- Öffentliche App https://amirhossin27-dev.github.io/live-scores/ HTTP200. HTML referenziert index-B64se_5g.js und index-Bnmw6Toz.css; beide HTTP200 und identisch zum lokal freigegebenen Build. sw.js HTTP200; CACHE exakt live-scores-d885e055ee22d47fc5c1b949f9d13657b9b7c52e.
+- Zusätzlich tatsächliche öffentliche Mobilansicht393×852 im Browser visuell geprüft, echte Ergebnisse geladen: transparenter Datumshintergrund, Teamnamen Gewicht400, Ligakopf12px, erste Spielzeile y175/Höhe60px, untere Leiste58px, keine horizontale Überschreitung393/393. Screenshot:C:/Users/amirh/Documents/ChatGPT/Live Scores/compact-design-published.jpg. Keine echte iOS-Geräteabnahme behauptet.
+- Nächster Gerätecheckpoint: App auf dem iPhone vollständig schließen und online vom Home-Bildschirm öffnen. Falls noch die vorherige Darstellung erscheint, nach kurzem Online-Start nochmals schließen/öffnen; keine Neuinstallation nötig. Gestaltung gegen gewählte Vorlage, Suche mit Tastatur/Profilrückweg, untere Werkzeuge und letzte Spielzeile in Hoch-/Querformat prüfen. Größere Systemschrift/native Safe Areas weiter offen.
+- Rückfallpunkt:dokumentierte vorige Veröffentlichung2d37566. Keine Backend-/Hosting-/Tarif- oder Datenstrategieänderung.
