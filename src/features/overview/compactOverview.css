@@ -61,9 +61,9 @@
 .sp-overview .sp-match { border-bottom: 1px solid var(--border); border-radius: 0; }
 .sp-overview .sp-match:last-child { border-bottom: 1px solid var(--border); }
 .sp-overview .sp-star { color: var(--text-muted); opacity: 1; }
-.sp-overview .sp-star.is-on { color: var(--accent); }
+.sp-overview .sp-star.is-on { color: #f5b301; opacity: 1; }
 .sp-overview .sp-star svg { width: 17px; height: 17px; stroke-width: 1.8; }
-.sp-overview .sp-star.is-on svg { fill: var(--accent-soft); }
+.sp-overview .sp-star.is-on svg { fill: #facc15; }
 .sp-overview.is-snapshot .sp-match.is-live .sp-when { color: var(--text-muted); }
 .start-sports.sp-overview.is-snapshot .sp-match.is-live .sp-score, .start-sports.sp-overview.is-snapshot .sp-match.is-live .sp-score i { color: var(--text-strong); }
 
