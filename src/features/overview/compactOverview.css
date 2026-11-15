@@ -54,8 +54,9 @@
 .sp-overview .sp-team.is-winner .sp-name { font-weight: 650; }
 .sp-overview .sp-logo.is-empty { display: grid; place-items: center; border-radius: 5px; background: var(--sp-control); color: var(--text-muted); font-size: 11px; font-weight: 650; }
 .sp-overview .sp-when { font-weight: 400; }
-.sp-overview .sp-match.is-live .sp-when { color: var(--accent); }
-.start-sports.sp-overview .sp-score, .sp-overview .sp-match.is-live .sp-score { color: var(--text-strong); font-weight: 650; }
+.sp-overview .sp-match.is-live .sp-when { color: #dc2626; }
+.start-sports.sp-overview .sp-score { color: var(--text-strong); font-weight: 650; }
+.start-sports.sp-overview .sp-match.is-live .sp-score, .start-sports.sp-overview .sp-match.is-live .sp-score i { color: #dc2626; }
 .sp-overview .sp-score b { font-weight: 650; }
 .sp-overview .sp-match { border-bottom: 1px solid var(--border); border-radius: 0; }
 .sp-overview .sp-match:last-child { border-bottom: 1px solid var(--border); }
@@ -64,6 +65,7 @@
 .sp-overview .sp-star svg { width: 17px; height: 17px; stroke-width: 1.8; }
 .sp-overview .sp-star.is-on svg { fill: var(--accent-soft); }
 .sp-overview.is-snapshot .sp-match.is-live .sp-when { color: var(--text-muted); }
+.start-sports.sp-overview.is-snapshot .sp-match.is-live .sp-score, .start-sports.sp-overview.is-snapshot .sp-match.is-live .sp-score i { color: var(--text-strong); }
 
 .sp-utility-spacer { flex: none; }
 .sp-utility-bar { position: fixed; z-index: 20; right: 0; bottom: 0; left: 0; display: flex; justify-content: center; min-height: calc(50px + var(--app-safe-bottom, 0px)); padding: 3px calc(12px + var(--app-safe-right, 0px)) calc(1px + var(--app-safe-bottom, 0px)) calc(12px + var(--app-safe-left, 0px)); border-top: 1px solid var(--border); background: var(--panel); }
