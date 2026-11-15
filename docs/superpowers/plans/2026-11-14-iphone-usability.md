@@ -6,7 +6,7 @@
 **Architecture:** React/TypeScript und die bestehende gemeinsame Oberfläche bleiben erhalten. Zuerst werden App-Rahmen und Detailfenster korrigiert; anschließend werden die bereits vorhandenen Rückwege vereinheitlicht und ihr Zustand erhalten.
 **Tech Stack:** React 19, TypeScript, Vite, Vitest/Testing Library; .NET-Backend; GitHub Pages und vorhandene Render-API.
 **Spec:** Die Abschnitte Zielbild, Grenzen und Navigation dieses Dokuments bilden den vorläufigen Entwurf. Der Nutzer hat den Plan und den Start von Etappe 1 mit „passt, go!“ freigegeben.
-**Stand:** 15.11.2026, Etappen1/2 veröffentlicht; Nutzer bestätigt Verbesserung. Etappe3 veröffentlicht und geprüft; CP3-Geräteabnahme offen.
+**Stand:** 15.11.2026, Etappen1–3 veröffentlicht; Nutzer bestätigt deutliche Verbesserung. Etappe4 mit Ergebnisspeicher lokal umgesetzt und geprüft; Veröffentlichung und CP4-Geräteabnahme offen.
 **Repository:** https://github.com/amirhossin27-dev/live-scores
 **Analysierte Basis:** main, Commit 905999b356228f6745cdd2f55fd66d326c7d43ad.
 **Live-App:** https://amirhossin27-dev.github.io/live-scores/
@@ -18,13 +18,13 @@
 | CP0 – Bestandsaufnahme | Erledigt, iOS-Reproduktion offen | Quellcode und veröffentlichte App bei 393 × 852 geprüft |
 | CP1 – Sichere Ränder und Ausgänge | Veröffentlicht; Nutzer bestätigt Funktion | Zusätzliche Gerätefälle wie Tastatur/große Schrift weiter offen |
 | CP2 – Durchgängige Navigation | Veröffentlicht; Nutzer bestätigt Verbesserung | Zusatzwunsch Header/kompaktes Layout in Etappe3 aufgenommen |
-| CP3 – Mobile Bedienung | Veröffentlicht; Geräteabnahme offen | Embleme, kompakte Aufstellung, größere Ziele und einfachere Werkzeuge; Version21ea918 |
-| CP4 – Datenzustände und Veröffentlichung | Geplant | Verlässliche Rückmeldungen und dokumentierte iPhone-Abnahme |
+| CP3 – Mobile Bedienung | Veröffentlicht; Nutzer bestätigt „viel besser“ | Erweiterte iOS-Fälle wie VoiceOver/große Schrift weiter offen |
+| CP4 – Datenzustände und Veröffentlichung | Lokal technisch geprüft; Release/Geräteabnahme offen | Gespeicherte Ergebnisse sofort, Hintergrundaktualisierung und ehrliche Fehlerzustände |
 
-**Aktueller nächster Schritt:** Veröffentlichte Etappe3 in der Home-Bildschirm-App auf dem iPhone15 prüfen: oberer Abstand, Embleme, Aufstellung und Ersatzbank in Hoch-/Querformat. Danach Rückmeldung für CP3 und Etappe4 festhalten.
+**Aktueller nächster Schritt:** Geprüfte Etappe4 mit konkreter Cache-Vorschau zur Veröffentlichung vorlegen. Danach einmal erfolgreich Daten laden, App schließen/öffnen und sofort sichtbaren gespeicherten Stand plus Hintergrundaktualisierung auf dem iPhone prüfen.
 **Fortsetzungsauftrag:** „Lies diesen Etappenplan, prüfe den aktuellen Repository-Stand und fahre mit dem ersten freigegebenen, offenen Checkpoint fort.“
 **Arbeitsverzeichnis:** C:/Users/amirh/Documents/ChatGPT/Live Scores
-**Lokaler Stand:** Checkout unter app/, Branch fix/iphone-stage-3. Veröffentlichte Etappe3:21ea9182a47057173797c6da00d5ef8aad74a363. Alle Projektprüfungen und GitHub-Pages-Deployment erfolgreich; Details unten.
+**Lokaler Stand:** Checkout unter app/, Branch fix/iphone-stage-4. Implementierungscommit793ebc1700df159cd951c9ec82de8f2e9d4fee49. Etappe4 nicht veröffentlicht; letzte Live-Version21ea918. Alle Projektprüfungen erfolgreich, Details unten.
 **Vor Fortsetzung:** Git-Status, Branch und neuen main-Stand prüfen; bestehende Änderungen bewahren. Den Plan in den künftigen Checkout übernehmen, nicht durch erneutes Klonen überschreiben.
 
 Nach jeder Etappe ergänzen:
@@ -169,16 +169,18 @@ Nutzer hat am15.11.2026 die kompakte Richtung mit konkreten Ergänzungen freigeg
 **Zweck:** Auch bei langsamer Verbindung verständlich bleiben und Verbesserungen zuverlässig aufs iPhone bringen.
 **Betroffene Dateien nach Bedarf:** SportsWidget.tsx, sportsHooks.ts, SportsSearch.tsx, App.tsx, main.tsx, vorhandene Tests, README.md. vite.config.ts nur bei einem nachgewiesenen Update-Problem ändern.
 
-- [ ] Vorhandene Zustände vereinheitlichen: lädt, keine Spiele, offline, Teilfehler, alte Daten nach Aktualisierungsfehler.
-- [ ] Bereits geladene Ergebnisse sichtbar behalten und mit Aktualisierungszeit sowie verständlicher Warnung kennzeichnen.
-- [ ] „Erneut versuchen“ und manuelles Aktualisieren dort ergänzen, wo sie fehlen; Rückweg unabhängig vom Netz lassen.
-- [ ] Standalone, Safari, Desktop sowie volle und kompakte Dashboard-Einbettung testen.
-- [ ] Deutsch/Englisch, Hell/Dunkel/Automatisch, Hoch-/Querformat, größere Schrift, Tastatur und Offline-/Wiederverbindungsfall prüfen.
-- [ ] npm test, npm run build und dotnet build backend/App.Api erfolgreich ausführen; Ergebnisse und Commit im Plan notieren.
+- [x] Übersichtszustände für Laden, keine Spiele, offline, Teilfehler und gespeicherte Daten nach Aktualisierungsfehler vereinheitlicht.
+- [x] Bereits geladene Ergebnisse auch nach App-Neustart begrenzt auf dem Gerät erhalten, Abrufdatum/Zeit und Warnungen anzeigen; ursprünglicher Zeitpunkt bleibt erhalten.
+- [x] Manuelles Aktualisieren, Wiederholen bei vorhandenen Daten und Online-/Vordergrundaktualisierung ergänzen; Rückwege bleiben unabhängig vom Netz.
+- [x] Chromium-Browser: Standalone-Oberfläche, Desktop sowie volle/kompakte Einbettung mit gespeicherten Daten geprüft.
+- [ ] Echtes iPhone/Safari: gespeicherte Daten und Online-/Offline-Rückkehr abnehmen.
+- [x] DE/EN, vorhandene Themes/responsive Struktur, Offline ohne/mit Snapshot, Wiederverbindung und lange Abrufe mit kontrollierten Daten geprüft.
+- [ ] Erweiterte Gerätefälle: echte iOS-Systemränder, VoiceOver, größere Schrift und Bildschirmtastatur abschließend prüfen.
+- [x] npm test, npm run build und dotnet build backend/App.Api erfolgreich ausführen; Ergebnisse und Commit unten notiert.
 - [ ] Änderungen vor Veröffentlichung konkret vorführen und gemeinsamen Release-Checkpoint abwarten.
 - [ ] Nach vereinbarter Veröffentlichung GitHub-Actions-Ergebnis und Live-Version prüfen; neu gestartete Home-Bildschirm-App auf aktuelle Oberfläche kontrollieren.
-- [ ] Favoriten und Einstellungen dürfen beim Update nicht zurückgesetzt werden; keine Live-Daten in Offline-Cache aufnehmen.
-- [ ] Frühere funktionierende Version als Rückfallpunkt dokumentieren.
+- [x] Favoriten/Einstellungen erhalten; ausdrücklicher Nutzerauftrag erlaubt jetzt begrenzte Ergebnissnapshots mit Zeitstempel. Keine Live-Daten in den Service Worker aufnehmen.
+- [x] Letzte veröffentlichte Etappe3 als Rückfallpunkt dokumentiert:21ea9182a47057173797c6da00d5ef8aad74a363.
 
 **CP4 – Abschluss:** Nutzer bestätigt die zwei ursprünglichen Probleme auf seinem iPhone 15 als behoben; alle vereinbarten Navigationswege sind abgenommen und die geprüfte Version ist veröffentlicht.
 
@@ -281,3 +283,17 @@ Nutzer hat am15.11.2026 die kompakte Richtung mit konkreten Ergänzungen freigeg
 - Live-HTML und sw.js HTTP200. HTML referenziert index-DHgv4Yub.js und index-CJ_t62AQ.css; beide Assets HTTP200. Service-Worker-Cache exakt live-scores-21ea9182a47057173797c6da00d5ef8aad74a363.
 - Gerätecheckpoint CP3: App vollständig schließen und vom Home-Bildschirm online öffnen. Oberen Abstand, entfernten Installationsbutton/Footer, sichtbare Embleme und komplette Aufstellung/Ersatzbank in Hoch-/Querformat prüfen. Falls zunächst alte Ansicht erscheint, nach kurzem Online-Start nochmals schließen/öffnen. Keine Neuinstallation erforderlich.
 - Rückfallpunkt: Etappe2, Commit6622942aa3b2587e6c4fe2b497452bf15e7abbfa. Nutzerabnahme CP3 ausstehend; danach Etappe4 mit Datenzuständen und Gesamttest.
+
+## Arbeitsstand Etappe4 – 15.11.2026
+
+- Nutzer bestätigt Etappe3 als „viel besser“ und beauftragt Fortsetzung mit zuletzt gespeicherten Ergebnissen während30s+ Ladezeit. Neuer konkreter Plan:docs/superpowers/plans/2026-11-15-iphone-stage-4.md.
+- Branch fix/iphone-stage-4, Basis d7d72c6. Implementierung lokal committed:793ebc1700df159cd951c9ec82de8f2e9d4fee49. Noch keine Veröffentlichung von Etappe4.
+- Gerätesnapshots der Übersicht je API/Spieltag/Wettbewerb, maximal48h/160 Einträge/1.5Mio Zeichen. Sofortige passende Anzeige, Aktualisierung im Hintergrund; Fehler überschreiben keine guten Daten. Erfolgreiche leere Ergebnisse ersetzen alte Spiele. Bei Teilfehlern konservativer ältester Datenstand; keine frische Live-Pulsanzeige für gespeicherte Werte.
+- Manuelle Aktualisierung, Wiederholen, Offlinehinweise, Online-/Vordergrundaktualisierung und längerer Ladehinweis nach8s. Automatische Datumssprünge nur nach frischem erfolgreichem Abruf, nicht bei Cache/Fehler/Offline. Andere Detailabrufe unverändert; Rückwege bleiben bedienbar.
+- Geänderte Dateien:sportsScoreCache.ts mit Tests; useSportsScores in sportsHooks.ts mit neuen Hooks-Tests; SportsWidget.tsx/Test und sports.css. Kein Backend-, Hosting-, Tarif- oder Service-Worker-Datencache-Umbau.
+- Nachweise:405 Vitest+5 Runtime=410 Tests bestanden in15 Vitest-Dateien. Frontend-Build69 Module,index-BNN962qi.js/index-DFdZWV-M.css. Backend-Build0 Warnungen/Fehler. git diff --check sauber; unabhängige Prüfung ohne wesentliche Befunde.
+- Browser mit kontrollierten Testdaten:35s Antwortlatenz bei sofort sichtbarem alten2:1; danach3:1. Fehler mit Wiederholen erhält2:1; Offline-Snapshot erhält2:1, Online-Rückkehr lädt3:1; Offline ohne Snapshot verständlich DE/EN; Teilfehler erhält alten Wettbewerbsstand. Einstellungen beim Erstabruf erreichbar,8s-Hinweis sichtbar.320/393/1280px ohne Überlauf; beide Einbettungen320px mit0px Außenpadding und sichtbarem Snapshot.
+- Vorschau:C:/Users/amirh/Documents/ChatGPT/Live Scores/stage4-cache-preview.jpg; Fehlerzustand:stage4-error-preview.jpg. Daten dort kontrollierte Testdaten.
+- Diagnosegrenze:warme reale API war schnell (Gesundheit0.28/0.11s,20 Standardwettbewerbe0.20/0.10s). Ein kalter Start wurde nicht gemessen; Render-Free-Ruhezustand ist plausible zusätzliche Ursache laut https://render.com/docs/free . Keine zugesicherte Verkürzung der Netzwerklatenz behaupten.
+- Der erste erfolgreiche Abruf mit der neuen Version füllt den Speicher. Ohne passenden Snapshot bleibt ein Erstabruf netzabhängig; Daten älter als48h werden beim Wiederherstellen verworfen. Speicherfehler beeinträchtigen nur Persistenz, nicht Einstellungen oder aktuelle Anzeige.
+- Genau ein nächster Schritt:konkreten Release-Checkpoint abnehmen, dann Etappe4 veröffentlichen und Live-Version prüfen. Danach iPhone-App erfolgreich laden, schließen/öffnen, gespeicherten Stand und Aktualisierung sowie ursprüngliche Bedienprobleme gemeinsam abschließend abnehmen.
