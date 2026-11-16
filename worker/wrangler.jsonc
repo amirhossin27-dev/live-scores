@@ -10,6 +10,6 @@
   // Public values only. The private VAPID key is the secret VAPID_PRIVATE_KEY (wrangler secret put).
   "vars": {
     "API_BASE_URL": "https://amir-live-scores-api.onrender.com",
-    "VAPID_PUBLIC_KEY": ""
+    "VAPID_PUBLIC_KEY": "BDCx7bVOzt8Ssu7UxEno-XhH5NMzrdyy2FlFXlfJVRobAduj5VOVMsOiGvwyfzsp0oyTeP7gLBCzTx79cgm0_RA"
   }
 }
