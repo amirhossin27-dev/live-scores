@@ -14,7 +14,7 @@ export interface WatcherDeps {
   push: (sub: PushSubscriptionJSON, msg: PushMessage) => Promise<{ status: number }>
 }
 
-export interface WorkerStatus { registered: boolean; lastTickAt: number | null; scheduleReady: boolean; favoritesToday: number; lastError: string | null }
+export interface WorkerStatus { registered: boolean; lastTickAt: number | null; scheduleReady: boolean; favoritesToday: number; lastError: string | null; lastPushFailed: boolean }
 
 interface Meta { lastTickAt?: number; lastSuccessAt?: number; lastError?: string; outageSince?: number; outageNotified?: boolean; leaseUntil?: number }
 interface Schedule { days: string[]; competitions: string[]; matches: ScheduledMatch[]; ok: boolean; attemptAt: number }
@@ -82,8 +82,11 @@ async function refreshSchedule(deps: WatcherDeps, devices: DeviceRecord[], now: 
   return schedule
 }
 
-/** The player of the index-th goal or sending-off of a side, from the match details; undefined when unknown. */
-async function playerOf(deps: WatcherDeps, competition: string, id: string, events: MatchEvent[]): Promise<Map<MatchEvent, string>> {
+/**
+ * The player of the index-th goal or sending-off of a side, from the match details. Only when ESPN lists exactly as many
+ * goals (sending-offs) of that side as the score shows: a disallowed goal kept in the list would shift the names.
+ */
+async function playerOf(deps: WatcherDeps, competition: string, id: string, events: MatchEvent[], next: MatchState): Promise<Map<MatchEvent, string>> {
   const players = new Map<MatchEvent, string>()
   try {
     const response = await deps.api(`/api/sports/match?competition=${encodeURIComponent(competition)}&id=${encodeURIComponent(id)}`)
@@ -92,6 +95,8 @@ async function playerOf(deps: WatcherDeps, competition: string, id: string, even
     for (const event of events) {
       const kinds = event.kind === 'goal' ? ['goal', 'penalty', 'own-goal'] : event.kind === 'goal-cancelled' ? [] : ['red', 'yellow-red']
       const ofSide = (details.events ?? []).filter((moment) => moment.side === event.side && kinds.includes(moment.kind))
+      const expected = event.kind === 'goal' ? next[event.side] : next[event.side === 'home' ? 'homeOff' : 'awayOff']
+      if (ofSide.length !== expected) continue
       const player = ofSide[event.index - 1]?.player
       if (player) players.set(event, player)
     }
@@ -105,13 +110,17 @@ async function send(deps: WatcherDeps, deviceKeys: Iterable<string>, msg: PushMe
   for (const key of deviceKeys) {
     const device = deps.store.get<DeviceRecord>(deviceKey(key))
     if (!device) continue
+    let status = 0
     try {
-      const { status } = await deps.push(device.subscription, msg)
-      if (status === 404 || status === 410) deps.store.delete(deviceKey(key))
-      else if (status >= 400) patchMeta(deps.store, { lastError: `Push-Dienst antwortet mit HTTP ${status}` })
+      status = (await deps.push(device.subscription, msg)).status
     } catch (error) {
       patchMeta(deps.store, { lastError: error instanceof Error ? error.message : String(error) })
     }
+    if (status === 404 || status === 410) { deps.store.delete(deviceKey(key)); continue }
+    if (status === 0 || status >= 400) patchMeta(deps.store, { lastError: `Push-Dienst antwortet mit HTTP ${status}` })
+    // Kept per device, so that the status line of that device turns red when its notifications are refused.
+    const current = deps.store.get<DeviceRecord>(deviceKey(key))
+    if (current) deps.store.put(deviceKey(key), { ...current, lastPushStatus: status, lastPushAt: deps.now() } satisfies DeviceRecord)
   }
 }
 
@@ -160,21 +169,25 @@ async function run(deps: WatcherDeps, now: number) {
     for (const [key, m] of received) {
       const entry = watched.get(key)!
       const competition = entry.match.competition
-      const previous = stored.get(stateKey(key))
+      // Read now, not at the start: a run that outlived its lease must not compare against a state a later run wrote.
+      const previous = store.get<StoredState>(stateKey(key))
+      if (previous && previous.seenAt >= now) continue
       const next = stateOf(m)
       // Save first, then send: a crash afterwards means one notification too few, never one twice.
       store.put(stateKey(key), { state: next ?? previous?.state ?? null, status: m.status, start: m.start, seenAt: now } satisfies StoredState)
       if (!next || !previous?.state) continue
       const events = detectEvents(previous.state, next)
       if (!events.length) continue
-      const players = await playerOf(deps, competition, m.id, events)
+      const players = await playerOf(deps, competition, m.id, events, next)
       for (const event of events) await send(deps, entry.devices, buildEventMessage(competition, m, event, players.get(event)))
     }
   }
 
   for (const [key, value] of stored) {
     const finished = value.status === 'finished' || value.status === 'postponed' || value.status === 'canceled'
-    if ((finished && now - value.seenAt > keepState) || now - Date.parse(value.start) > 2 * keepState) store.delete(key)
+    // A running match nobody watches any more forgets its state: watched again later, it starts fresh (no burst of old goals).
+    const unwatched = !finished && !watched.has(key.slice('state:'.length)) && value.seenAt < now
+    if (unwatched || (finished && now - value.seenAt > keepState) || now - Date.parse(value.start) > 2 * keepState) store.delete(key)
   }
 }
 
@@ -183,11 +196,13 @@ export async function tick(deps: WatcherDeps): Promise<void> {
   const now = deps.now()
   const current = meta(deps.store)
   if (current.leaseUntil && current.leaseUntil > now) return
-  patchMeta(deps.store, { leaseUntil: now + leaseTime, lastTickAt: now })
+  const lease = now + leaseTime
+  patchMeta(deps.store, { leaseUntil: lease, lastTickAt: now })
   try {
     await run(deps, now)
   } finally {
-    patchMeta(deps.store, { leaseUntil: undefined })
+    // Only our own lease: a run that took longer than its lease must not free the lease of the run after it.
+    if (meta(deps.store).leaseUntil === lease) patchMeta(deps.store, { leaseUntil: undefined })
   }
 }
 
@@ -196,7 +211,11 @@ export async function register(deps: WatcherDeps, body: unknown): Promise<{ ok: 
   if ('error' in parsed) return parsed
   const key = await endpointKey(parsed.subscription.endpoint)
   const now = deps.now()
-  deps.store.put(deviceKey(key), { key, ...parsed, lastSeen: now } satisfies DeviceRecord)
+  // The result of the last push stays while the subscription is the same (the app re-registers on every start).
+  const before = deps.store.get<DeviceRecord>(deviceKey(key))
+  const same = before && before.subscription.keys.p256dh === parsed.subscription.keys.p256dh && before.subscription.keys.auth === parsed.subscription.keys.auth
+  const last = same ? { lastPushStatus: before.lastPushStatus, lastPushAt: before.lastPushAt } : {}
+  deps.store.put(deviceKey(key), { key, ...parsed, lastSeen: now, ...last } satisfies DeviceRecord)
   const devices = devicesOf(deps.store)
   if (devices.length > maxDevices) {
     const oldest = devices.filter((device) => device.key !== key).sort((a, b) => a.lastSeen - b.lastSeen)
@@ -228,6 +247,7 @@ export async function status(deps: WatcherDeps, endpoint: string): Promise<Worke
     scheduleReady: schedule !== undefined && schedule.ok && schedule.days[0] === today,
     favoritesToday,
     lastError: m.lastError ?? null,
+    lastPushFailed: device?.lastPushStatus !== undefined && (device.lastPushStatus === 0 || device.lastPushStatus >= 400),
   }
 }
 

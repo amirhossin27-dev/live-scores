@@ -176,6 +176,87 @@ describe('tick', () => {
     expect(h.sent.map((s) => s.msg.title)).toEqual(['⚽ Tor für Bayern'])
   })
 
+  test('a run that outlives its lease does not push the same goal twice', async () => {
+    await registerFav(h)
+    await tick(h.deps)
+    h.setMatch(match('1', '0'))
+    const fastApi = h.deps.api
+    let release!: () => void
+    const gate = new Promise<void>((resolve) => { release = resolve })
+    let hold = true
+    h.deps.api = async (path) => { if (hold) { hold = false; await gate } return fastApi(path) }
+    h.setNow(kickOff + 11 * minute)
+    const slow = tick(h.deps)
+    h.setNow(kickOff + 17 * minute)
+    await tick(h.deps)
+    expect(h.sent).toHaveLength(1)
+    release()
+    await slow
+    expect(h.sent).toHaveLength(1)
+  })
+
+  test('a run that outlives its lease does not release the lease of the next run', async () => {
+    await registerFav(h)
+    await tick(h.deps)
+    const fastApi = h.deps.api
+    const gates: (() => void)[] = []
+    h.deps.api = async (path) => { await new Promise<void>((resolve) => gates.push(resolve)); return fastApi(path) }
+    h.setNow(kickOff + 11 * minute)
+    const a = tick(h.deps)
+    h.setNow(kickOff + 17 * minute)
+    const b = tick(h.deps)
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    gates.shift()!()
+    await a
+    h.calls.length = 0
+    h.setNow(kickOff + 18 * minute)
+    await tick(h.deps)
+    expect(h.calls).toEqual([])
+    gates.forEach((go) => go())
+    h.deps.api = fastApi
+    await b
+  })
+
+  test('a match watched again after a pause starts from a fresh state (no burst of old goals)', async () => {
+    await registerFav(h)
+    h.setMatch(match('1', '0'))
+    await tick(h.deps)
+    await registerFav(h, 'a', [])
+    h.setNow(kickOff + 11 * minute); await tick(h.deps)
+    h.setMatch(match('3', '0'))
+    await registerFav(h, 'a', [fav])
+    h.setNow(kickOff + 12 * minute); await tick(h.deps)
+    expect(h.sent).toEqual([])
+    h.setMatch(match('4', '0'))
+    h.setNow(kickOff + 13 * minute); await tick(h.deps)
+    expect(h.sent.map((s) => s.msg.tag)).toEqual(['soccer/ger.1|7|goal|home|4'])
+  })
+
+  test('no scorer name when ESPN lists more goals of that side than the score shows', async () => {
+    await registerFav(h)
+    await tick(h.deps)
+    h.events = [{ kind: 'goal', side: 'home', player: 'Disallowed' }, { kind: 'goal', side: 'home', player: 'Kane' }]
+    h.setMatch(match('1', '0', { statusText: '' }))
+    h.setNow(kickOff + 11 * minute)
+    await tick(h.deps)
+    expect(h.sent.map((s) => s.msg.body)).toEqual(['Bayern 1:0 Dortmund'])
+  })
+
+  test('a push the service rejects marks the device in the status', async () => {
+    await registerFav(h)
+    await tick(h.deps)
+    h.pushStatus = 403
+    h.setMatch(match('1', '0'))
+    h.setNow(kickOff + 11 * minute)
+    await tick(h.deps)
+    expect((await status(h.deps, sub('a').endpoint)).lastPushFailed).toBe(true)
+    h.pushStatus = 201
+    h.setMatch(match('2', '0'))
+    h.setNow(kickOff + 12 * minute)
+    await tick(h.deps)
+    expect((await status(h.deps, sub('a').endpoint)).lastPushFailed).toBe(false)
+  })
+
   test('a match of a favourite competition running past midnight stays watched after the plan of the new day', async () => {
     const late = { ...fav, start: '2026-11-21T22:30:00Z' }
     h.setNow(Date.parse('2026-11-21T22:00:00Z'))
@@ -195,10 +276,10 @@ describe('tick', () => {
 describe('register, status and health', () => {
   test('status reports registered, lastTickAt, scheduleReady and favoritesToday', async () => {
     const h = harness()
-    expect(await status(h.deps, sub('a').endpoint)).toEqual({ registered: false, lastTickAt: null, scheduleReady: false, favoritesToday: 0, lastError: null })
+    expect(await status(h.deps, sub('a').endpoint)).toEqual({ registered: false, lastTickAt: null, scheduleReady: false, favoritesToday: 0, lastError: null, lastPushFailed: false })
     await registerFav(h, 'a', [fav, { ...fav, id: '8', start: '2026-11-25T14:30:00Z' }])
     await tick(h.deps)
-    expect(await status(h.deps, sub('a').endpoint)).toEqual({ registered: true, lastTickAt: kickOff + 10 * minute, scheduleReady: true, favoritesToday: 1, lastError: null })
+    expect(await status(h.deps, sub('a').endpoint)).toEqual({ registered: true, lastTickAt: kickOff + 10 * minute, scheduleReady: true, favoritesToday: 1, lastError: null, lastPushFailed: false })
   })
 
   test('register over limit evicts the least recently seen device', async () => {

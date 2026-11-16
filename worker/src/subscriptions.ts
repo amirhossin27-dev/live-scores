@@ -3,7 +3,11 @@ import { fromBase64url, type PushSubscriptionJSON } from './webpush'
 export interface FavoriteMatch { competition: string; id: string; start: string }
 
 /** One device with notifications on: its push subscription and its football favourites. */
-export interface DeviceRecord { key: string; subscription: PushSubscriptionJSON; favorites: FavoriteMatch[]; competitions: string[]; lastSeen: number }
+export interface DeviceRecord {
+  key: string; subscription: PushSubscriptionJSON; favorites: FavoriteMatch[]; competitions: string[]; lastSeen: number
+  /** HTTP status of the last push to this device (0: not reachable), and when. */
+  lastPushStatus?: number; lastPushAt?: number
+}
 
 export interface Registration { subscription: PushSubscriptionJSON; favorites: FavoriteMatch[]; competitions: string[] }
 

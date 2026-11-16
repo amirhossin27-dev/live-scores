@@ -33,6 +33,10 @@ describe('days', () => {
     expect(apiDaysFor('2026-11-21T14:30:00Z')).toEqual(['20261121'])
     expect(apiDaysFor('2026-11-21T23:30:00Z')).toEqual(['20261122', '20261121'])
   })
+  test('apiDaysFor adds the US day, under which ESPN files night matches (01:30 Berlin = previous US day)', () => {
+    expect(apiDaysFor('2026-11-22T01:30:00Z')).toContain('20261121')
+    expect(apiDaysFor('2026-11-22T01:30:00Z')).toContain('20261122')
+  })
 })
 
 describe('watchedMatches', () => {

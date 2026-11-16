@@ -1,7 +1,7 @@
 /** Web Push of the app: subscription, registration of the football favourites at the push worker, status. */
 
 export interface PushFavorite { competition: string; id: string; start: string }
-export interface WorkerStatus { registered: boolean; lastTickAt: number | null; scheduleReady: boolean; favoritesToday: number; lastError: string | null }
+export interface WorkerStatus { registered: boolean; lastTickAt: number | null; scheduleReady: boolean; favoritesToday: number; lastError: string | null; lastPushFailed?: boolean }
 export type PushAvailability = 'no-config' | 'unsupported' | 'not-installed' | 'denied' | 'ready'
 
 const settingKey = 'dwh.sports.push.v1'

@@ -51,6 +51,14 @@ test('an unknown device is registered again and the warning shows', async () => 
   await waitFor(() => expect(env.requests.some((r) => r.method === 'PUT')).toBe(true))
 })
 
+test('warns when the push service refused the last notification of this device', async () => {
+  const env = installPushEnv({ subscribed: true })
+  window.localStorage.setItem('dwh.sports.push.v1', 'on')
+  env.status = { registered: true, lastTickAt: Date.now() - 60_000, scheduleReady: true, favoritesToday: 1, lastError: null, lastPushFailed: true }
+  render(<NotificationSettings language="de" favorites={favorites} competitions={[]} />)
+  expect((await screen.findByText('Letzte Mitteilung wurde vom Push-Dienst abgelehnt')).classList.contains('is-warning')).toBe(true)
+})
+
 test('missing plan and unreachable watcher are warnings', async () => {
   const env = installPushEnv({ subscribed: true })
   window.localStorage.setItem('dwh.sports.push.v1', 'on')

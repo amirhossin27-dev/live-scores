@@ -6,7 +6,7 @@ function fakeWatcher() {
   const api: WatcherApi = {
     register: async (body) => { calls.push(['register', body]); return { ok: true, key: 'k' } },
     unregister: async (endpoint) => { calls.push(['unregister', endpoint]) },
-    status: async (endpoint) => { calls.push(['status', endpoint]); return { registered: true, lastTickAt: 1, scheduleReady: true, favoritesToday: 2, lastError: null } },
+    status: async (endpoint) => { calls.push(['status', endpoint]); return { registered: true, lastTickAt: 1, scheduleReady: true, favoritesToday: 2, lastError: null, lastPushFailed: false } },
     health: async () => ({ lastTickAt: 1, lastSuccessAt: 1, devices: 1, lastError: null }),
   }
   return { api, calls }

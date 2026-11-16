@@ -18,6 +18,7 @@ const copy = {
     stale: (minutes: number | null) => minutes === null ? 'Wächter noch nicht gelaufen' : `Wächter seit ${minutes} Min nicht gelaufen`,
     unregistered: 'Gerät nicht registriert – wird neu angemeldet',
     noPlan: 'Spielplan für heute fehlt',
+    pushRefused: 'Letzte Mitteilung wurde vom Push-Dienst abgelehnt',
     unreachable: 'Wächter nicht erreichbar',
     failed: (message: string) => `Einschalten fehlgeschlagen: ${message}`,
   },
@@ -32,6 +33,7 @@ const copy = {
     stale: (minutes: number | null) => minutes === null ? 'Watcher has not run yet' : `Watcher has not run for ${minutes} min`,
     unregistered: 'Device not registered – registering again',
     noPlan: 'Today’s fixtures are missing',
+    pushRefused: 'The push service refused the last notification',
     unreachable: 'Watcher not reachable',
     failed: (message: string) => `Could not switch on: ${message}`,
   },
@@ -46,6 +48,7 @@ export function statusLine(status: WorkerStatus | null, now: number, t: Copy): {
   const age = status.lastTickAt === null ? null : now - status.lastTickAt
   if (age === null || age > staleAfter) return { text: t.stale(age === null ? null : Math.floor(age / 60_000)), warning: true }
   if (!status.scheduleReady) return { text: t.noPlan, warning: true }
+  if (status.lastPushFailed) return { text: t.pushRefused, warning: true }
   return { text: t.ok(Math.max(1, Math.round(age / 60_000)), status.favoritesToday), warning: false }
 }
 

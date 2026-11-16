@@ -90,6 +90,8 @@ export async function sendPush(sub: PushSubscriptionJSON, payload: object, vapid
       Authorization: await vapidAuthorization(sub.endpoint, vapid, now),
     },
     body: body.buffer.slice(body.byteOffset, body.byteOffset + body.byteLength) as ArrayBuffer,
+    // A hanging push service must not hold the watcher past its lease.
+    signal: AbortSignal.timeout(10_000),
   })
   return { status: response.status }
 }

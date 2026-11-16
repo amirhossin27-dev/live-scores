@@ -52,6 +52,7 @@ describe('sendPush', () => {
     expect(headers.get('Content-Encoding')).toBe('aes128gcm')
     expect(headers.get('TTL')).toBe('3600')
     expect(headers.get('Urgency')).toBe('high')
+    expect(seen!.init.signal).toBeInstanceOf(AbortSignal)
     expect(headers.get('Authorization')).toMatch(/^vapid t=.+, k=.+$/)
     const plain = await decryptForTest(new Uint8Array(seen!.init.body as ArrayBuffer), receiver, auth)
     expect(JSON.parse(new TextDecoder().decode(plain))).toEqual({ title: 'T', body: 'B' })

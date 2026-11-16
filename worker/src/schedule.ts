@@ -12,6 +12,8 @@ const over: MatchStatus[] = ['finished', 'postponed', 'canceled']
 const dayFormat = (timeZone: string) => new Intl.DateTimeFormat('en-CA', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit' })
 const berlin = dayFormat('Europe/Berlin')
 const utc = dayFormat('UTC')
+// ESPN files a match under its US day: a night kick-off in Berlin (01:30) belongs to the previous day there.
+const us = dayFormat('America/New_York')
 const compact = (formatted: string) => formatted.replace(/-/g, '')
 
 /** `YYYYMMDD` of the calendar day in Berlin, optionally some days later. */
@@ -24,10 +26,10 @@ export function scheduleDays(now: number): string[] {
   return [berlinDay(now), berlinDay(now, 1)]
 }
 
-/** The days to ask the API for a match: the Berlin day of the kick-off and, where it differs, the UTC day. */
+/** The days to ask the API for a match: the Berlin day of the kick-off and, where they differ, the UTC and the US day. */
 export function apiDaysFor(start: string): string[] {
   const time = Date.parse(start)
-  const days = [berlinDay(time), compact(utc.format(new Date(time)))]
+  const days = [berlinDay(time), compact(utc.format(new Date(time))), compact(us.format(new Date(time)))]
   return [...new Set(days)]
 }
 
