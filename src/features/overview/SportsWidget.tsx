@@ -274,8 +274,8 @@ function MatchRow({ match, time, t, language, favorite, onToggleFavorite, onOpen
       {onOpen && <button type="button" className="sp-open" aria-label={t.details(teamName(home.name, language), teamName(away.name, language))} onClick={onOpen} />}
       <span className="sp-when">{when}</span>
       <span className={`sp-team is-home${home.winner ? ' is-winner' : ''}`}>
-        <SendOffs side={home} t={t} />
         <span className="sp-name">{teamName(home.name, language)}</span>
+        <SendOffs side={home} t={t} />
         <Logo side={home} />
       </span>
       <span className="sp-score">

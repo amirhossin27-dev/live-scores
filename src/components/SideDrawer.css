@@ -81,6 +81,14 @@
   border-bottom: 1px solid var(--border);
 }
 
+/* Title and subtitle stay on one line each; very long ones end in an ellipsis. */
+.side-drawer-header h2,
+.side-drawer-header p {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .side-drawer-header h2 {
   margin: 0;
   font-size: 18px;
@@ -90,7 +98,6 @@
   margin: 4px 0 0;
   color: var(--text-muted);
   font-size: 13px;
-  overflow-wrap: anywhere;
 }
 
 .side-drawer-close {

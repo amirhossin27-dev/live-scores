@@ -555,12 +555,14 @@
 }
 
 /* Match details (side panel) */
+/* Crest and name on each side, the score in the middle and the status on its own line below:
+   the narrow middle leaves the names their full width, so they stay on one line. */
 .md-head {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
-  gap: 10px;
-  padding: 14px 10px;
+  gap: 6px 8px;
+  padding: 12px 8px 10px;
   border: 1px solid var(--border);
   border-radius: 14px;
   background: var(--surface);
@@ -569,20 +571,24 @@
 .md-side {
   display: grid;
   justify-items: center;
-  gap: 8px;
+  gap: 6px;
   min-width: 0;
   text-align: center;
 }
 
 .md-side strong {
+  max-width: 100%;
+  overflow: hidden;
   color: var(--text-strong);
   font-size: 14px;
   line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .md-crest {
-  width: 46px;
-  height: 46px;
+  width: 40px;
+  height: 40px;
   object-fit: contain;
 }
 
@@ -592,12 +598,13 @@
 }
 
 .md-result {
-  display: grid;
-  justify-items: center;
-  gap: 4px;
+  display: contents;
 }
 
 .md-result b {
+  grid-column: 2;
+  grid-row: 1;
+  padding: 0 4px;
   color: var(--text-strong);
   font-size: 30px;
   font-variant-numeric: tabular-nums;
@@ -606,10 +613,19 @@
 }
 
 .md-result small {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  overflow: hidden;
   color: var(--text-muted);
   font-size: 12px;
   font-weight: 800;
   text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.md-result small:empty {
+  display: none;
 }
 
 .md-head.is-live .md-result b,
@@ -619,6 +635,7 @@
 
 .md-tabs {
   justify-self: start;
+  max-width: 100%;
 }
 
 .md-empty {
@@ -2918,7 +2935,8 @@ button.pp-club:focus-visible strong {
   .start-sports .sp-team { justify-content: flex-start; gap: 6px; min-height: 24px; text-align: left; }
   .start-sports .sp-team.is-home { grid-column: 2; grid-row: 1; }
   .start-sports .sp-team.is-away { grid-column: 2; grid-row: 2; }
-  .start-sports .sp-name { white-space: normal; overflow-wrap: anywhere; }
+  /* One line per club: long names end in an ellipsis, the sending-off cards stay visible behind them. */
+  .start-sports .sp-name { white-space: nowrap; }
   .start-sports .sp-logo { display: block; width: 18px; height: 18px; order: -1; }
   .start-sports .sp-when { grid-column: 1; grid-row: 1 / span 2; font-size: 11px; }
   .start-sports .sp-score { display: contents; }
@@ -2937,9 +2955,7 @@ button.pp-club:focus-visible strong {
   .sp-option { min-height: 44px; }
   .sp-order-move { min-width: 44px; min-height: 44px; }
   .sp-order-row { grid-template-columns: 12px 20px 18px minmax(0, 1fr) 44px 44px; }
-  .sp-order-name { white-space: normal; overflow-wrap: anywhere; }
   .md-tabs button { min-height: 40px; }
-  .md-side strong { overflow-wrap: anywhere; }
 }
 
 /* Keep exceptional load states visible without a normal refresh button. */

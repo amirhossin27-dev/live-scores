@@ -402,7 +402,7 @@ function MatchContent({ competition, competitionLabel, match, language, onBack, 
     const id = side === 'home' ? details?.homeTeamId : details?.awayTeamId
     return football && id
       ? <button type="button" className="md-side md-team-link" title={t.openTeam(name)} onClick={() => openTeam(id)}>{content}</button>
-      : <span className="md-side">{content}</span>
+      : <span className="md-side" title={name}>{content}</span>
   }
 
   return (

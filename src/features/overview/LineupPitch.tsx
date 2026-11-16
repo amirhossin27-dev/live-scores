@@ -143,14 +143,17 @@ function PitchPlayer({ player, side, marks, t, locale, language, onOpen, onOpenC
     player.subOut !== null ? t.subOut(player.subOut) : null,
     player.country ? `${t.nationality}: ${countryName(player.country, language)}` : null,
   ].filter(Boolean).join(', ')
+  const name = shortName(player.name)
+  // Long names (with the substitution minute) get a smaller size so they stay on one line next to their neighbours.
+  const long = name.length + (player.subOut !== null ? 4 : 0) >= 11
   const content = (
     <>
       <span className="lp-shirt">
         {player.jersey ?? ''}
         {player.captain && <span className="lp-captain" aria-hidden="true">C</span>}
       </span>
-      <span className="lp-name">
-        {shortName(player.name)}
+      <span className={`lp-name${long ? ' is-long' : ''}`}>
+        <span className="lp-name-text">{name}</span>
         {player.subOut !== null && <i className="lp-off" aria-hidden="true">↓{player.subOut}′</i>}
       </span>
     </>

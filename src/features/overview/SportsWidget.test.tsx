@@ -717,8 +717,11 @@ describe('SportsWidget favourites', () => {
     carded.competitions[1].matches[0].away = { ...side('Borussia Dortmund', '1'), redCards: 1, yellowRedCards: 1 }
     api.loadSportsScores.mockResolvedValue(carded)
     renderWidget()
-    expect(await screen.findByRole('img', { name: 'Rote Karte' })).toBeTruthy()
+    const home = await screen.findByRole('img', { name: 'Rote Karte' })
     const away = screen.getByRole('img', { name: 'Gelb-Rote Karte, Rote Karte' })
+    // The cards follow the club name on both sides, never stand in front of it.
+    expect(home.previousElementSibling?.textContent).toBe('Bayern München')
+    expect(away.previousElementSibling?.textContent).toBe('Borussia Dortmund')
     expect([...away.querySelectorAll('.sp-card')].map((card) => card.className)).toEqual(['sp-card is-yellow-red', 'sp-card is-red'])
   })
 

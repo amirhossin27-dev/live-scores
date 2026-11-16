@@ -68,8 +68,12 @@ button.lp-player-open:hover .lp-shirt, button.lp-player-open:focus-visible .lp-s
 .lp-bench-compare { min-width: 0; overflow-x: visible; }
 .lp-bench-compare:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .lp .lp-benches { grid-template-columns: repeat(2, minmax(0, 1fr)); min-width: 0; gap: 12px; }
-.lp .lp-bench-row { grid-template-columns: 20px 16px minmax(0, 1fr) 26px 27px; gap: 4px; }
+/* One compact line per substitute; fixed slots keep minutes and ratings aligned down the list. */
+.lp .lp-bench-row { grid-template-columns: 20px 18px minmax(0, 1fr) 32px 28px; align-items: center; gap: 6px; min-height: 32px; padding: 0 4px; }
 .lp-bench-flag, .lp-bench-sub, .lp-bench-rating { display: flex; align-items: center; min-width: 0; }
+.lp-bench-flag { justify-content: center; }
+.lp .lp-bench-row .md-jersey { text-align: right; }
+.lp .lp-bench-sub .lp-on { white-space: nowrap; }
 .lp-bench-rating, .lp-bench-sub { justify-content: flex-end; }
 .lp-bench-identity { display: flex; align-items: center; gap: 5px; min-width: 0; }
 button.lp-bench-identity { width: 100%; min-height: 20px; padding: 0; border: 0; border-radius: 3px; background: transparent; box-shadow: none; color: inherit; font: inherit; text-align: left; }
@@ -86,32 +90,36 @@ button.lp-bench-identity:focus-visible { outline: 2px solid var(--accent); outli
 /* Fit the pitch to its panel instead of requiring a sideways swipe. */
 .lp { min-width: 0; }
 .lp .lp-player { width: min(76px, 19%); }
-.lp .lp-name { max-width: 100%; white-space: normal; overflow-wrap: anywhere; display: block; text-align: center; }
+/* Names stay on one line: they may use a little of the space between two players, long ones are set smaller, an ellipsis is the last resort. */
+.lp .lp-name { display: flex; justify-content: center; align-items: baseline; gap: 2px; max-width: calc(100% + 10px); white-space: nowrap; }
+.lp .lp-name-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.lp .lp-name .lp-off { flex: none; }
 .lp .lp-player-open { min-height: 44px; align-content: center; }
 .lp .lp-benches { grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); }
 .lp .lp-bench { min-width: 0; }
 .lp .lp-bench-row { width: 100%; min-width: 0; }
-.lp .lp-bench-identity .lp-bench-name { white-space: normal; overflow-wrap: anywhere; }
 @media (max-width: 900px) {
   .lp { gap: 12px; }
   .lp .lp-player { max-width: none; }
   .lp .lp-name { font-size: 10px; line-height: 1.15; }
+  .lp .lp-name.is-long { font-size: 9px; letter-spacing: -.01em; }
   .lp .lp-shirt { width: 25px; height: 25px; font-size: 11px; }
   .lp .lp-player > .lp-status { top: -10px; left: 50%; transform: translateX(-50%); width: 52px; grid-template-columns: 14px 22px 14px; column-gap: 1px; }
   .lp .lp-country-slot { padding-left: 0; }
   .lp .lp-country-slot .sp-country-flag, .lp .lp-country-slot .lp-country-link { width: 14px; height: 9px; }
   .lp .lp-status > .lp-events { width: auto; flex-direction: column; justify-content: center; gap: 1px; }
   .lp .lp-status .lp-rating { font-size: 9px; padding: 1px; }
-  .lp .lp-bench-row { grid-template-columns: 20px 24px minmax(0, 1fr) 26px 27px; }
-  .lp .lp-bench-identity { min-height: 44px; }
-  .lp .lp-bench-flag .lp-country-link { width: 24px; height: 32px; justify-content: center; }
+  .lp .lp-bench-row { grid-template-columns: 20px 24px minmax(0, 1fr) 32px 28px; gap: 6px; min-height: 36px; }
+  .lp .lp-bench-identity { min-height: 36px; }
+  /* The flag keeps a finger-sized tap area, drawn centred on the line. */
+  .lp .lp-bench-flag .lp-country-link { width: 24px; height: 36px; align-items: center; justify-content: center; }
   .lp .lp-coach-link { min-height: 44px; text-align: left; }
 }
 
 /* Team labels live outside the playing area so names never compete with the keeper. */
 .lp-teams { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-.lp .lp-teams .lp-team { position: static; display: grid; grid-template-columns: 8px minmax(0, 1fr) auto; align-items: center; gap: 5px; min-width: 0; max-width: none; color: var(--text-strong); font-size: 11px; line-height: 1.4; white-space: normal; }
+.lp .lp-teams .lp-team { position: static; display: grid; grid-template-columns: 8px minmax(0, 1fr) auto; align-items: center; gap: 5px; min-width: 0; max-width: none; color: var(--text-strong); font-size: 11px; line-height: 1.4; white-space: nowrap; }
 .lp-teams .lp-team::before { width: 8px; height: 8px; border: 1px solid var(--border); border-radius: 50%; background: #1d4ed8; content: ''; }
 .lp-teams .lp-team.is-away::before { background: #f8fafc; }
-.lp-teams .lp-team > span { min-width: 0; overflow: visible; overflow-wrap: anywhere; }
+.lp-teams .lp-team > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .lp-teams .lp-team > b { color: var(--text-muted); font-size: 10px; }

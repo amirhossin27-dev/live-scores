@@ -11,6 +11,18 @@
   min-width: 0;
 }
 
+/* Name and league line stay on one line each; a long league name ends in an ellipsis. */
+.tp-head > div {
+  min-width: 0;
+}
+
+.tp-head h3,
+.tp-head p {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .tp-head h3 {
   margin: 0;
   color: var(--text-strong);
@@ -19,12 +31,15 @@
 }
 
 .tp-head p {
-  display: flex;
-  align-items: center;
-  gap: 6px;
   margin: 3px 0 0;
   color: var(--text-muted);
   font-size: 13px;
+}
+
+.tp-head p > img {
+  display: inline-block;
+  margin-right: 6px;
+  vertical-align: -1px;
 }
 
 .tp-head .tp-crest {
