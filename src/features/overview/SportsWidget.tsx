@@ -17,6 +17,9 @@ import { useSportsScores } from './sportsHooks'
 import { teamName } from './sportsNames'
 import { favoriteKey, readFavoriteCompetitions, readSportsFavorites, saveFavoriteCompetitions, saveSportsFavorites, readSportsSelection, saveSportsSelection } from './sportsPrefs'
 import type { SportsFavorite } from './sportsPrefs'
+import { NotificationSettings } from '../notifications/NotificationSettings'
+import { usePushSync } from '../notifications/usePushSync'
+import { readViewOptions } from '../../runtime.mjs'
 
 const copy = {
   de: {
@@ -383,15 +386,18 @@ interface SettingsProps {
   t: Copy
   onToggle: (id: string) => void
   onMove: (id: string, to: number) => void
+  favorites: SportsFavorite[]
+  favoriteLeagues: string[]
   onReset: () => void
   onClose: () => void
 }
 
-function SportsSettings({ language, selection, t, onToggle, onMove, onReset, onClose }: SettingsProps) {
+function SportsSettings({ language, selection, t, favorites, favoriteLeagues, onToggle, onMove, onReset, onClose }: SettingsProps) {
   const lang = language === 'de' ? 'de' : 'en'
   return (
     <div className="sp-settings">
       <div className="sp-settings-exit"><button type="button" className="sp-text-button is-primary" onClick={onClose}>{t.done}</button></div>
+      <NotificationSettings language={language} favorites={favorites} competitions={favoriteLeagues} />
       <p className="sp-intro">{t.settingsIntro(selection.length)}</p>
       <CompetitionOrder language={language} selection={selection} t={t} onMove={onMove} />
       {sportsGroups.map((group) => (
@@ -451,6 +457,8 @@ export function SportsWidget({ language, now, appearanceControls }: { language: 
   const [filter, setFilter] = useState<'all' | 'live' | 'favorites'>('all')
   const [favorites, setFavorites] = useState<SportsFavorite[]>(() => readSportsFavorites(now.getTime()))
   const [favoriteLeagues, setFavoriteLeagues] = useState<string[]>(readFavoriteCompetitions)
+  const [embedded] = useState(() => readViewOptions(window.location.href).embedded)
+  usePushSync(favorites, favoriteLeagues, !embedded)
   const [offset, setOffset] = useState(0)
   // Until the user picks a day, a day without matches is skipped: the next day with matches is shown.
   const [auto, setAuto] = useState(true)
@@ -645,7 +653,7 @@ export function SportsWidget({ language, now, appearanceControls }: { language: 
       <h2 className="sp-sr">{t.title}</h2>
 
       {settingsOpen ? (
-        <div ref={settingsPane}><SportsSettings language={language} selection={selection} t={t} onToggle={toggle} onMove={move} onReset={() => change(presetSelection)} onClose={closeSettings} /></div>
+        <div ref={settingsPane}><SportsSettings language={language} selection={selection} t={t} favorites={favorites} favoriteLeagues={favoriteLeagues} onToggle={toggle} onMove={move} onReset={() => change(presetSelection)} onClose={closeSettings} /></div>
       ) : (
         <>
           <div className="sp-toolbar sp-toolbar-compact">

@@ -1,0 +1,5 @@
+.sp-push { display: grid; gap: 6px; }
+.sp-push-toggle input { accent-color: var(--accent); width: 18px; height: 18px; flex: none; }
+.sp-push-toggle span { white-space: normal; }
+.sp-push-status { margin: 0; color: var(--text-muted); font-size: 12px; line-height: 1.35; overflow-wrap: anywhere; }
+.sp-push-status.is-warning { color: #dc2626; font-weight: 600; }
