@@ -1,0 +1,15 @@
+{
+  // Push watcher for Live Scores: checks favourite football matches every minute and sends Web Push.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "live-scores-push",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-11-01",
+  "triggers": { "crons": ["* * * * *"] },
+  "durable_objects": { "bindings": [{ "name": "WATCHER", "class_name": "Watcher" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Watcher"] }],
+  // Public values only. The private VAPID key is the secret VAPID_PRIVATE_KEY (wrangler secret put).
+  "vars": {
+    "API_BASE_URL": "https://amir-live-scores-api.onrender.com",
+    "VAPID_PUBLIC_KEY": ""
+  }
+}
