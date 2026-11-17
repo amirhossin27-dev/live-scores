@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 import { swPushSource } from './src/swPush.mjs'
 export default defineConfig({
  base: './', plugins: [react(), {name:'offline-shell', generateBundle(_options,bundle) {
- const assets=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png','./icons/apple-touch-icon.png',...Object.keys(bundle).filter(p=>p.startsWith('assets/')).map(p=>'./'+p)];
+ const assets=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png','./icons/apple-touch-icon.png','./icons/favicon.ico','./icons/favicon-16.png','./icons/favicon-32.png','./icons/favicon-48.png',...Object.keys(bundle).filter(p=>p.startsWith('assets/')).map(p=>'./'+p)];
  const version=process.env.GITHUB_SHA ?? String(Date.now());
  this.emitFile({type:'asset',fileName:'sw.js',source:`const CACHE='${pkgName}-${version}'; const ASSETS=${JSON.stringify(assets)};
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting()))});
