@@ -164,7 +164,8 @@ public sealed partial class SportsService
 
     /// <summary>The competition of the catalog that FotMob's league id stands for.</summary>
     public static string? CompetitionOf(int? leagueId) =>
-        leagueId is null ? null : FotMobLeagues.FirstOrDefault(pair => pair.Value == leagueId).Key;
+        leagueId is 9807 or 9808 or 9809 ? "soccer/uefa.nations"
+        : leagueId is null ? null : FotMobLeagues.FirstOrDefault(pair => pair.Value == leagueId).Key;
 
     /// <summary>
     /// The form of each team with FotMob's id: its last finished matches of the competition (newest first) and the next match (the

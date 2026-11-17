@@ -90,8 +90,8 @@ public sealed partial class SportsService
     {
         requestedSeason = SportsSeasons.Normalize(requestedSeason);
         var currentTask = GetEspnTableAsync(competition, cancellationToken);
-        var fotMobTask = fotMob is not null && FotMobLeagues.TryGetValue(competition, out var leagueId)
-            ? fotMob.GetLeagueAsync(leagueId, cancellationToken, requestedSeason) : null;
+        var fotMobTask = fotMob is not null && FotMobLeagues.ContainsKey(competition)
+            ? GetCompetitionLeagueAsync(competition, cancellationToken, requestedSeason) : null;
         var catalogTask = transfermarkt?.GetArchiveCatalogAsync(competition, cancellationToken);
         var current = await currentTask;
         var league = fotMobTask is null ? null : await fotMobTask;
@@ -105,7 +105,9 @@ public sealed partial class SportsService
             ? current : year is { } selectedYear ? await GetEspnTableAsync(competition, cancellationToken, selectedYear) : null;
         // Some upstreams silently return the current season for unknown historical requests.
         if (requestedSeason is not null && SportsSeasons.Normalize(espn?.Season) != requestedSeason) espn = null;
-        if (requestedSeason is not null && SportsSeasons.Normalize(league?.Season) != requestedSeason && league is not null)
+        var leagueSeason = isCurrent
+            ? QualificationSourceSeason(competition, espn?.Season ?? requestedSeason, league?.Season) : league?.Season;
+        if (requestedSeason is not null && SportsSeasons.Normalize(leagueSeason) != requestedSeason && league is not null)
             league = league with { Table = null, Bracket = null, Fixtures = null };
 
         var table = espn?.Table ?? league?.Table;
@@ -125,12 +127,13 @@ public sealed partial class SportsService
         }
 
         if (table is not null && espn?.Table is not null && league?.Table is not null
-            && SportsSeasons.Normalize(espn.Season) == SportsSeasons.Normalize(league.Season))
+            && SportsSeasons.Normalize(espn.Season) is { } espnSeason && espnSeason == SportsSeasons.Normalize(leagueSeason))
         {
             table = AttachTeamIds(table, league.Table);
-            table = AttachQualificationZones(table, espn.Season, league.Table, league.Season);
+            table = AttachQualificationZones(table, espn.Season, league.Table, leagueSeason,
+                requireSnapshot: competition == "soccer/arg.1" && SportsSeasons.Normalize(league.Season) != SportsSeasons.Normalize(leagueSeason));
         }
-        if (table is not null && SportsSeasons.Normalize(season) == SportsSeasons.Normalize(league?.Season)
+        if (table is not null && SportsSeasons.Normalize(season) == SportsSeasons.Normalize(leagueSeason)
             && league?.Fixtures is { Count: > 0 } fixtures) table = AttachForm(table, fixtures);
         // Historical tables retain their original points and never receive today's running results.
         if (isCurrent && table is not null && competition.StartsWith("soccer/", StringComparison.Ordinal) && table.Columns.SequenceEqual(SoccerColumns))
@@ -157,7 +160,12 @@ public sealed partial class SportsService
         {
             try
             {
-                using var response = await http.GetAsync($"https://site.api.espn.com/apis/v2/sports/{competition}/standings" + (year is null ? "" : $"?season={year}"), cancellationToken);
+                var query = new List<string>();
+                if (year is not null) query.Add($"season={year}");
+                if (competition == "basketball/wnba") query.Add("level=1"); // Top eight across the whole league.
+                if (competition == "hockey/nhl") query.Add("level=3"); // Division berths plus conference wild cards.
+                using var response = await http.GetAsync($"https://site.api.espn.com/apis/v2/sports/{competition}/standings"
+                    + (query.Count == 0 ? "" : "?" + string.Join('&', query)), cancellationToken);
                 response.EnsureSuccessStatusCode();
                 var parsed = ParseStandings(competition, await response.Content.ReadAsStringAsync(cancellationToken));
                 entry.AbsoluteExpirationRelativeToNow = year is not null && year < DateTime.UtcNow.Year - 1 ? TimeSpan.FromHours(24) : StandingsCache;
@@ -282,17 +290,27 @@ public sealed partial class SportsService
                 var same = sameColumns && candidate.Values.SequenceEqual(row.Values) && (shared > 0 || unique);
                 return shared * 2 + (same ? 1 : 0);
             }).ToArray();
-            var best = scores.Max();
-            return best > 0 && scores.Count(score => score == best) == 1 ? candidates[Array.IndexOf(scores, best)].TeamId : null;
+            var byTeam = candidates.Select((candidate, index) => (candidate.TeamId, Score: scores[index]))
+                .GroupBy(item => item.TeamId).Select(group => (Id: group.Key, Score: group.Max(item => item.Score))).ToArray();
+            var best = byTeam.Max(item => item.Score);
+            return best > 0 && byTeam.Count(item => item.Score == best) == 1 ? byTeam.Single(item => item.Score == best).Id : null;
         }
 
         var partners = table.Groups.Select(group => group.Rows.Select(Partner).ToArray()).ToArray();
-        var wanted = partners.SelectMany(ids => ids).OfType<string>().GroupBy(id => id).Where(group => group.Count() > 1).Select(group => group.Key).ToHashSet(StringComparer.Ordinal);
+        // Identical target teams may recur in several phases, but different teams must never share an id.
+        var conflicts = table.Groups.SelectMany((group, groupIndex) => group.Rows.Select((row, rowIndex) =>
+                (Name: row.Name.Trim(), Id: partners[groupIndex][rowIndex])))
+            .Where(item => item.Id is not null).GroupBy(item => item.Id!)
+            .Where(group => group.Select(item => item.Name).Distinct(StringComparer.OrdinalIgnoreCase).Count() > 1)
+            .Select(group => group.Key).ToHashSet(StringComparer.Ordinal);
+        // A team can appear in both a conference and an overall/phase table; only collisions within one group are ambiguous.
+        var wanted = partners.Select(ids => ids.OfType<string>().GroupBy(id => id).Where(group => group.Count() > 1)
+            .Select(group => group.Key).ToHashSet(StringComparer.Ordinal)).ToArray();
         return table with
         {
             Groups = table.Groups.Select((group, groupIndex) => group with
             {
-                Rows = group.Rows.Select((row, rowIndex) => partners[groupIndex][rowIndex] is { } id && !wanted.Contains(id) ? row with { TeamId = id } : row).ToArray(),
+                Rows = group.Rows.Select((row, rowIndex) => partners[groupIndex][rowIndex] is { } id && !wanted[groupIndex].Contains(id) && !conflicts.Contains(id) ? row with { TeamId = id } : row).ToArray(),
             }).ToArray(),
         };
     }
@@ -303,7 +321,7 @@ public sealed partial class SportsService
     /// Match groups by their complete team-id sets, then copy zones by rank, never by the team's current position at the
     /// other provider. Unknown seasons, partial groups and ambiguous matches retain the original source's zones.
     /// </summary>
-    public static SportsTable AttachQualificationZones(SportsTable table, string? season, SportsTable fotMob, string? fotMobSeason)
+    public static SportsTable AttachQualificationZones(SportsTable table, string? season, SportsTable fotMob, string? fotMobSeason, bool requireSnapshot = false)
     {
         if (SeasonIdentity(season) is not { } identity || identity != SeasonIdentity(fotMobSeason)) return table;
         if (!table.Columns.SequenceEqual(fotMob.Columns)) return table;
@@ -319,6 +337,15 @@ public sealed partial class SportsService
         {
             if (TeamIds(group) is not { } teams) return group;
             var candidates = fotMob.Groups.Where(candidate => TeamIds(candidate) is { } others && teams.SetEquals(others)).ToArray();
+            // Repeated team sets can describe different phases. Identical allocations are safe regardless
+            // of the phase; otherwise require a complete matching team-stat snapshot to identify it.
+            var sameAllocations = candidates.Length > 1 && candidates.Skip(1).All(candidate =>
+                candidate.Rows.OrderBy(row => row.Rank).Select(row => (row.Rank, row.ZoneKey, row.Zone))
+                    .SequenceEqual(candidates[0].Rows.OrderBy(row => row.Rank).Select(row => (row.Rank, row.ZoneKey, row.Zone))));
+            if (sameAllocations) candidates = [candidates[0]];
+            else if (candidates.Length > 1 || requireSnapshot)
+                candidates = candidates.Where(candidate => group.Rows.All(row => candidate.Rows.Any(other =>
+                    other.TeamId == row.TeamId && other.Values.SequenceEqual(row.Values)))).ToArray();
             if (candidates.Length != 1) return group;
             var source = candidates[0];
             if (!source.Rows.Any(row => row.ZoneKey is not null)) return group;
@@ -393,6 +420,9 @@ public sealed partial class SportsService
         var groups = new List<SportsTableGroup>();
         // the season of the tables themselves; the root names the coming season once it is set up (MLB in October: 2027)
         string? season = null;
+        var tableSeason = nodes.Select(node => SeasonOf(Text(node.GetProperty("standings"), "seasonDisplayName"))).OfType<string>().FirstOrDefault()
+            ?? (root.TryGetProperty("season", out var publishedSeason) ? SeasonOf(Text(publishedSeason, "displayName")) : null);
+        var playoffZones = PlayoffZones(competition, root, nodes, tableSeason);
         foreach (var node in nodes)
         {
             var standings = node.GetProperty("standings");
@@ -400,7 +430,8 @@ public sealed partial class SportsService
             var rows = new List<(SportsTableRow Row, double Order)>();
             foreach (var entry in standings.GetProperty("entries").EnumerateArray())
             {
-                if (StandingsRow(entry, sport, columns, zones) is { } row) rows.Add(row);
+                var teamId = entry.TryGetProperty("team", out var team) ? Text(team, "id") : null;
+                if (StandingsRow(entry, sport, columns, zones, teamId is null ? null : playoffZones.GetValueOrDefault(teamId)) is { } row) rows.Add(row);
             }
 
             if (rows.Count == 0) continue;
@@ -440,7 +471,7 @@ public sealed partial class SportsService
     };
 
     /// <summary>One line and the number it is sorted by: the place for football and racing, the seed (or the win share) for US sports.</summary>
-    private static (SportsTableRow Row, double Order)? StandingsRow(JsonElement entry, string sport, string[] columns, List<SportsZone> zones)
+    private static (SportsTableRow Row, double Order)? StandingsRow(JsonElement entry, string sport, string[] columns, List<SportsZone> zones, SportsZone? playoffZone = null)
     {
         var who = entry.TryGetProperty("team", out var team) && team.ValueKind == JsonValueKind.Object ? team
             : entry.TryGetProperty("athlete", out var athlete) && athlete.ValueKind == JsonValueKind.Object ? athlete : default;
@@ -492,6 +523,12 @@ public sealed partial class SportsService
             }
         }
 
+        if (zoneKey is null && playoffZone is not null)
+        {
+            zone = playoffZone.Color;
+            zoneKey = playoffZone.Key;
+            if (!zones.Any(item => item.Key == zoneKey)) zones.Add(playoffZone);
+        }
         return (new SportsTableRow(0, name.Trim(), logo, columns.Select(Value).ToArray(), zone, ZoneKey: zoneKey), order);
     }
 

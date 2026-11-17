@@ -22,13 +22,15 @@ export function zoneAppearance(label: SportsText): CSSProperties {
   let palette: readonly [string, string]
   if (relegationPlayoff) palette = palettes.relegationPlayoff
   else if (relegation) palette = palettes.relegation
-  else if (/champions\s?league/.test(meaning)) palette = palettes.champions
+  else if (/playoff bye|division series|first.round bye/.test(meaning)) palette = palettes.champions
+  else if (/playoff berth|stanley cup playoffs/.test(meaning)) palette = palettes.qualification
+  else if (/champions\s?league|libertadores/.test(meaning)) palette = palettes.champions
   else if (/conference/.test(meaning)) palette = palettes.conference
-  else if (/europa/.test(meaning)) palette = palettes.europa
-  else if (/playoff|play off|possible qualification/.test(meaning)) palette = palettes.playoff
+  else if (/europa|sudamericana|afc cup/.test(meaning)) palette = palettes.europa
+  else if (/playoff|play off|play\s?in|wild\s?card|possible qualification|promotion\s?qual/.test(meaning)) palette = palettes.playoff
   else if (/promotion/.test(meaning)) palette = palettes.promotion
   else if (/eliminat/.test(meaning)) palette = palettes.eliminated
-  else if (/qualif|advance|finals|next stage/.test(meaning)) palette = palettes.qualification
+  else if (/qualif|advance|finals|next stage|world\s?cup/.test(meaning)) palette = palettes.qualification
   // An unlabeled provider marker must not borrow the colour of a known competition.
   else palette = palettes.eliminated
   return {

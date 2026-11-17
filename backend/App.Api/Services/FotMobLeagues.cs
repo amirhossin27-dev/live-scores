@@ -227,15 +227,23 @@ public sealed partial class FotMobService
     private static SportsTable? LeagueTable(JsonElement root)
     {
         if (!root.TryGetProperty("table", out var tables) || tables.ValueKind != JsonValueKind.Array || tables.GetArrayLength() == 0) return null;
-        if (!tables[0].TryGetProperty("data", out var data) || data.ValueKind != JsonValueKind.Object) return null;
-
-        var parts = data.TryGetProperty("tables", out var composite) && composite.ValueKind == JsonValueKind.Array ? composite.EnumerateArray().ToArray() : [data];
+        // A competition can contain multiple independent table blocks, each with its own groups and legend.
+        var parts = new List<(JsonElement Table, JsonElement Parent)>();
+        foreach (var block in tables.EnumerateArray())
+        {
+            if (!block.TryGetProperty("data", out var data) || data.ValueKind != JsonValueKind.Object) continue;
+            if (data.TryGetProperty("tables", out var composite) && composite.ValueKind == JsonValueKind.Array)
+                parts.AddRange(composite.EnumerateArray().Select(part => (part, data)));
+            else parts.Add((data, default));
+        }
         var zones = new List<SportsZone>();
         var groups = new List<SportsTableGroup>();
-        foreach (var part in parts)
+        foreach (var (part, parent) in parts)
         {
             var groupZones = new List<(SportsZone Zone, HashSet<int>? Ranks)>();
-            if (part.TryGetProperty("legend", out var legend) && legend.ValueKind == JsonValueKind.Array)
+            var ownLegend = part.TryGetProperty("legend", out var legend) && legend.ValueKind == JsonValueKind.Array;
+            if (!ownLegend && parent.ValueKind == JsonValueKind.Object) parent.TryGetProperty("legend", out legend);
+            if (legend.ValueKind == JsonValueKind.Array)
             {
                 foreach (var item in legend.EnumerateArray())
                 {
@@ -255,14 +263,16 @@ public sealed partial class FotMobService
             var lines = rows.EnumerateArray().Select(TableRow).OfType<SportsTableRow>().OrderBy(row => row.Rank).Select(row =>
             {
                 // Legend indices describe places, whereas colours are presentation and can be shared by different zones.
-                var matches = groupZones.Where(item => item.Ranks?.Contains(row.Rank) == true).Select(item => item.Zone).ToArray();
+                // An inherited legend may combine different groups. Require the row's marker as evidence in that case.
+                var matches = groupZones.Where(item => item.Ranks?.Contains(row.Rank) == true
+                    && (ownLegend || item.Zone.Color == row.Zone)).Select(item => item.Zone).ToArray();
                 if (matches.Length == 0)
                     matches = groupZones.Where(item => item.Ranks is null && item.Zone.Color == row.Zone).Select(item => item.Zone).ToArray();
                 if (matches.Length == 1) return row with { Zone = matches[0].Color, ZoneKey = matches[0].Key };
                 // Do not turn an ambiguous provider colour into a wrong qualification category.
                 return groupZones.Any(item => item.Zone.Color == row.Zone) ? row with { Zone = null, ZoneKey = null } : row;
             }).ToArray();
-            if (lines.Length > 0) groups.Add(new SportsTableGroup(parts.Length > 1 ? Text(part, "leagueName") : null, lines));
+            if (lines.Length > 0) groups.Add(new SportsTableGroup(parts.Count > 1 || parent.ValueKind == JsonValueKind.Object ? Text(part, "leagueName") : null, lines));
         }
 
         return groups.Count == 0 ? null : new SportsTable(TableColumns, groups, zones, "fotmob");
