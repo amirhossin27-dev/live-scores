@@ -82,12 +82,25 @@ function columnLabel(column: SportsTableColumn, competition: string, language: L
 
 /** The meaning of a colour of the table in German: by FotMob's key or by ESPN's English text; unknown ones stay English. */
 const zoneLabels: Record<string, string> = {
+  playoff_berth: 'Play-offs',
+  playin: 'Play-in-Turnier',
+  playoff_bye: 'Play-offs mit Freilos in Runde 1',
+  wildcard: 'Play-offs (Wild Card)',
+  division_series: 'Division Series (Freilos in Runde 1)',
+  wildcard_series: 'Wild-Card-Serie',
+  stanley_cup_playoffs: 'Stanley-Cup-Play-offs',
   championsleague: 'Champions League',
   'champions league': 'Champions League',
+  clqual: 'Champions-League-Qualifikation',
+  'champions league qualification': 'Champions-League-Qualifikation',
   'champions league qualifying': 'Champions-League-Qualifikation',
   europaleague: 'Europa League',
   'europa league': 'Europa League',
+  euroqual: 'Europa-League-Qualifikation',
+  'europa league qualification': 'Europa-League-Qualifikation',
   'europa league qualifying': 'Europa-League-Qualifikation',
+  europa_conference_league_playoff: 'Conference-League-Play-offs',
+  'conference league playoff': 'Conference-League-Play-offs',
   europa_conference_league: 'Conference-League-Qualifikation',
   'conference league': 'Conference League',
   'uefa conference league': 'Conference League',
@@ -100,6 +113,8 @@ const zoneLabels: Record<string, string> = {
   'relegation playoff': 'Relegation',
   'relegation playoffs': 'Relegation',
   promotion: 'Aufstieg',
+  promotionqual: 'Aufstiegs-Play-offs',
+  'promotion qualification': 'Aufstiegs-Play-offs',
   'promotion playoff': 'Aufstiegsrelegation',
   'promotion playoffs': 'Aufstiegs-Play-offs',
   championship_playoff: 'Meisterrunde',
@@ -124,22 +139,40 @@ const zoneLabels: Record<string, string> = {
   'qualifies for world cup': 'WM-Teilnahme',
   'qualifies for world cup playoffs': 'WM-Play-offs',
   'inter-confederation playoffs': 'Interkontinentale Play-offs',
+  world_cup: 'WM-Teilnahme',
+  'world cup': 'WM-Teilnahme',
+  tr_afcchampionsleague: 'AFC Champions League',
+  tr_afcchampionsleaguequal: 'AFC-Champions-League-Qualifikation',
+  'afc champions league qualification': 'AFC-Champions-League-Qualifikation',
+  tr_afcccup: 'AFC Cup',
+  copalibertadores: 'Copa Libertadores',
+  copalibertadoresqual: 'Copa-Libertadores-Qualifikation',
+  'copa libertadores qualification': 'Copa-Libertadores-Qualifikation',
+  copasudamericana: 'Copa Sudamericana',
   qualification_next_stage: 'Nächste Runde',
   'qualification next stage': 'Nächste Runde',
   possible_qualification_next_stage: 'Mögliche nächste Runde',
   'possible qualification next stage': 'Mögliche nächste Runde',
 }
 
-function zoneLabel(label: SportsText, language: Language) {
+function zoneLabel(label: SportsText, language: Language, competition: string) {
+  // The same source key describes domestic championship rounds and national-team knockout stages.
+  if ((competition === 'soccer/uefa.nations' || competition === 'soccer/concacaf.nations.league')
+    && (label.key === 'championship_playoff' || label.text.trim().toLowerCase() === 'championship playoff')) {
+    return language === 'de' ? 'K.-o.-Runde der Nations League' : 'Nations League knockout stage'
+  }
+  if (competition.startsWith('soccer/fifa.worldq.') && label.key === 'qualification_next_stage') {
+    return language === 'de' ? 'WM-Play-offs' : 'World Cup play-offs'
+  }
   if (language !== 'de') return label.text
-  return (label.key && zoneLabels[label.key]) ?? zoneLabels[label.text.trim().toLowerCase()] ?? label.text
+  return (label.key && zoneLabels[label.key.trim().toLowerCase()]) ?? zoneLabels[label.text.trim().toLowerCase()] ?? label.text
 }
 
 /** "Group A" / FotMob's "Grp. A", "League Phase", "League A, Group B", the two classifications of Formula 1. */
 function groupName(name: string, language: Language) {
-  if (language !== 'de') return name.replace(/^Grp\.\s*/, 'Group ')
+  if (language !== 'de') return name.replace(/\bGrp\.\s*/g, 'Group ')
   return name
-    .replace(/^Grp\.\s*/, 'Gruppe ')
+    .replace(/\bGrp\.\s*/g, 'Gruppe ')
     .replace(/\bGroup\b/g, 'Gruppe')
     .replace(/\bLeague Phase\b/i, 'Ligaphase')
     .replace(/\bLeague ([A-D])\b/g, 'Liga $1')
@@ -194,7 +227,7 @@ function StandingsTable({ table, competition, language, focus, t, onOpenTeam }: 
   }
   const zones = sourceZones.map((zone) => ({
     ...zone,
-    name: zoneLabel(zone.label, language),
+    name: zoneLabel(zone.label, language, competition),
     style: zoneAppearance(zone.label),
   }))
   const zoneOf = (key: string | null) => key ? zones.find((zone) => zoneKey(zone) === key) : undefined

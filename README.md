@@ -23,6 +23,7 @@ Die lokale App nutzt die API automatisch. Fuer eine andere Adresse: `.env.exampl
 
 ```powershell
 npm test
+npm run test:backend
 npm run build
 dotnet build backend/App.Api -c Release
 ```

@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview --host 127.0.0.1",
     "test": "node --test tests/*.test.mjs && vitest run",
+    "test:backend": "dotnet run --project backend/App.Api.Tests",
     "test:unit": "vitest run",
     "test:runtime": "node --test tests/*.test.mjs"
   },

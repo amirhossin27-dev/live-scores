@@ -63,3 +63,19 @@ describe('table zone palettes', () => {
     expect(appearance('Unknown table zone')).toEqual(appearance('Eliminated'))
   })
 })
+
+it('distinguishes promotion qualification from direct promotion, including provider keys', () => {
+  const promotion = zoneAppearance({ key: 'promotion', text: 'Promotion' })
+  const playoff = zoneAppearance({ key: 'promotionqual', text: 'Promotion qualification' })
+  expect(playoff).toEqual(zoneAppearance({ key: null, text: 'Promotion playoff' }))
+  expect(playoff).not.toEqual(promotion)
+})
+
+it('distinguishes direct playoff berths, play-in qualification and first-round byes', () => {
+  const direct = zoneAppearance({ key: 'playoff_berth', text: 'Playoffs' })
+  const playIn = zoneAppearance({ key: 'playin', text: 'Play-In Tournament' })
+  const bye = zoneAppearance({ key: 'playoff_bye', text: 'Playoffs with a first-round bye' })
+  expect(direct).not.toEqual(playIn)
+  expect(bye).not.toEqual(playIn)
+  expect(bye).not.toEqual(direct)
+})

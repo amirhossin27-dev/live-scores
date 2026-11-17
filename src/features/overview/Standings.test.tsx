@@ -127,3 +127,44 @@ describe('standings zones', () => {
     expect(palettes[4]['--st-zone-dark']).not.toBe(palettes[5]['--st-zone-dark'])
   })
 })
+
+it.each([
+  ['playoff_berth', 'Playoffs', 'Play-offs'],
+  ['playin', 'Play-In Tournament', 'Play-in-Turnier'],
+  ['playoff_bye', 'Playoffs with a first-round bye', 'Play-offs mit Freilos in Runde 1'],
+  ['wildcard', 'Playoffs (wild card)', 'Play-offs (Wild Card)'],
+  ['division_series', 'Division Series (first-round bye)', 'Division Series (Freilos in Runde 1)'],
+  ['wildcard_series', 'Wild Card Series', 'Wild-Card-Serie'],
+  ['stanley_cup_playoffs', 'Stanley Cup Playoffs', 'Stanley-Cup-Play-offs'],
+  ['promotionqual', 'Promotion qualification', 'Aufstiegs-Play-offs'],
+  ['clqual', 'Champions League qualification', 'Champions-League-Qualifikation'],
+  ['euroqual', 'Europa League qualification', 'Europa-League-Qualifikation'],
+  ['europa_conference_league_playoff', 'Conference League playoff', 'Conference-League-Play-offs'],
+  ['tr_afcchampionsleaguequal', 'AFC Champions League Qualification', 'AFC-Champions-League-Qualifikation'],
+  ['copaLibertadoresQual', 'Copa Libertadores qualification', 'Copa-Libertadores-Qualifikation'],
+  ['world_cup', 'World Cup', 'WM-Teilnahme'],
+])('explains qualification marker %s in German', (key, text, expected) => {
+  const data: SportsStandings = { ...standings, table: { ...standings.table!, groups: [{ name: null, rows: [
+    { ...row(2, 'Qualifying Team', '#2AD572'), zoneKey: key },
+  ] }], zones: [{ key, color: '#2AD572', label: { key, text } }] } }
+  render(<StandingsBody standings={data} view="table" language="de" />)
+  expect(screen.getByRole('img', { name: `Platz 2: ${expected}` })).toBeTruthy()
+  expect(screen.getByRole('list', { name: 'Tabellenbereiche' }).textContent).toBe(expected)
+})
+
+it.each(['de', 'en'] as const)('distinguishes Nations League advancement from a domestic championship round in %s', (language) => {
+  const data: SportsStandings = { ...standings, competition: 'soccer/uefa.nations', table: { ...standings.table!, groups: [{ name: 'League A, Group 1', rows: [
+    { ...row(1, 'France', '#2AD572'), zoneKey: 'knockout' },
+  ] }], zones: [{ key: 'knockout', color: '#2AD572', label: { key: 'championship_playoff', text: 'Championship playoff' } }] } }
+  render(<StandingsBody standings={data} view="table" language={language} />)
+  expect(screen.getByRole('img', { name: language === 'de' ? 'Platz 1: K.-o.-Runde der Nations League' : 'Position 1: Nations League knockout stage' })).toBeTruthy()
+})
+
+it('explains the World Cup qualifying playoff and localizes nested league group names', () => {
+  const data: SportsStandings = { ...standings, competition: 'soccer/fifa.worldq.uefa', table: { ...standings.table!, groups: [{ name: 'League B, Grp. 1', rows: [
+    { ...row(2, 'Austria', '#FFD908'), zoneKey: 'playoff' },
+  ] }], zones: [{ key: 'playoff', color: '#FFD908', label: { key: 'qualification_next_stage', text: 'Qualification next stage' } }] } }
+  render(<StandingsBody standings={data} view="table" language="de" />)
+  expect(screen.queryByRole('img', { name: 'Platz 2: WM-Play-offs' })).not.toBeNull()
+  expect(screen.queryByRole('region', { name: 'Liga B, Gruppe 1' })).not.toBeNull()
+})
