@@ -24,3 +24,84 @@ body{margin:0;min-width:0}h1,h2,h3,p{margin-top:0}button,input,select,textarea{f
 .app-tools { display: flex; align-items: center; gap: 2px; flex: none; }
 .app-tools button { min-width: 44px; min-height: 44px; padding: 6px; border: 0; background: transparent; font-size: 13px; }
 .app-tools select { width: 88px; min-height: 44px; padding: 4px; border: 0; background: transparent; font-size: 16px; }
+
+.is-compact .start-sports.sp-overview {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  min-height: 190px;
+  padding: 0 12px 6px;
+  border-radius: 14px;
+}
+
+.is-compact .start-sports .panel-header {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 12px;
+  background: light-dark(#2563eb, #38bdf8);
+  color: white;
+  flex: none;
+  gap: 6px;
+  margin: 0 -12px 8px;
+}
+
+.is-compact .panel-header h2 { margin-right: auto; }
+.is-compact .start-sports .panel-header h2 {
+  color: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.is-compact .panel-header :is(.sp-icon-button, .sp-open-app) {
+  display: grid;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+}
+
+.is-compact .panel-header :is(button, a):is(:hover, :focus-visible, .active) {
+  background: rgb(255 255 255 / 22%);
+}
+
+.is-compact .sp-open-app svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.is-compact .start-sports .sp-list {
+  flex: 1;
+  min-height: 0;
+  max-height: none;
+  overflow: auto;
+}
+
+/* Keep the two-team row on wide frames and the stacked scoreboard on phones. */
+@media (min-width: 901px) {
+  .is-compact .sp-overview .sp-match:not(.is-single) {
+    grid-template-columns: 42px minmax(0, 1fr) 48px minmax(0, 1fr) 44px;
+  }
+}
+
+@media (min-width: 600px) {
+  .is-compact .sp-overview .sp-toolbar-compact {
+    display: flex;
+    flex-wrap: wrap;
+    max-width: none;
+    justify-content: space-between;
+  }
+}
+
+.is-compact .sp-compact-settings { min-height: 0; overflow: auto; }

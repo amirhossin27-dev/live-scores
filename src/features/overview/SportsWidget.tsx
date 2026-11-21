@@ -427,8 +427,9 @@ function SportsSettings({ language, selection, t, favorites, favoriteLeagues, on
 }
 
 /** Live scores of the competitions the user picked (preset: the Flashscore leagues, cups, European and national tournaments, Formula 1, UFC). */
-export function SportsWidget({ language, now, appearanceControls }: { language: Language; now: Date; appearanceControls?: ReactNode }) {
+export function SportsWidget({ language, now, compact = false, appearanceControls }: { language: Language; now: Date; compact?: boolean; appearanceControls?: ReactNode }) {
   const t = copy[language === 'de' ? 'de' : 'en']
+  const openLabel = language === 'de' ? 'Live Scores in neuem Tab öffnen' : 'Open Live Scores in a new tab'
   const locale = localeFor(language)
   const [selection, setSelection] = useState(readSportsSelection)
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -650,10 +651,18 @@ export function SportsWidget({ language, now, appearanceControls }: { language: 
 
   return (
     <article style={{ '--sp-utility-height': `${hasUtility ? utilityHeight : 0}px` } as CSSProperties} className={`panel start-sports sp-overview${hasUtility ? ' has-utility' : ''}${cached || offline ? ' is-snapshot' : ''}`} aria-label={`${t.eyebrow} · ${t.title}`}>
-      <h2 className="sp-sr">{t.title}</h2>
+      {compact ? (
+        <header className="panel-header">
+          <h2>{t.title}</h2>
+          {settingsControl}
+          <a className="sp-open-app" href="./" target="_blank" rel="noopener noreferrer" aria-label={openLabel} title={openLabel}>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" /></svg>
+          </a>
+        </header>
+      ) : <h2 className="sp-sr">{t.title}</h2>}
 
       {settingsOpen ? (
-        <div ref={settingsPane}><SportsSettings language={language} selection={selection} t={t} favorites={favorites} favoriteLeagues={favoriteLeagues} onToggle={toggle} onMove={move} onReset={() => change(presetSelection)} onClose={closeSettings} /></div>
+        <div ref={settingsPane} className={compact ? 'sp-compact-settings' : undefined}><SportsSettings language={language} selection={selection} t={t} favorites={favorites} favoriteLeagues={favoriteLeagues} onToggle={toggle} onMove={move} onReset={() => change(presetSelection)} onClose={closeSettings} /></div>
       ) : (
         <>
           <div className="sp-toolbar sp-toolbar-compact">
@@ -682,7 +691,7 @@ export function SportsWidget({ language, now, appearanceControls }: { language: 
             <button ref={searchTrigger} type="button" className="sp-icon-button sp-search-toggle" aria-label={searchExpanded ? t.closeSearch : t.openSearch} aria-expanded={searchExpanded} onClick={() => searchExpanded ? closeSearch() : setSearchExpanded(true)}>
               {searchExpanded ? <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg> : <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" /><path d="m16 16 4.5 4.5" /></svg>}
             </button>
-            {!hasUtility && settingsControl}
+            {!hasUtility && !compact && settingsControl}
             </div>
             {searchExpanded && <SportsSearch language={language} autoFocus onCollapse={closeSearch} />}
             <div className="sp-filter" role="group" aria-label={t.title}>
