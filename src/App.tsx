@@ -20,11 +20,11 @@ export function App() {
   if(!embedded || !options.parentOrigin || window.parent===window)return
   try { if(new URL(document.referrer).origin!==options.parentOrigin)return } catch {return}
   const parentOrigin=options.parentOrigin
-  const report=()=>{const dialog=Boolean(document.querySelector('[role="dialog"]')); const height=dialog?1000:Math.max(240,Math.min(2200,Math.ceil(document.getElementById('root')?.scrollHeight || 600))); window.parent.postMessage({type:'standalone-app:resize',height},parentOrigin)}
+  const report=()=>{const dialog=Boolean(document.querySelector('[role="dialog"]')); const height=dialog?1000:Math.max(240,Math.min(2200,Math.ceil(document.getElementById('root')?.scrollHeight || 600))); window.parent.postMessage({type:'standalone-app:resize',height,hasOpenLink:compact},parentOrigin)}
   const resize=new ResizeObserver(report);resize.observe(document.getElementById('root')!);
   const mutations=new MutationObserver(report);mutations.observe(document.body,{subtree:true,childList:true});report()
   return()=>{resize.disconnect();mutations.disconnect()}
- },[embedded,options.parentOrigin])
+ },[embedded,compact,options.parentOrigin])
  const appearanceControls = <div className="app-tools">
    <button type="button" aria-label={de?'Sprache wechseln':'Change language'} onClick={()=>setLanguage(language==='de'?'en':'de')}>{language.toUpperCase()}</button>
    <label className="app-theme">
@@ -37,6 +37,6 @@ export function App() {
  return <div className={`standalone ${embedded?'is-embedded':''} ${compact?'is-compact':''}`}>
   <h1 className="app-title">Live Scores</h1>
   {!apiBaseUrl && <aside className="connection-notice" role="status">{de?'Die Verbindung für vollständige Live-Daten ist noch nicht eingerichtet.':'The connection for complete live data has not been configured yet.'}</aside>}
-  <main><SportsWidget language={language} now={now} appearanceControls={embedded ? undefined : appearanceControls} /></main>
+  <main><SportsWidget language={language} now={now} compact={compact} appearanceControls={embedded ? undefined : appearanceControls} /></main>
  </div>
 }
