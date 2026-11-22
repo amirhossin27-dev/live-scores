@@ -14,7 +14,8 @@ public sealed record FotMobMatchFacts(
     string? City,
     SportsCountry? StadiumCountry,
     string? HomeTeamId,
-    string? AwayTeamId);
+    string? AwayTeamId,
+    IReadOnlyList<SportsEvent> CoachDismissals);
 
 /// <summary>A side of a match in a team's schedule; <c>Logo</c> is FotMob's crest.</summary>
 public sealed record SportsTeamSide(string? Id, string Name, string? Logo, int? Score);
@@ -146,7 +147,9 @@ public sealed partial class FotMobService
         SportsOfficial? referee = null;
         string? stadium = null, city = null;
         SportsCountry? country = null;
-        if (TryChild(root, "content", out var content) && TryChild(content, "matchFacts", out var facts) && TryChild(facts, "infoBox", out var info) && info.ValueKind == JsonValueKind.Object)
+        TryChild(root, "content", out var content);
+        TryChild(content, "matchFacts", out var facts);
+        if (TryChild(facts, "infoBox", out var info) && info.ValueKind == JsonValueKind.Object)
         {
             if (TryChild(info, "Referee", out var official) && Text(official, "text") is { } name && !string.IsNullOrWhiteSpace(name))
             {
@@ -161,7 +164,31 @@ public sealed partial class FotMobService
             }
         }
 
-        return new FotMobMatchFacts(lineups, referee, stadium, city, country, IsValidTeamId(homeId) ? homeId : null, IsValidTeamId(awayId) ? awayId : null);
+        return new FotMobMatchFacts(lineups, referee, stadium, city, country, IsValidTeamId(homeId) ? homeId : null, IsValidTeamId(awayId) ? awayId : null, CoachDismissals(facts, lineups));
+    }
+
+    private static IReadOnlyList<SportsEvent> CoachDismissals(JsonElement facts, IReadOnlyList<SportsLineup> lineups)
+    {
+        if (!TryChild(facts, "events", out var group) || !TryChild(group, "events", out var events) || events.ValueKind != JsonValueKind.Array) return [];
+        var cards = new List<SportsEvent>();
+        foreach (var item in events.EnumerateArray())
+        {
+            if (Text(item, "type") != "Card" || Text(item, "card") is not ("Red" or "YellowRed" or "YellowRedCard")) continue;
+            if (!TryChild(item, "isHome", out var home) || home.ValueKind is not (JsonValueKind.True or JsonValueKind.False)) continue;
+            var side = home.GetBoolean() ? "home" : "away";
+            var lineup = lineups.FirstOrDefault(team => team.Side == side);
+            TryChild(item, "player", out var person);
+            var id = Text(person, "id") ?? Text(item, "playerId");
+            var matchesCoach = id is not null && id == lineup?.CoachId;
+            TryChild(item, "cardDescription", out var description);
+            if (!matchesCoach && Text(description, "localizedKey") != "coach") continue;
+            var name = matchesCoach ? lineup!.Coach : Text(person, "name") ?? Text(item, "nameStr");
+            var time = Whole(item, "time");
+            if (time is null) continue;
+            var minute = Whole(item, "overloadTime") is > 0 and var added ? $"{time}'+{added}'" : $"{time}'";
+            cards.Add(new SportsEvent(Text(item, "card") == "Red" ? "red" : "yellow-red", minute, side, name, null, IsCoach: true));
+        }
+        return cards;
     }
 
     // ---------- Team page ----------

@@ -1,10 +1,21 @@
-import type { SportsLineup, SportsPlayer } from './sportsApi'
+import type { SportsEvent, SportsLineup, SportsPlayer } from './sportsApi'
 
 // Names of the two sources differ in accents now and then ("Krauß"/"Krauss", "Jagiełło"/"Jagiello"); compare them plainly.
 const letters: Record<string, string> = { ß: 'ss', ł: 'l', Ł: 'l', ø: 'o', Ø: 'o', đ: 'd', Đ: 'd', æ: 'ae', Æ: 'ae', œ: 'oe', ı: 'i' }
 
 export function plain(name: string) {
   return name.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[ßłŁøØđĐæÆœı]/g, (letter) => letters[letter]).toLowerCase().trim()
+}
+
+/** Older feeds sometimes put the coach in the player field without marking their role. */
+export function isCoachDismissal(event: SportsEvent, lineups: SportsLineup[]) {
+  if (event.kind !== 'red' && event.kind !== 'yellow-red') return false
+  if (event.isCoach) return true
+  if (!event.player) return false
+  const team = lineups.find((lineup) => lineup.side === event.side)
+  const name = plain(event.player)
+  return !!team?.coach && plain(team.coach) === name &&
+    ![...team.starters, ...team.bench].some((player) => plain(player.name) === name)
 }
 
 /**

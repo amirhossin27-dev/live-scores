@@ -31,7 +31,7 @@ public sealed record SportsStat(string Key, string Label, string Home, string Aw
 /// yellow), <c>red</c> or <c>substitution</c>;
 /// <c>Player</c> is the scorer, the booked player or the player coming on, <c>Other</c> the assist or the player going off.
 /// </summary>
-public sealed record SportsEvent(string Kind, string Minute, string Side, string? Player, string? Other);
+public sealed record SportsEvent(string Kind, string Minute, string Side, string? Player, string? Other, bool IsCoach = false);
 
 /// <summary>
 /// A player of a line-up. <c>X</c>/<c>Y</c> place a starter on his half of the pitch (0..1, seen from his own goal: <c>Y</c> 0.1 is
@@ -177,6 +177,7 @@ public sealed partial class SportsService(HttpClient http, IMemoryCache cache, F
                         details = details with
                         {
                             Lineups = facts.Lineups.Count > 0 ? facts.Lineups : details.Lineups,
+                            Events = WithCoachDismissals(details.Events, facts.CoachDismissals),
                             Referee = facts.Referee ?? details.Referee,
                             Venue = facts.Stadium ?? details.Venue,
                             City = facts.Stadium is not null ? facts.City : details.City,
@@ -330,6 +331,38 @@ public sealed partial class SportsService(HttpClient http, IMemoryCache cache, F
         return order.Where(awayStats.ContainsKey).Select(key => new SportsStat(key, homeStats[key].Label, homeStats[key].Value, awayStats[key].Value)).ToArray();
     }
 
+    private static IReadOnlyList<SportsEvent> WithCoachDismissals(IReadOnlyList<SportsEvent> events, IReadOnlyList<SportsEvent> coachCards)
+    {
+        if (coachCards.Count == 0) return events;
+        var merged = events.ToList();
+        foreach (var card in coachCards)
+        {
+            // A coach can only be sent off once. The two feeds can disagree on the minute.
+            var existing = merged.FindIndex(item => item.Kind is "red" or "yellow-red" && item.Side == card.Side
+                && (item.Player is not null && card.Player is not null
+                    ? FotMobService.Plain(item.Player) == FotMobService.Plain(card.Player)
+                    : item.IsCoach && item.Minute == card.Minute));
+            if (existing >= 0)
+            {
+                merged[existing] = card with { Minute = merged[existing].Minute, Player = card.Player ?? merged[existing].Player };
+                continue;
+            }
+            var time = EventTime(card);
+            var next = merged.FindIndex(item => EventTime(item).CompareTo(time) > 0);
+            merged.Insert(next < 0 ? merged.Count : next, card);
+        }
+        return merged;
+    }
+
+    private static (int Minute, int Added) EventTime(SportsEvent item)
+    {
+        var parts = item.Minute.Replace("'", "").Split('+', 2);
+        if (!int.TryParse(parts[0], out var minute)) return (int.MaxValue, 0);
+        // ESPN places substitutions made at the interval at 45', after all first-half stoppage time.
+        if (minute == 45 && parts.Length == 1 && item.Kind == "substitution") return (45, int.MaxValue);
+        return (minute, parts.Length == 2 && int.TryParse(parts[1], out var added) ? added : 0);
+    }
+
     private static IReadOnlyList<SportsEvent> Events(JsonElement root, Func<JsonElement, string> sideOf)
     {
         if (!root.TryGetProperty("keyEvents", out var keyEvents) || keyEvents.ValueKind != JsonValueKind.Array) return [];
@@ -354,14 +387,19 @@ public sealed partial class SportsService(HttpClient http, IMemoryCache cache, F
             if (!item.TryGetProperty("team", out var team) || team.ValueKind != JsonValueKind.Object) continue;
 
             var people = item.TryGetProperty("participants", out var participants) && participants.ValueKind == JsonValueKind.Array
-                ? participants.EnumerateArray().Select(participant => participant.TryGetProperty("athlete", out var athlete) ? Text(athlete, "displayName") : null).ToArray()
+                ? participants.EnumerateArray().Select(participant =>
+                {
+                    var coach = participant.TryGetProperty("coach", out var person) && person.ValueKind == JsonValueKind.Object;
+                    if (!coach) participant.TryGetProperty("athlete", out person);
+                    return (Name: Text(person, "displayName") ?? Text(person, "fullName"), Coach: coach);
+                }).ToArray()
                 : [];
             var minute = item.TryGetProperty("clock", out var clock) ? Text(clock, "displayValue") ?? string.Empty : string.Empty;
             var side = sideOf(team);
-            var player = people.ElementAtOrDefault(0);
+            var (player, isCoach) = people.ElementAtOrDefault(0);
             // ESPN files a second yellow as a red card: the player was booked before
-            if (kind == "red" && player is not null && events.Any(moment => moment.Kind == "yellow" && moment.Side == side && moment.Player == player)) kind = "yellow-red";
-            events.Add(new SportsEvent(kind, minute, side, player, people.ElementAtOrDefault(1)));
+            if (kind == "red" && player is not null && events.Any(moment => moment.Kind == "yellow" && moment.Side == side && moment.Player == player && moment.IsCoach == isCoach)) kind = "yellow-red";
+            events.Add(new SportsEvent(kind, minute, side, player, people.ElementAtOrDefault(1).Name, isCoach));
         }
 
         return events;

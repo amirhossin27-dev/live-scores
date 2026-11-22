@@ -6,7 +6,7 @@ import { countryName, rectangularFlagUrl } from './sportsCountries'
 import './sportsLineup.css'
 import type { SportsCountry, SportsEvent, SportsLineup, SportsPlayer } from './sportsApi'
 import { Rating } from './sportsRating'
-import { plain } from './sportsPlayers'
+import { isCoachDismissal, plain } from './sportsPlayers'
 
 const copy = {
   de: {
@@ -173,11 +173,28 @@ function PitchPlayer({ player, side, marks, t, locale, language, onOpen, onOpenC
   )
 }
 
-function BenchList({ lineup, team, marks, t, locale, language, onOpen, onOpenCountry }: { lineup: SportsLineup | undefined; team: string; marks: Map<string, Marks>; t: Copy; locale: string; language: Language; onOpen: (player: SportsPlayer) => void; onOpenCountry?: (country: SportsCountry) => void }) {
+function CoachRow({ name, profileId, card, t, onOpen }: {
+  name: string | null; profileId?: string | null; card?: SportsEvent; t: Copy; onOpen: PlayerProps['onOpen']
+}) {
+  const kind = card?.kind === 'yellow-red' ? 'yellow-red' : 'red'
+  const label = cardLabel(kind, t)!
+  return <p className="lp-coach">
+    {t.coach}{name && ': '}{name && profileId
+      ? <button type="button" className="lp-coach-link" title={t.profile(name)} onClick={() => onOpen({ name, profileId, jersey: null, position: null, x: null, y: null, rating: null, subIn: null, subOut: null, captain: false })}>{name}</button>
+      : name}
+    {card && <span className="lp-events"><span className={`lp-card is-${kind}`} role="img" aria-label={label} title={`${label} ${card.minute}`.trim()} /></span>}
+  </p>
+}
+
+function BenchList({ lineup, team, coachCards, marks, t, locale, language, onOpen, onOpenCountry }: { lineup: SportsLineup | undefined; team: string; coachCards: SportsEvent[]; marks: Map<string, Marks>; t: Copy; locale: string; language: Language; onOpen: (player: SportsPlayer) => void; onOpenCountry?: (country: SportsCountry) => void }) {
+  const coach = lineup?.coach
+  const listedCoach = (card: SportsEvent) => !!coach && (!card.player || plain(card.player) === plain(coach))
   return (
     <section className="lp-bench">
       <h4>{team}</h4>
-      {lineup?.coach && <p className="lp-coach">{t.coach}: {lineup.coachId ? <button type="button" className="lp-coach-link" title={t.profile(lineup.coach)} onClick={() => onOpen({ name: lineup.coach!, profileId: lineup.coachId!, jersey: null, position: null, x: null, y: null, rating: null, subIn: null, subOut: null, captain: false })}>{lineup.coach}</button> : lineup.coach}</p>}
+      {coach && <CoachRow name={coach} profileId={lineup?.coachId} card={coachCards.find(listedCoach)} t={t} onOpen={onOpen} />}
+      {coachCards.filter((card) => !listedCoach(card)).map((card) =>
+        <CoachRow key={`${card.minute}-${card.player}`} name={card.player} card={card} t={t} onOpen={onOpen} />)}
       {lineup && lineup.bench.length > 0 && (
         <>
           <h5>{t.bench}</h5>
@@ -224,12 +241,14 @@ export function LineupPitch({ lineups, events, homeName, awayName, language, loc
   const t = copy[language === 'de' ? 'de' : 'en']
   const home = lineups.find((lineup) => lineup.side === 'home')
   const away = lineups.find((lineup) => lineup.side === 'away')
-  if (!home && !away) return <p className="md-empty">{t.noLineups}</p>
-  const marks = marksFor(events)
+  const coachCards = events.filter((event) => isCoachDismissal(event, lineups))
+  if (!home && !away && coachCards.length === 0) return <p className="md-empty">{t.noLineups}</p>
+  const marks = marksFor(events.filter((event) => !event.isCoach && !coachCards.includes(event)))
   const markOf = (side: 'home' | 'away', player: SportsPlayer) => marks.get(`${side}|${plain(player.name)}`)
 
   return (
     <div className="lp">
+      {home || away ? <>
       <div className="lp-teams"><span className="lp-team is-home" title={homeName}><span>{homeName}</span>{home?.formation && <b>{home.formation}</b>}</span><span className="lp-team is-away" title={awayName}><span>{awayName}</span>{away?.formation && <b>{away.formation}</b>}</span></div>
       <div className="lp-pitch-viewport" role="region" aria-label={t.pitch} tabIndex={0}>
        <div className="lp-pitch">
@@ -246,11 +265,12 @@ export function LineupPitch({ lineups, events, homeName, awayName, language, loc
         {away?.starters.map((player) => <PitchPlayer key={`a-${player.jersey}-${player.name}`} player={player} side="away" marks={markOf('away', player)} t={t} locale={locale} language={language} onOpen={onOpenPlayer} onOpenCountry={onOpenCountry} />)}
        </div>
       </div>
+      </> : <p className="md-empty">{t.noLineups}</p>}
       {(home?.source === 'espn' || away?.source === 'espn') && <p className="lp-hint">{t.noRatings}</p>}
       <div className="lp-bench-compare" role="region" aria-label={t.benches} tabIndex={0}>
         <div className="lp-benches">
-          <BenchList lineup={home} team={homeName} marks={marks} t={t} locale={locale} language={language} onOpen={onOpenPlayer} onOpenCountry={onOpenCountry} />
-          <BenchList lineup={away} team={awayName} marks={marks} t={t} locale={locale} language={language} onOpen={onOpenPlayer} onOpenCountry={onOpenCountry} />
+          <BenchList lineup={home} team={homeName} coachCards={coachCards.filter((card) => card.side === 'home')} marks={marks} t={t} locale={locale} language={language} onOpen={onOpenPlayer} onOpenCountry={onOpenCountry} />
+          <BenchList lineup={away} team={awayName} coachCards={coachCards.filter((card) => card.side === 'away')} marks={marks} t={t} locale={locale} language={language} onOpen={onOpenPlayer} onOpenCountry={onOpenCountry} />
         </div>
       </div>
     </div>

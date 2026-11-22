@@ -436,6 +436,30 @@ describe('SportsWidget', () => {
     ],
   }
 
+  it('shows a coach dismissal on the correct side in the timeline and beside the coach in the lineup', async () => {
+    api.loadMatchDetails.mockResolvedValue({
+      ...details,
+      events: [{ kind: 'red', minute: "86'", side: 'away', player: 'Jürgen Klopp', other: null, isCoach: true }],
+      lineups: details.lineups.map((team) => team.side === 'away'
+        ? { ...team, coach: 'Jürgen Klopp', coachId: '78660', bench: [player('Jürgen Klopp', '18', { profileId: '18' })] }
+        : team),
+    })
+    renderWidget()
+    fireEvent.click(await screen.findByRole('button', { name: 'Statistik Bayern München gegen Borussia Dortmund' }))
+    const panel = within(await screen.findByRole('dialog'))
+    const event = (await panel.findByRole('img', { name: 'Rote Karte' })).closest('li')!
+    expect(event.classList.contains('is-away')).toBe(true)
+    expect(event.textContent).toContain("86'")
+    expect(event.textContent).toContain('Jürgen Klopp')
+    expect(within(event).getByText('Trainer')).toBeTruthy()
+    expect(within(event).queryByRole('button', { name: 'Jürgen Klopp' })).toBeNull()
+
+    fireEvent.click(panel.getByRole('tab', { name: 'Aufstellung' }))
+    const card = panel.getByRole('img', { name: 'Rote Karte' })
+    expect(card.closest('.lp-coach')?.textContent).toContain('Jürgen Klopp')
+    expect(card.closest('.lp-bench')?.querySelector('h4')?.textContent).toBe('Borussia Dortmund')
+  })
+
   it('opens the statistics, timeline and line-ups of a match when its line is tapped', async () => {
     api.loadMatchDetails.mockResolvedValue(details)
     api.loadPlayerMatches.mockResolvedValue(profile.recentMatches)

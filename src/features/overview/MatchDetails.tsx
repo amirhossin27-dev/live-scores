@@ -20,7 +20,7 @@ import type { SportsCountry, SportsEvent, SportsLineup, SportsMatch, SportsMatch
 import { competitionLabelOf, hasStandings } from './sportsCatalog'
 import { OpenMatchContext } from './sportsMatchNav'
 import type { MatchTarget } from './sportsMatchNav'
-import { findPlayer } from './sportsPlayers'
+import { findPlayer, isCoachDismissal } from './sportsPlayers'
 import { useMatchDetails, useStandings } from './sportsHooks'
 import { teamName } from './sportsNames'
 import { standingsViews } from './sportsStandings'
@@ -38,6 +38,7 @@ const copy = {
     noMoments: 'Noch keine Tore, Karten oder Wechsel.',
     noLineups: 'Die Aufstellungen sind noch nicht bekannt.',
     bench: 'Ersatzbank',
+    coach: 'Trainer',
     venue: 'Stadion',
     attendance: (count: string) => `${count} Zuschauer`,
     live: 'Live',
@@ -85,6 +86,7 @@ const copy = {
     noMoments: 'No goals, cards or substitutions yet.',
     noLineups: 'The line-ups are not known yet.',
     bench: 'Bench',
+    coach: 'Coach',
     venue: 'Venue',
     attendance: (count: string) => `Attendance ${count}`,
     live: 'Live',
@@ -263,6 +265,7 @@ function Moments({ events, t, details, onOpenPlayer }: MomentsProps) {
     const sides: ('home' | 'away')[] = event.kind === 'own-goal' ? [event.side === 'home' ? 'away' : 'home', event.side] : [event.side]
     const person = (name: string | null) => <Person name={name} sides={sides} lineups={details.lineups} t={t} onOpen={onOpenPlayer} />
     // a substitution in one line: the player coming on, then the one going off
+    const coach = isCoachDismissal(event, details.lineups)
     const who = event.kind === 'substitution' ? (
       <span className="md-who is-sub">
         <strong className="md-sub-on" title={t.on}>{person(event.player)}</strong>
@@ -270,7 +273,8 @@ function Moments({ events, t, details, onOpenPlayer }: MomentsProps) {
       </span>
     ) : (
       <span className="md-who">
-        <strong>{person(event.player)}</strong>
+        <strong>{coach ? event.player || t.coach : person(event.player)}</strong>
+        {coach && event.player && <small>{t.coach}</small>}
         {(event.kind === 'goal' || event.kind === 'penalty') && event.other && <small className="md-assist" title={t.assist}>({person(event.other)})</small>}
       </span>
     )

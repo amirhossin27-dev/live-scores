@@ -83,6 +83,7 @@ button.lp-bench-identity:focus-visible { outline: 2px solid var(--accent); outli
 .lp-bench-identity .lp-events { flex: none; }
 .lp-bench-identity .lp-events:empty { display: none; }
 
+.lp-coach .lp-events { margin-inline-start: 4px; vertical-align: middle; }
 .lp-coach-link { padding: 0; border: 0; background: transparent; color: var(--text-strong); font: inherit; cursor: pointer; }
 .lp-coach-link:hover { text-decoration: underline; }
 .lp-coach-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }

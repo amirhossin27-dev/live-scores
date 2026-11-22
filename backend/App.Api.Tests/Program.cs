@@ -4,6 +4,44 @@ using Microsoft.Extensions.Caching.Memory;
 using Standalone.Api.Services;
 
 var failed = 0;
+await Run("match details merge coach dismissals from both sources in match order", async () =>
+{
+    using var cache = new MemoryCache(new MemoryCacheOptions());
+    using var http = new HttpClient(new FixtureHandler(uri => uri.AbsolutePath.Split('/').Last() switch
+    {
+        "summary" => """
+            {"header":{"competitions":[{"id":"1","date":"2022-10-16T15:30:00Z","competitors":[
+                {"homeAway":"home","team":{"id":"1","displayName":"Liverpool"}},
+                {"homeAway":"away","team":{"id":"2","displayName":"Manchester City"}}]}]},
+             "keyEvents":[
+                {"type":{"type":"red-card"},"team":{"id":"2"},"clock":{"displayValue":"52'"},"participants":[{"athlete":{"displayName":"Away Coach"}}]},
+                {"type":{"type":"yellow-card"},"team":{"id":"1"},"clock":{"displayValue":"89'"},"participants":[{"athlete":{"displayName":"Player"}}]}]}
+            """,
+        "matches" => """
+            {"leagues":[{"matches":[{"id":"3901037","status":{"utcTime":"2022-10-16T15:30:00Z"},"home":{"name":"Liverpool"},"away":{"name":"Manchester City"}}]}]}
+            """,
+        "matchDetails" => """
+            {"content":{"matchFacts":{"events":{"events":[
+                {"type":"Card","card":"Red","time":52,"isHome":false,"nameStr":"Away Coach","cardDescription":{"localizedKey":"coach"}},
+                {"type":"Card","card":"Red","time":86,"isHome":true,"player":{"id":78660,"name":"Jürgen Klopp"},"cardDescription":{"localizedKey":"coach"}},
+                {"type":"Card","card":"Red","time":90,"isHome":true,"nameStr":"Unrelated Player"}]}}}}
+            """,
+        _ => throw new Exception($"Unexpected request {uri}"),
+    }));
+    var match = await new SportsService(http, cache, new FotMobService(http, cache)).GetMatchAsync("soccer/eng.1", "1", CancellationToken.None);
+    var events = match!.Events;
+    Equal(3, events.Count);
+    Equal("Away Coach", events[0].Player);
+    Equal("away", events[0].Side);
+    Equal("Jürgen Klopp", events[1].Player);
+    Equal("86'", events[1].Minute);
+    Equal("home", events[1].Side);
+    Equal("red", events[1].Kind);
+    Equal("Player", events[2].Player);
+    Equal(true, events[0].IsCoach && events[1].IsCoach);
+    Equal(false, events[2].IsCoach);
+});
+
 await Run("Nations League loads zones and team ids for A, B, C and D", async () =>
 {
     var result = await Standings();

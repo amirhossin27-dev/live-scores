@@ -60,6 +60,7 @@ export type SportsEventKind = 'goal' | 'penalty' | 'own-goal' | 'yellow' | 'yell
 /** A moment of a football match: `player` scores, is booked or comes on; `other` is the assist or the player going off. */
 export interface SportsEvent {
   kind: SportsEventKind
+  isCoach?: boolean
   minute: string
   side: 'home' | 'away'
   player: string | null
