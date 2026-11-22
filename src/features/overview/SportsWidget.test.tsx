@@ -550,16 +550,16 @@ describe('SportsWidget', () => {
     expect(recent[2].textContent).toContain('Bank')
     // the transfers with the crests of both clubs and the fees from Transfermarkt
     fireEvent.click(stats.getByRole('tab', { name: 'Transfers' }))
-    const move = stats.getByLabelText('Von: Tottenham').closest('li') as HTMLElement
-    expect(within(move).getByLabelText('Zu: Bayern München')).toBeTruthy()
+    const move = stats.getByRole('row', { name: /Tottenham Bayern München/ })
+    expect(within(move).getByText('Bayern München')).toBeTruthy()
     expect([...move.querySelectorAll('img.pp-crest')].map((image) => image.getAttribute('src'))).toEqual([
       'https://img.a.transfermarkt.technology/wappen/smallquad/148.png',
       'https://img.a.transfermarkt.technology/wappen/smallquad/27.png',
     ])
-    expect(within(move).getByText('95 Mio. €')).toBeTruthy()
-    expect(within(move).getByText('Marktwert 90 Mio. €')).toBeTruthy()
+    expect(within(move).getByText('95,00 Mio. €')).toBeTruthy()
+    expect(within(move).getByText('90,00 Mio. €')).toBeTruthy()
     expect(stats.getByText('Leihende')).toBeTruthy()
-    expect(stats.getByText('Summe der Ablösen: 95 Mio. €')).toBeTruthy()
+    expect(stats.getByText('Transfererlöse gesamt:').closest('tr')?.textContent).toContain('95,00 Mio. €')
     expect(stats.queryByText('Ablösesummen: Transfermarkt')).toBeNull()
     // the injuries from Transfermarkt by season, a running one in red without an end
     fireEvent.click(stats.getByRole('tab', { name: 'Verletzungen' }))

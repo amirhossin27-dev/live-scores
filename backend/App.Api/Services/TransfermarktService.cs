@@ -147,7 +147,10 @@ public sealed partial class TransfermarktService(HttpClient http, IMemoryCache c
             if (to is null) continue;
             var fee = Text(transfer, "fee") ?? string.Empty;
             var (kind, amount) = Fee(fee);
-            list.Add(new SportsTransfer(date, Club(transfer, "from"), to, null, amount, kind, Euros(Text(transfer, "marketValue") ?? string.Empty), Emblem(transfer, "from"), Emblem(transfer, "to")));
+            list.Add(new SportsTransfer(date, Club(transfer, "from"), to, null, amount, kind, Euros(Text(transfer, "marketValue") ?? string.Empty), Emblem(transfer, "from"), Emblem(transfer, "to"),
+                Text(transfer, "season"), Flag(transfer, "from"), Flag(transfer, "to"),
+                Uri.TryCreate(new Uri(Site), Text(transfer, "url"), out var detail) && detail.Scheme == "https"
+                    && detail.Host == "www.transfermarkt.de" && detail.AbsolutePath.Contains("/transfer_id/") ? detail.AbsoluteUri : null));
         }
 
         return list;
@@ -163,6 +166,10 @@ public sealed partial class TransfermarktService(HttpClient http, IMemoryCache c
         && (Text(club, "clubEmblem-2x") ?? Text(club, "clubEmblem-1x")) is { } url && url.StartsWith("https://", StringComparison.Ordinal)
             ? url
             : null;
+
+    private static string? Flag(JsonElement transfer, string side) =>
+        transfer.TryGetProperty(side, out var club) && club.ValueKind == JsonValueKind.Object
+        && Text(club, "countryFlag") is { } url && url.StartsWith("https://", StringComparison.Ordinal) ? url : null;
 
     // ---------- Injury history ----------
 

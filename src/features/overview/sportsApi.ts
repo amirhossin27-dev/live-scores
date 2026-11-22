@@ -228,6 +228,10 @@ export interface SportsInjuryRecord {
 
 /** A move between clubs; `feeKind` and `fee` come from Transfermarkt (null for moves derived from FotMob's career). */
 export interface SportsTransfer {
+  season?: string | null
+  fromFlag?: string | null
+  toFlag?: string | null
+  detailUrl?: string | null
   date: string
   from: string | null
   to: string

@@ -663,54 +663,58 @@ function CoachRecord({ stint, t, locale }: { stint: SportsCoachStint; t: Copy; l
   )
 }
 
-function feeText(move: SportsTransfer, t: Copy, money: Intl.NumberFormat) {
+function feeText(move: SportsTransfer, t: Copy, money: (value: number) => string) {
   switch (move.feeKind) {
-    case 'fee': return move.fee !== null ? money.format(move.fee) : t.unknownFee
+    case 'fee': return move.fee !== null ? money(move.fee) : t.unknownFee
     case 'free': return t.free
-    case 'loan': return move.fee !== null ? t.loanFee(money.format(move.fee)) : t.loan
+    case 'loan': return move.fee !== null ? t.loanFee(money(move.fee)) : t.loan
     case 'loan-end': return t.loanEnd
     case 'unknown': return '–'
     default: return null
   }
 }
 
+function TransferClub({ name, logo, flag }: { name: string; logo?: string | null; flag?: string | null }) {
+  return <span className="pp-transfer-club"><Crest logo={logo} />{flag && <img src={flag} alt="" loading="lazy" />}<strong>{name}</strong></span>
+}
+
 function Transfers({ profile, t, language, locale }: { profile: SportsPlayerProfile; t: Copy; language: Language; locale: string }) {
-  const date = new Intl.DateTimeFormat(locale, { day: '2-digit', month: '2-digit', year: 'numeric' })
-  const money = new Intl.NumberFormat(locale, { style: 'currency', currency: 'EUR', notation: 'compact', maximumFractionDigits: 2 })
-  if (profile.transfers.length === 0) return <p className="md-empty">{t.noTransfers}</p>
+  if (!profile.transfers.length) return <p className="md-empty">{t.noTransfers}</p>
+  const date = new Intl.DateTimeFormat(locale, { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC' })
+  const de = language === 'de'
+  const money = (value: number) => {
+    const scale = value >= 1_000_000 ? 1_000_000 : value >= 1000 ? 1000 : 1
+    const number = (value / scale).toLocaleString(locale, { minimumFractionDigits: scale === 1_000_000 ? 2 : 0, maximumFractionDigits: 2 })
+    const unit = scale === 1_000_000 ? (de ? ' Mio.' : 'm') : scale === 1000 ? (de ? ' Tsd.' : 'k') : ''
+    return de ? `${number}${unit} €` : `€${number}${unit}`
+  }
+  const moves = [...profile.transfers].sort((a, b) => Date.parse(b.date) - Date.parse(a.date))
   const withFees = profile.transfersSource === 'transfermarkt'
-  const sum = profile.transfers.reduce((total, move) => total + (move.feeKind === 'fee' || move.feeKind === 'loan' ? move.fee ?? 0 : 0), 0)
-  return (
-    <>
-      <ol className="pp-moves">
-        {profile.transfers.map((move) => {
-          const fee = feeText(move, t, money) ?? say(move.type, language)
-          return (
-            <li key={`${move.date}-${move.from}-${move.to}`}>
-              <span className="pp-date">{date.format(new Date(move.date))}</span>
-              <span className="pp-route">
-                <span className="pp-hop is-from" aria-label={`${t.from}: ${move.from ?? t.youth}`}>
-                  <Crest logo={move.fromLogo} />
-                  <span>{move.from ?? t.youth}</span>
-                </span>
-                <span className="pp-hop is-to" aria-label={`${t.to}: ${move.to}`}>
-                  <i aria-hidden="true">→</i>
-                  <Crest logo={move.toLogo} />
-                  <strong>{move.to}</strong>
-                </span>
-              </span>
-              <span className="pp-price">
-                {fee && <b className={`pp-fee is-${move.feeKind ?? 'unknown'}`}>{fee}</b>}
-                {move.marketValue !== null && <small>{t.valueThen(money.format(move.marketValue))}</small>}
-              </span>
-            </li>
-          )
-        })}
-      </ol>
-      {withFees && sum > 0 && <p className="pp-sum">{t.total(money.format(sum))}</p>}
-      {!withFees && <p className="pp-note">{t.noFees}</p>}
-    </>
-  )
+  const total = moves.reduce((sum, move) => sum + (move.feeKind === 'fee' || move.feeKind === 'loan' ? move.fee ?? 0 : 0), 0)
+  const hasDetails = moves.some(move => move.detailUrl)
+  const hasKnownFee = moves.some(move => move.fee != null || move.feeKind === 'free')
+  const headings = [t.season, t.date, de ? 'Abgebender Verein' : 'Departing club', de ? 'Aufnehmender Verein' : 'Receiving club', de ? 'MW' : 'MV', de ? 'Ablöse' : 'Fee']
+  return <>
+    <div className="pp-transfer-history">
+      <table className="pp-transfer-table" aria-label={t.transfers}>
+        <thead><tr>
+          {headings.map((label, index) => <th scope="col" key={label}>{index === 4 ? <abbr title={de ? 'Marktwert' : 'Market value'}>{label}</abbr> : label}</th>)}
+          {hasDetails && <th scope="col" aria-label="Details" />}
+        </tr></thead>
+        <tbody>{moves.map(move => <tr key={`${move.date}-${move.from}-${move.to}`}>
+          <td data-label={headings[0]}>{move.season || '–'}</td><td data-label={headings[1]}>{date.format(new Date(move.date))}</td>
+          <td data-label={headings[2]}><TransferClub name={move.from ?? t.youth} logo={move.fromLogo} flag={move.fromFlag} /></td>
+          <td data-label={headings[3]}><TransferClub name={move.to} logo={move.toLogo} flag={move.toFlag} /></td>
+          <td data-label={headings[4]}>{move.marketValue == null ? '–' : money(move.marketValue)}</td>
+          <td data-label={headings[5]}>{feeText(move, t, money) ?? (say(move.type, language) || '–')}</td>
+          {hasDetails && <td>{move.detailUrl && <a href={move.detailUrl} target="_blank" rel="noopener noreferrer" aria-label={`Details: ${move.from ?? t.youth} → ${move.to}`}>›</a>}</td>}
+        </tr>)}</tbody>
+        {withFees && <tfoot><tr><th scope="row" colSpan={5}>{de ? 'Transfererlöse gesamt:' : 'Total transfer fees:'}</th>
+          <td colSpan={hasDetails ? 2 : 1}>{hasKnownFee ? money(total) : '–'}</td></tr></tfoot>}
+      </table>
+    </div>
+    {!withFees && <p className="pp-note">{t.noFees}</p>}
+  </>
 }
 
 function CurrentInjury({ profile, t, language }: { profile: SportsPlayerProfile; t: Copy; language: Language }) {

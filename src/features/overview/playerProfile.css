@@ -63,3 +63,29 @@
 .pp-head > div { min-width: 0; }
 .pp-portrait { display: grid; place-items: center; flex: 0 0 72px; width: 72px; height: 72px; overflow: hidden; border-radius: 50%; background: var(--accent-soft); color: var(--text-muted); }
 .pp-portrait img, .pp-portrait svg { width: 100%; height: 100%; object-fit: contain; }
+
+.side-drawer.sports-detail-drawer:has(.pp-transfer-history) { width: min(860px, 100%); }
+.pp:has(.pp-transfer-history) { grid-template-columns: minmax(0, 1fr); }
+.pp-transfer-history { container-type: inline-size; }
+.pp-transfer-table { width: 100%; border-collapse: collapse; background: #181a1b; color: #eef0f1; font-size: 12px; font-variant-numeric: tabular-nums; }
+.pp-transfer-table th, .pp-transfer-table td { border: 1px solid #383c3e; padding: 5px 6px; text-align: left; line-height: 17px; }
+.pp-transfer-table th, .pp-transfer-table tfoot { background: #202223; font-weight: 700; }
+.pp-transfer-table :is(thead, tbody) :is(th, td):nth-child(-n+2) { text-align: center; white-space: nowrap; }
+.pp-transfer-table :is(th, td):nth-child(n+5), .pp-transfer-table tfoot :is(th, td) { text-align: right; white-space: nowrap; }
+.pp-transfer-club { display: flex; align-items: center; gap: 6px; overflow-wrap: anywhere; color: #63c7ff; }
+.pp-transfer-club img { width: 14px; height: auto; flex: none; object-fit: contain; }
+.pp-transfer-club .pp-crest { width: 16px; height: 16px; }
+.pp-transfer-table td:last-child a { display: block; color: #63c7ff; font-size: 18px; text-align: center; text-decoration: none; }
+
+@container (max-width: 660px) {
+  .pp-transfer-table { display: block; }
+  .pp-transfer-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .pp-transfer-table tbody, .pp-transfer-table tfoot { display: block; }
+  .pp-transfer-table tbody tr { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 8px 10px; gap: 5px 12px; border-bottom: 1px solid #383c3e; }
+  .pp-transfer-table tbody tr td { display: block; padding: 0; border: 0; text-align: left; white-space: normal; overflow-wrap: anywhere; }
+  .pp-transfer-table tbody td[data-label]::before { content: attr(data-label); display: block; color: #b6bfc6; font-size: 10px; }
+  .pp-transfer-table tbody td:nth-child(7) { grid-column: 1 / -1; justify-self: end; }
+  .pp-transfer-table td:last-child a { padding-inline: 10px; }
+  .pp-transfer-table tfoot tr { display: flex; justify-content: flex-end; flex-wrap: wrap; }
+  .pp-transfer-table tfoot :is(th, td) { border: 0; }
+}

@@ -47,7 +47,7 @@ public sealed record SportsInjuryRecord(string? Season, string Injury, DateTimeO
 /// <c>Fee</c> when there was one), <c>loan-end</c> or <c>unknown</c>; <c>MarketValue</c> is the player's value at that time.
 /// Moves derived from FotMob's career have no fee (<c>FeeKind</c> null).
 /// </summary>
-public sealed record SportsTransfer(DateTimeOffset Date, string? From, string To, SportsText? Type, long? Fee = null, string? FeeKind = null, long? MarketValue = null, string? FromLogo = null, string? ToLogo = null);
+public sealed record SportsTransfer(DateTimeOffset Date, string? From, string To, SportsText? Type, long? Fee = null, string? FeeKind = null, long? MarketValue = null, string? FromLogo = null, string? ToLogo = null, string? Season = null, string? FromFlag = null, string? ToFlag = null, string? DetailUrl = null);
 
 /// <summary>The current injury from FotMob (the history comes from Transfermarkt).</summary>
 public sealed record SportsInjury(SportsText Status, string? ExpectedReturn, DateTimeOffset? Updated);
