@@ -97,20 +97,4 @@ body:has(> .side-drawer-backdrop) .has-viewport-drawers {
   overflow: auto;
 }
 
-/* Keep the two-team row on wide frames and the stacked scoreboard on phones. */
-@media (min-width: 901px) {
-  .is-compact .sp-overview .sp-match:not(.is-single) {
-    grid-template-columns: 42px minmax(0, 1fr) 48px minmax(0, 1fr) 44px;
-  }
-}
-
-@media (min-width: 600px) {
-  .is-compact .sp-overview .sp-toolbar-compact {
-    display: flex;
-    flex-wrap: wrap;
-    max-width: none;
-    justify-content: space-between;
-  }
-}
-
 .is-compact .sp-compact-settings { min-height: 0; overflow: auto; }

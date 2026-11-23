@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { CSSProperties, DragEvent, ReactNode } from 'react'
 import './sports.css'
 import './compactOverview.css'
@@ -85,6 +85,7 @@ const copy = {
     red: (count: number) => (count === 1 ? 'Rote Karte' : `${count} Rote Karten`),
     yellowRed: (count: number) => (count === 1 ? 'Gelb-Rote Karte' : `${count} Gelb-Rote Karten`),
     openTable: (name: string) => `Tabelle: ${name}`,
+    bracket: 'Turnierbaum',
     openBracket: (name: string) => `Turnierbaum: ${name}`,
     openTeam: (name: string) => `Verein: ${name}`,
     pickDay: 'Tag im Kalender wählen',
@@ -153,6 +154,7 @@ const copy = {
     red: (count: number) => (count === 1 ? 'Red card' : `${count} red cards`),
     yellowRed: (count: number) => (count === 1 ? 'Second yellow card' : `${count} second yellow cards`),
     openTable: (name: string) => `Table: ${name}`,
+    bracket: 'Bracket',
     openBracket: (name: string) => `Bracket: ${name}`,
     openTeam: (name: string) => `Team: ${name}`,
     pickDay: 'Pick a day in the calendar',
@@ -457,6 +459,11 @@ export function SportsWidget({ language, now, compact = false, appearanceControl
 
   const [filter, setFilter] = useState<'all' | 'live' | 'favorites'>('all')
   const [favorites, setFavorites] = useState<SportsFavorite[]>(() => readSportsFavorites(now.getTime()))
+  const listId = useId()
+  const [collapsed, setCollapsed] = useState<string[]>([])
+  function toggleLeague(id: string) {
+    setCollapsed(previous => previous.includes(id) ? previous.filter(item => item !== id) : [...previous, id])
+  }
   const [favoriteLeagues, setFavoriteLeagues] = useState<string[]>(readFavoriteCompetitions)
   const [embedded] = useState(() => readViewOptions(window.location.href).embedded)
   usePushSync(favorites, favoriteLeagues, !embedded)
@@ -599,32 +606,27 @@ export function SportsWidget({ language, now, compact = false, appearanceControl
           </section>
         )}
         {shown.map(({ competition, matches }) => {
-          const title = (
-            <>
-              <Flag code={competition.flag} />
-              <span className="sp-comp-country">{competitionCountry(competition, language)}</span>
-              <b>{competitionName(competition, language)}</b>
-              <span className="sp-count">{matches.length}</span>
-            </>
-          )
-          // A click on the competition opens its table (a cup: its tree); fight cards and friendlies have neither.
-          const open = (competition.group === 'cups' ? t.openBracket : t.openTable)(label(competition))
-          // the star of the title marks the whole competition
-          const leagueStar = <Star league on={favoriteLeagues.includes(competition.id)} name={label(competition)} t={t} onToggle={() => toggleFavoriteLeague(competition.id)} />
+          const expanded = !collapsed.includes(competition.id)
+          const matchesId = `${listId}-${competition.id}`
+          const isCup = competition.group === 'cups'
+          const open = (isCup ? t.openBracket : t.openTable)(label(competition))
           return (
             <section key={competition.id} className="sp-comp" aria-label={`${competitionCountry(competition, language)} ${competitionName(competition, language)}`}>
-              {hasStandings(competition.id) ? (
-                <h3 className="sp-comp-title is-button">
-                  <button type="button" className="sp-comp-open" aria-label={open} title={open} onClick={() => setStandingsOf(competition)}>
-                    {title}
-                    <svg className="sp-comp-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
+              <h3 className="sp-comp-title is-button">
+                <button type="button" className="sp-comp-open" aria-label={label(competition)}
+                  aria-expanded={expanded} aria-controls={matchesId} onClick={() => toggleLeague(competition.id)}>
+                  <svg className="sp-comp-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
+                  <Flag code={competition.flag} />
+                  <span className="sp-comp-label"><span className="sp-comp-country">{competitionCountry(competition, language)}</span><b>{competitionName(competition, language)}</b></span>
+                </button>
+                {hasStandings(competition.id) && (
+                  <button type="button" className="sp-comp-table" aria-label={open} title={open} onClick={() => setStandingsOf(competition)}>
+                    {isCup ? t.bracket : 'Tabelle'}
                   </button>
-                  {leagueStar}
-                </h3>
-              ) : (
-                <h3 className="sp-comp-title">{title}{leagueStar}</h3>
-              )}
-              <ul className="sp-matches">
+                )}
+                <Star league on={favoriteLeagues.includes(competition.id)} name={label(competition)} t={t} onToggle={() => toggleFavoriteLeague(competition.id)} />
+              </h3>
+              <ul className="sp-matches" id={matchesId} hidden={!expanded}>
                 {matches.map((match) => row(competition, match, false))}
               </ul>
             </section>

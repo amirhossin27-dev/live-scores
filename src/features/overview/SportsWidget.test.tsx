@@ -94,7 +94,7 @@ describe('SportsWidget', () => {
     await screen.findByText('Bayern München')
 
     const titles = screen.getAllByRole('heading', { level: 3 }).map((heading) => heading.textContent)
-    expect(titles).toEqual(['DeutschlandBundesliga3', 'SpanienLaLiga1', 'MotorsportFormel 11', 'KampfsportUFC1'])
+    expect(titles).toEqual(['DeutschlandBundesligaTabelle', 'SpanienLaLigaTabelle', 'MotorsportFormel 1Tabelle', 'KampfsportUFC'])
 
     const bundesliga = within(screen.getByRole('region', { name: 'Deutschland Bundesliga' }))
     const live = bundesliga.getByText('Bayern München').closest('li') as HTMLElement
@@ -219,7 +219,7 @@ describe('SportsWidget', () => {
     const view = renderWidget()
     await screen.findByText('Bayern München')
     const titles = () => screen.getAllByRole('heading', { level: 3 }).map((heading) => heading.textContent)
-    expect(titles()).toEqual(['DeutschlandBundesliga3', 'SpanienLaLiga1', 'MotorsportFormel 11', 'KampfsportUFC1'])
+    expect(titles()).toEqual(['DeutschlandBundesligaTabelle', 'SpanienLaLigaTabelle', 'MotorsportFormel 1Tabelle', 'KampfsportUFC'])
 
     fireEvent.click(screen.getByRole('button', { name: 'Wettbewerbe auswählen' }))
     const order = within(screen.getByRole('group', { name: 'Reihenfolge' }))
@@ -243,7 +243,7 @@ describe('SportsWidget', () => {
     expect(rows().slice(0, 3)).toEqual(['Spanien · LaLiga', 'Deutschland · 2. Bundesliga', 'Deutschland · Bundesliga'])
 
     fireEvent.click(screen.getByRole('button', { name: 'Fertig' }))
-    expect(titles()).toEqual(['SpanienLaLiga1', 'DeutschlandBundesliga3', 'MotorsportFormel 11', 'KampfsportUFC1'])
+    expect(titles()).toEqual(['SpanienLaLigaTabelle', 'DeutschlandBundesligaTabelle', 'MotorsportFormel 1Tabelle', 'KampfsportUFC'])
     // the scores do not depend on the order: no new request
     expect(api.loadSportsScores).toHaveBeenCalledTimes(1)
 
@@ -251,7 +251,7 @@ describe('SportsWidget', () => {
     view.unmount()
     renderWidget()
     await screen.findByText('Bayern München')
-    expect(titles()).toEqual(['SpanienLaLiga1', 'DeutschlandBundesliga3', 'MotorsportFormel 11', 'KampfsportUFC1'])
+    expect(titles()).toEqual(['SpanienLaLigaTabelle', 'DeutschlandBundesligaTabelle', 'MotorsportFormel 1Tabelle', 'KampfsportUFC'])
   })
 
   it('opens the match on its timeline when a team name in the scores is clicked', async () => {
@@ -679,6 +679,21 @@ describe('SportsWidget', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Statistics FC Sevilla vs Real Betis' }))
     expect(await screen.findByText('The match data is not reachable right now.')).toBeTruthy()
   })
+})
+
+it('collapses one league while keeping its table, favourite and other leagues available', async () => {
+  renderWidget()
+  const region = within(await screen.findByRole('region', { name: 'Deutschland Bundesliga' }))
+  const toggle = region.getByRole('button', { expanded: true })
+  fireEvent.click(toggle)
+  expect(toggle.getAttribute('aria-expanded')).toBe('false')
+  expect(region.queryByRole('list')).toBeNull()
+  expect(screen.getByText('FC Sevilla')).toBeTruthy()
+  fireEvent.click(region.getByRole('button', { name: /als Favorit merken/ }))
+  expect(screen.getByRole('button', { name: 'Favoriten' }).textContent).toBe('Favoriten 3')
+  expect(region.getByRole('button', { name: /^Tabelle:/ }).textContent).toBe('Tabelle')
+  fireEvent.click(toggle)
+  expect(region.getAllByRole('listitem')).toHaveLength(3)
 })
 
 describe('SportsWidget favourites', () => {
