@@ -56,11 +56,12 @@ export function useSportsScores(ids: string[], date: string) {
         const failed = new Set(scores.failed)
         const retained = previous?.scores.competitions.filter(c => failed.has(c.id) && !scores.competitions.some(fresh => fresh.id === c.id)) ?? []
         const merged = { ...scores, competitions: [...scores.competitions, ...retained] }
-        const at = retained.length && previous ? Math.min(previous.at, Date.now()) : Date.now()
+        const fetchedAt = Math.min(scores.fetchedAt ?? Date.now(), Date.now())
+        const at = retained.length && previous ? Math.min(previous.at, fetchedAt) : fetchedAt
         const next = { key: requestKey, scores: merged, at, cached: retained.length > 0, complete: !scores.failed.length }
         latest.current = next
         setLoaded(next)
-        if (scores.date === date) saveScoreSnapshot(apiBaseUrl, scores)
+        if (scores.date === date) saveScoreSnapshot(apiBaseUrl, scores, fetchedAt)
         setFailedKey(null)
         schedule(merged)
       }).catch(() => {

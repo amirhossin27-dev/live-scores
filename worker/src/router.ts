@@ -1,3 +1,4 @@
+import { serveScores } from './scores'
 import type { WorkerStatus } from './watcher'
 
 /** What the HTTP layer needs from the Durable Object (its RPC methods). */
@@ -38,6 +39,7 @@ export async function route(request: Request, watcher: WatcherApi): Promise<Resp
   const { pathname } = new URL(request.url)
   try {
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers })
+    if (pathname === '/api/sports/scores' && request.method === 'GET') return await serveScores(new URL(request.url), headers)
     if (pathname === '/subscription' && request.method === 'PUT') {
       const result = await watcher.register(await readJson(request))
       return 'error' in result ? json({ error: result.error }, 400) : json({ ok: true })

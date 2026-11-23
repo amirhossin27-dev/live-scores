@@ -1,50 +1,11 @@
-import { fetchJson } from '../../services/platformApi'
+import { fetchJson, scoresApiBaseUrl } from '../../services/platformApi'
 
-/** Live results as the platform API reads them from ESPN's public scoreboards. */
-export type SportsStatus = 'scheduled' | 'live' | 'finished' | 'postponed' | 'canceled'
-
-export interface SportsSide {
-  name: string
-  shortName: string | null
-  logo: string | null
-  /** Text, because some sports have no number. */
-  score: string | null
-  winner: boolean | null
-  /** Football in the scores: sending-offs of the team (straight red / second yellow). */
-  redCards?: number | null
-  yellowRedCards?: number | null
-}
-
-export interface SportsMatch {
-  id: string
-  start: string
-  status: SportsStatus
-  /** What the source shows next to the score: "67'", "HT", "FT". */
-  statusText: string
-  /** A race weekend: the Grand Prix; a fight: the weight class. */
-  title: string | null
-  /** For a race the winner, once it is over. */
-  home: SportsSide | null
-  away: SportsSide | null
-  detail: string | null
-}
-
-export interface SportsCompetitionScores {
-  id: string
-  name: string
-  matches: SportsMatch[]
-}
-
-export interface SportsScores {
-  date: string
-  competitions: SportsCompetitionScores[]
-  /** Competitions the source did not answer for. */
-  failed: string[]
-}
+export type { SportsStatus, SportsSide, SportsMatch, SportsCompetitionScores, SportsScores } from '../../../shared/scoreboard'
+import type { SportsStatus, SportsSide, SportsMatch, SportsScores } from '../../../shared/scoreboard'
 
 export function loadSportsScores(competitions: string[], date: string, signal?: AbortSignal) {
   const query = new URLSearchParams({ competitions: competitions.join(','), date })
-  return fetchJson<SportsScores>(`/api/sports/scores?${query.toString()}`, { signal })
+  return fetchJson<SportsScores>(`/api/sports/scores?${query.toString()}`, { signal }, scoresApiBaseUrl)
 }
 
 /** One figure of a match for both sides, as text ("69.6", "19/34", "30:40"); `label` is the English label of the source. */

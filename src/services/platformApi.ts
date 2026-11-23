@@ -1,8 +1,9 @@
 import { resolveApiUrl } from '../runtime.mjs'
 export const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || window.APP_CONFIG?.apiBaseUrl || (import.meta.env.DEV ? 'http://localhost:5181' : '')
+export const scoresApiBaseUrl = import.meta.env.VITE_API_BASE_URL || window.APP_CONFIG?.scoresApiBaseUrl || apiBaseUrl
 const pending = new Map<string, Promise<unknown>>()
-export async function fetchJson<T>(path: string, options: RequestInit = {}): Promise<T> {
- const url = resolveApiUrl(apiBaseUrl, path)
+export async function fetchJson<T>(path: string, options: RequestInit = {}, baseUrl = apiBaseUrl): Promise<T> {
+ const url = resolveApiUrl(baseUrl, path)
  const load = async () => {
   const timeout = AbortSignal.timeout(75_000)
   const signal = options.signal ? AbortSignal.any([options.signal, timeout]) : timeout
