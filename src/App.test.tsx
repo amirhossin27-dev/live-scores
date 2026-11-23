@@ -44,6 +44,20 @@ it('persists the moved language/theme controls and returns from settings to the 
   expect(screen.getByRole('button', { name: /^Live/ }).getAttribute('aria-pressed')).toBe('true')
 })
 
+it('reserves a header and a left and right ad area in the standalone view', async () => {
+  const { container } = render(<App />)
+  await screen.findByText('Bayern München')
+  const slots = [...container.querySelectorAll<HTMLElement>('.ad-slot')].map(slot => slot.dataset.adSlot)
+  expect(slots).toEqual(['top', 'left', 'right'])
+})
+
+it.each(['full', 'compact'])('keeps the embedded %s dashboard view free of ad areas', async view => {
+  history.replaceState({}, '', '/?embed=1&view=' + view + '&lang=en&theme=light')
+  const { container } = render(<App />)
+  await waitFor(() => expect(screen.getByRole('button', { name: 'Choose competitions' })).toBeTruthy())
+  expect(container.querySelector('.ad-slot')).toBeNull()
+})
+
 it.each(['full', 'compact'])('keeps embedded %s settings accessible without global appearance tools', async view => {
   history.replaceState({}, '', '/?embed=1&view=' + view + '&lang=en&theme=light')
   render(<App />)

@@ -98,3 +98,33 @@ body:has(> .side-drawer-backdrop) .has-viewport-drawers {
 }
 
 .is-compact .sp-compact-settings { min-height: 0; overflow: auto; }
+
+/* Desktop browser view: a narrower centre column with reserved room for a header banner (up to 970x90) and a side
+   banner left and right (160x600, 300x600 on wide screens). Phones, tablets and dashboard embeds keep their layout. */
+.ad-slot { display: none; }
+@media (min-width: 1101px) {
+  .standalone:not(.is-embedded) {
+    --app-content-max: 1000px;
+    --ad-rail: 160px;
+    --ad-gap: 24px;
+    display: grid;
+    grid-template-columns: var(--ad-rail) minmax(0, var(--app-content-max)) var(--ad-rail);
+    grid-template-areas: 'ad-top ad-top ad-top' '. notice .' 'ad-left main ad-right';
+    column-gap: var(--ad-gap);
+    justify-content: center;
+    max-width: none;
+  }
+  .standalone:not(.is-embedded) > main { grid-area: main; min-width: 0; }
+  .standalone:not(.is-embedded) > .connection-notice { grid-area: notice; }
+  .ad-slot { display: block; }
+  .ad-slot-top { grid-area: ad-top; justify-self: center; width: min(100%, 970px); height: 90px; margin-bottom: 12px; }
+  .ad-slot-left { grid-area: ad-left; }
+  .ad-slot-right { grid-area: ad-right; }
+  /* The bottom margin keeps the whole banner clear of the fixed footer bar once the page is scrolled to its end. */
+  .ad-slot-left, .ad-slot-right { position: sticky; top: 16px; align-self: start; height: 600px; margin-bottom: 48px; }
+  /* The fixed footer bar lines up with the centre column. */
+  .standalone:not(.is-embedded) .sp-utility-inner { max-width: min(var(--app-content-max), 100% - 2 * (var(--ad-rail) + var(--ad-gap))); }
+}
+@media (min-width: 1700px) {
+  .standalone:not(.is-embedded) { --ad-rail: 300px; }
+}

@@ -42,7 +42,11 @@ export function App() {
  </div>
  return <div className={`standalone ${embedded?'is-embedded':''} ${compact?'is-compact':''} ${viewportDrawers?'has-viewport-drawers':''}`}>
   <h1 className="app-title">Live Scores</h1>
+  {/* Reserved ad areas of the desktop browser view; hidden on phones and absent in dashboard embeds. */}
+  {!embedded && <div className="ad-slot ad-slot-top" data-ad-slot="top" />}
+  {!embedded && <div className="ad-slot ad-slot-left" data-ad-slot="left" />}
   {!apiBaseUrl && <aside className="connection-notice" role="status">{de?'Die Verbindung für vollständige Live-Daten ist noch nicht eingerichtet.':'The connection for complete live data has not been configured yet.'}</aside>}
   <main><SportsWidget language={language} now={now} compact={compact} appearanceControls={embedded ? undefined : appearanceControls} /></main>
+  {!embedded && <div className="ad-slot ad-slot-right" data-ad-slot="right" />}
  </div>
 }
